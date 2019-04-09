@@ -2,7 +2,7 @@
 //  PrivateMailUITests.swift
 //  PrivateMailUITests
 //
-//  Created by Артём Абрамов on 11/03/2019.
+//  Created by Артём Абрамов
 //  Copyright © 2019 PrivateRouter. All rights reserved.
 //
 

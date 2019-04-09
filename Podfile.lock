@@ -1,0 +1,44 @@
+PODS:
+  - KeychainAccess (3.1.2)
+  - ObjectivePGP (0.13.0)
+  - Realm (3.13.1):
+    - Realm/Headers (= 3.13.1)
+  - Realm/Headers (3.13.1)
+  - RealmSwift (3.13.1):
+    - Realm (= 3.13.1)
+  - SDWebImage (4.4.5):
+    - SDWebImage/Core (= 4.4.5)
+  - SDWebImage/Core (4.4.5)
+  - SideMenu (4.0.0)
+  - SVProgressHUD (2.2.5)
+
+DEPENDENCIES:
+  - KeychainAccess (~> 3.1.2)
+  - ObjectivePGP (~> 0.13.0)
+  - RealmSwift (~> 3.13.1)
+  - SDWebImage (~> 4.4.5)
+  - SideMenu (~> 4.0.0)
+  - SVProgressHUD (~> 2.2.5)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - KeychainAccess
+    - ObjectivePGP
+    - Realm
+    - RealmSwift
+    - SDWebImage
+    - SideMenu
+    - SVProgressHUD
+
+SPEC CHECKSUMS:
+  KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
+  ObjectivePGP: a99461bc871424bdbb8fb6fd80dcd20cbeeee9ec
+  Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
+  RealmSwift: 8a1e6a02b7a08cd17a31e3115143fb69fe5f3fb9
+  SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
+  SideMenu: 70ee5657df63ec3382660ec4ef470bf1cf5db07d
+  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+
+PODFILE CHECKSUM: 35caffc1b001bb4a6ada4adcc0f303372ee8dffb
+
+COCOAPODS: 1.5.2

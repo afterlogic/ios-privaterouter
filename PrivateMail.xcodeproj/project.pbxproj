@@ -7,13 +7,44 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CC32E07953282CE2F7F91C3 /* Pods_PrivateMail.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */; };
+		321743B6A25A55F898A69FA7 /* Pods_PrivateMailTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */; };
+		8251612B96DDB65962FF4437 /* Pods_PrivateMailUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */; };
+		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
+		E526714E2253E54900A1D180 /* APIObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E526714D2253E54900A1D180 /* APIObjects.swift */; };
+		E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */; };
+		E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */; };
+		E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */; };
+		E5630A23224AE87B002A0FDA /* MailAttachmentTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5630A21224AE87B002A0FDA /* MailAttachmentTableViewCell.xib */; };
 		E567B4662236D51C00FA9945 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B4652236D51C00FA9945 /* AppDelegate.swift */; };
-		E567B4682236D51C00FA9945 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B4672236D51C00FA9945 /* ViewController.swift */; };
+		E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B4672236D51C00FA9945 /* MainViewController.swift */; };
 		E567B46B2236D51C00FA9945 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E567B4692236D51C00FA9945 /* Main.storyboard */; };
 		E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E567B46C2236D51D00FA9945 /* Assets.xcassets */; };
 		E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E567B46E2236D51D00FA9945 /* LaunchScreen.storyboard */; };
 		E567B47B2236D51D00FA9945 /* PrivateMailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B47A2236D51D00FA9945 /* PrivateMailTests.swift */; };
 		E567B4862236D51D00FA9945 /* PrivateMailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B4852236D51D00FA9945 /* PrivateMailUITests.swift */; };
+		E5A032E0223ADEA1001BC795 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E2223ADEA1001BC795 /* Localizable.strings */; };
+		E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */; };
+		E5A032E7223B0AFC001BC795 /* FolderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */; };
+		E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E8223B0BDB001BC795 /* Helpers.swift */; };
+		E5A032EB223B16BB001BC795 /* ModelControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EA223B16BB001BC795 /* ModelControllers.swift */; };
+		E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EC223B1A11001BC795 /* MailViewController.swift */; };
+		E5F1D7842242CFE2007071AA /* ContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7832242CFE2007071AA /* ContactsViewController.swift */; };
+		E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */; };
+		E5F1D7882242D3E4007071AA /* AddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */; };
+		E5F1D78B2242DAF2007071AA /* AddressCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7892242DAF2007071AA /* AddressCollectionViewCell.swift */; };
+		E5F1D78C2242DAF2007071AA /* AddressCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F1D78A2242DAF2007071AA /* AddressCollectionViewCell.xib */; };
+		E5F1D78F2242E067007071AA /* MailSubjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D78D2242E067007071AA /* MailSubjectTableViewCell.swift */; };
+		E5F1D7902242E067007071AA /* MailSubjectTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */; };
+		E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */; };
+		E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */; };
+		E5F28A972238442D002721ED /* MailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28A952238442D002721ED /* MailTableViewCell.swift */; };
+		E5F28A982238442D002721ED /* MailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F28A962238442D002721ED /* MailTableViewCell.xib */; };
+		E5F28A9B22384A56002721ED /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28A9A22384A56002721ED /* API.swift */; };
+		E5F28A9D223856DD002721ED /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28A9C223856DD002721ED /* LoginViewController.swift */; };
+		E5F28A9F22386172002721ED /* ComposeMailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28A9E22386172002721ED /* ComposeMailViewController.swift */; };
+		E5F28AA1223864B2002721ED /* ColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28AA0223864B2002721ED /* ColorScheme.swift */; };
+		E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F28AA222387ACB002721ED /* SideMenuViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,9 +65,23 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		348916663F4D5598C1A29D4E /* Pods-PrivateMail.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMail.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail.release.xcconfig"; sourceTree = "<group>"; };
+		395F47C3D4BEB2B73EFD2B2B /* Pods-PrivateMailUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailUITests/Pods-PrivateMailUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		40D2CBDF1905F6336C38A08A /* Pods-PrivateMail.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMail.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail.debug.xcconfig"; sourceTree = "<group>"; };
+		94A918A7C51F5483393C5599 /* Pods-PrivateMailTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.debug.xcconfig"; sourceTree = "<group>"; };
+		BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMail.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
+		E5111F042242BA420036501F /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		E526714D2253E54900A1D180 /* APIObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIObjects.swift; sourceTree = "<group>"; };
+		E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailHeaderTableViewCell.swift; sourceTree = "<group>"; };
+		E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailHeaderTableViewCell.xib; sourceTree = "<group>"; };
+		E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAttachmentTableViewCell.swift; sourceTree = "<group>"; };
+		E5630A21224AE87B002A0FDA /* MailAttachmentTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailAttachmentTableViewCell.xib; sourceTree = "<group>"; };
 		E567B4622236D51C00FA9945 /* PrivateMail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PrivateMail.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E567B4652236D51C00FA9945 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E567B4672236D51C00FA9945 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E567B4672236D51C00FA9945 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		E567B46A2236D51C00FA9945 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E567B46C2236D51D00FA9945 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E567B46F2236D51D00FA9945 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -47,6 +92,30 @@
 		E567B4812236D51D00FA9945 /* PrivateMailUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PrivateMailUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E567B4852236D51D00FA9945 /* PrivateMailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateMailUITests.swift; sourceTree = "<group>"; };
 		E567B4872236D51D00FA9945 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E5A032E1223ADEA1001BC795 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E5A032E3223ADEAB001BC795 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
+		E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderTableViewCell.xib; sourceTree = "<group>"; };
+		E5A032E8223B0BDB001BC795 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		E5A032EA223B16BB001BC795 /* ModelControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelControllers.swift; sourceTree = "<group>"; };
+		E5A032EC223B1A11001BC795 /* MailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewController.swift; sourceTree = "<group>"; };
+		E5F1D7832242CFE2007071AA /* ContactsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift; sourceTree = "<group>"; };
+		E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressTableViewCell.swift; sourceTree = "<group>"; };
+		E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddressTableViewCell.xib; sourceTree = "<group>"; };
+		E5F1D7892242DAF2007071AA /* AddressCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCollectionViewCell.swift; sourceTree = "<group>"; };
+		E5F1D78A2242DAF2007071AA /* AddressCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddressCollectionViewCell.xib; sourceTree = "<group>"; };
+		E5F1D78D2242E067007071AA /* MailSubjectTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailSubjectTableViewCell.swift; sourceTree = "<group>"; };
+		E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailSubjectTableViewCell.xib; sourceTree = "<group>"; };
+		E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailBodyTableViewCell.swift; sourceTree = "<group>"; };
+		E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailBodyTableViewCell.xib; sourceTree = "<group>"; };
+		E5F28A952238442D002721ED /* MailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailTableViewCell.swift; sourceTree = "<group>"; };
+		E5F28A962238442D002721ED /* MailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailTableViewCell.xib; sourceTree = "<group>"; };
+		E5F28A9A22384A56002721ED /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		E5F28A9C223856DD002721ED /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		E5F28A9E22386172002721ED /* ComposeMailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeMailViewController.swift; sourceTree = "<group>"; };
+		E5F28AA0223864B2002721ED /* ColorScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScheme.swift; sourceTree = "<group>"; };
+		E5F28AA222387ACB002721ED /* SideMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuViewController.swift; sourceTree = "<group>"; };
+		F52C0DEFAA7A3AD684340A13 /* Pods-PrivateMailUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailUITests/Pods-PrivateMailUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CC32E07953282CE2F7F91C3 /* Pods_PrivateMail.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				321743B6A25A55F898A69FA7 /* Pods_PrivateMailTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,12 +139,36 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8251612B96DDB65962FF4437 /* Pods_PrivateMailUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		38D3DFF2CB822266D826227D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				40D2CBDF1905F6336C38A08A /* Pods-PrivateMail.debug.xcconfig */,
+				348916663F4D5598C1A29D4E /* Pods-PrivateMail.release.xcconfig */,
+				94A918A7C51F5483393C5599 /* Pods-PrivateMailTests.debug.xcconfig */,
+				DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */,
+				395F47C3D4BEB2B73EFD2B2B /* Pods-PrivateMailUITests.debug.xcconfig */,
+				F52C0DEFAA7A3AD684340A13 /* Pods-PrivateMailUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		86AA06CBA2649DD754D67353 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */,
+				D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */,
+				BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E567B4592236D51C00FA9945 = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +176,8 @@
 				E567B4792236D51D00FA9945 /* PrivateMailTests */,
 				E567B4842236D51D00FA9945 /* PrivateMailUITests */,
 				E567B4632236D51C00FA9945 /* Products */,
+				38D3DFF2CB822266D826227D /* Pods */,
+				86AA06CBA2649DD754D67353 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,10 +195,13 @@
 			isa = PBXGroup;
 			children = (
 				E567B4652236D51C00FA9945 /* AppDelegate.swift */,
-				E567B4672236D51C00FA9945 /* ViewController.swift */,
+				E5F28A9922384A33002721ED /* Models */,
+				E5F28A93223843E9002721ED /* View Controllers */,
+				E5F28A94223843FA002721ED /* Cells */,
 				E567B4692236D51C00FA9945 /* Main.storyboard */,
 				E567B46C2236D51D00FA9945 /* Assets.xcassets */,
 				E567B46E2236D51D00FA9945 /* LaunchScreen.storyboard */,
+				E5A032E2223ADEA1001BC795 /* Localizable.strings */,
 				E567B4712236D51D00FA9945 /* Info.plist */,
 			);
 			path = PrivateMail;
@@ -125,6 +225,55 @@
 			path = PrivateMailUITests;
 			sourceTree = "<group>";
 		};
+		E5F28A93223843E9002721ED /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				E5F28A9C223856DD002721ED /* LoginViewController.swift */,
+				E567B4672236D51C00FA9945 /* MainViewController.swift */,
+				E5A032EC223B1A11001BC795 /* MailViewController.swift */,
+				E5F28A9E22386172002721ED /* ComposeMailViewController.swift */,
+				E5F28AA222387ACB002721ED /* SideMenuViewController.swift */,
+				E5111F042242BA420036501F /* SettingsViewController.swift */,
+				E5F1D7832242CFE2007071AA /* ContactsViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		E5F28A94223843FA002721ED /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				E5F28A952238442D002721ED /* MailTableViewCell.swift */,
+				E5F28A962238442D002721ED /* MailTableViewCell.xib */,
+				E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */,
+				E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */,
+				E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */,
+				E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */,
+				E5F1D7892242DAF2007071AA /* AddressCollectionViewCell.swift */,
+				E5F1D78A2242DAF2007071AA /* AddressCollectionViewCell.xib */,
+				E5F1D78D2242E067007071AA /* MailSubjectTableViewCell.swift */,
+				E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */,
+				E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */,
+				E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */,
+				E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */,
+				E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */,
+				E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */,
+				E5630A21224AE87B002A0FDA /* MailAttachmentTableViewCell.xib */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		E5F28A9922384A33002721ED /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E5F28A9A22384A56002721ED /* API.swift */,
+				E526714D2253E54900A1D180 /* APIObjects.swift */,
+				E5F28AA0223864B2002721ED /* ColorScheme.swift */,
+				E5A032E8223B0BDB001BC795 /* Helpers.swift */,
+				E5A032EA223B16BB001BC795 /* ModelControllers.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +281,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E567B48A2236D51D00FA9945 /* Build configuration list for PBXNativeTarget "PrivateMail" */;
 			buildPhases = (
+				FBE52F11FCB28CB0AB115562 /* [CP] Check Pods Manifest.lock */,
 				E567B45E2236D51C00FA9945 /* Sources */,
 				E567B45F2236D51C00FA9945 /* Frameworks */,
 				E567B4602236D51C00FA9945 /* Resources */,
+				6EAB6CD32678692E6ECBF7D9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -149,6 +300,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E567B48D2236D51D00FA9945 /* Build configuration list for PBXNativeTarget "PrivateMailTests" */;
 			buildPhases = (
+				5F2B7392B68E33C7B7D0A034 /* [CP] Check Pods Manifest.lock */,
 				E567B4722236D51D00FA9945 /* Sources */,
 				E567B4732236D51D00FA9945 /* Frameworks */,
 				E567B4742236D51D00FA9945 /* Resources */,
@@ -167,6 +319,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E567B4902236D51D00FA9945 /* Build configuration list for PBXNativeTarget "PrivateMailUITests" */;
 			buildPhases = (
+				E713C8984CE0885B67C80161 /* [CP] Check Pods Manifest.lock */,
 				E567B47D2236D51D00FA9945 /* Sources */,
 				E567B47E2236D51D00FA9945 /* Frameworks */,
 				E567B47F2236D51D00FA9945 /* Resources */,
@@ -211,6 +364,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = E567B4592236D51C00FA9945;
 			productRefGroup = E567B4632236D51C00FA9945 /* Products */;
@@ -229,8 +383,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5A032E0223ADEA1001BC795 /* Localizable.strings in Resources */,
+				E5A032E7223B0AFC001BC795 /* FolderTableViewCell.xib in Resources */,
+				E5F28A982238442D002721ED /* MailTableViewCell.xib in Resources */,
+				E5630A23224AE87B002A0FDA /* MailAttachmentTableViewCell.xib in Resources */,
+				E5F1D78C2242DAF2007071AA /* AddressCollectionViewCell.xib in Resources */,
+				E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */,
+				E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */,
 				E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */,
 				E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */,
+				E5F1D7882242D3E4007071AA /* AddressTableViewCell.xib in Resources */,
+				E5F1D7902242E067007071AA /* MailSubjectTableViewCell.xib in Resources */,
 				E567B46B2236D51C00FA9945 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,13 +414,121 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		5F2B7392B68E33C7B7D0A034 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PrivateMailTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6EAB6CD32678692E6ECBF7D9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
+				"${PODS_ROOT}/ObjectivePGP/Frameworks/ios/ObjectivePGP.framework",
+				"${PODS_ROOT}/ObjectivePGP/Frameworks/ios/ObjectivePGP.framework.dSYM",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
+				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectivePGP.framework",
+				"${DWARF_DSYM_FOLDER_PATH}/ObjectivePGP.framework.dSYM",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E713C8984CE0885B67C80161 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PrivateMailUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FBE52F11FCB28CB0AB115562 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PrivateMail-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E567B45E2236D51C00FA9945 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E567B4682236D51C00FA9945 /* ViewController.swift in Sources */,
+				E5A032EB223B16BB001BC795 /* ModelControllers.swift in Sources */,
+				E5F1D7842242CFE2007071AA /* ContactsViewController.swift in Sources */,
+				E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */,
+				E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */,
+				E5F28A972238442D002721ED /* MailTableViewCell.swift in Sources */,
+				E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */,
+				E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */,
+				E5F1D78B2242DAF2007071AA /* AddressCollectionViewCell.swift in Sources */,
+				E5F28A9B22384A56002721ED /* API.swift in Sources */,
+				E5F28AA1223864B2002721ED /* ColorScheme.swift in Sources */,
+				E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */,
+				E526714E2253E54900A1D180 /* APIObjects.swift in Sources */,
+				E5F28A9D223856DD002721ED /* LoginViewController.swift in Sources */,
+				E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */,
+				E5F1D78F2242E067007071AA /* MailSubjectTableViewCell.swift in Sources */,
+				E5111F052242BA420036501F /* SettingsViewController.swift in Sources */,
+				E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */,
+				E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */,
+				E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */,
 				E567B4662236D51C00FA9945 /* AppDelegate.swift in Sources */,
+				E5F28A9F22386172002721ED /* ComposeMailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,6 +580,15 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		E5A032E2223ADEA1001BC795 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E5A032E1223ADEA1001BC795 /* en */,
+				E5A032E3223ADEAB001BC795 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -316,6 +596,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -363,7 +644,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -377,6 +658,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -418,7 +700,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -430,44 +712,56 @@
 		};
 		E567B48B2236D51D00FA9945 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 40D2CBDF1905F6336C38A08A /* Pods-PrivateMail.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		E567B48C2236D51D00FA9945 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 348916663F4D5598C1A29D4E /* Pods-PrivateMail.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 		E567B48E2236D51D00FA9945 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 94A918A7C51F5483393C5599 /* Pods-PrivateMailTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
 				INFOPLIST_FILE = PrivateMailTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -484,10 +778,12 @@
 		};
 		E567B48F2236D51D00FA9945 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
 				INFOPLIST_FILE = PrivateMailTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -504,9 +800,11 @@
 		};
 		E567B4912236D51D00FA9945 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 395F47C3D4BEB2B73EFD2B2B /* Pods-PrivateMailUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
 				INFOPLIST_FILE = PrivateMailUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -523,9 +821,11 @@
 		};
 		E567B4922236D51D00FA9945 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F52C0DEFAA7A3AD684340A13 /* Pods-PrivateMailUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2686KEVMM9;
 				INFOPLIST_FILE = PrivateMailUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
