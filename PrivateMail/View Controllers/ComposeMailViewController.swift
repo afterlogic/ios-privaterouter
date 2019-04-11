@@ -100,6 +100,8 @@ class ComposeMailViewController: UIViewController {
                 mail.body = armoredResult
                 ComposeMailModelController.shared.mail = mail
                 tableView.reloadData()
+            } else {
+                SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
             }
         } catch {
            print("")

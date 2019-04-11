@@ -65,6 +65,12 @@ class MailViewController: UIViewController {
             } else {
                 self.mail.isSeen = true
                 StorageProvider.shared.saveMail(mail: self.mail)
+                
+                API.shared.setMailSeen(mail: self.mail, completionHandler: { (resul, error) in
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    }
+                })
             }
         }
     }

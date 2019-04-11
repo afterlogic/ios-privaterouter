@@ -133,6 +133,10 @@ class API: NSObject {
                         if let unreadCount = item[1] as? Int {
                             updatedFolders[i].unreadCount = unreadCount
                         }
+                        
+                        if let hash = item[3] as? String {
+                            updatedFolders[i].hash = hash
+                        }
                     }
                 }
                 
@@ -169,16 +173,16 @@ class API: NSObject {
             "Filters": "",
             "UseThreading": true
             ] as [String : Any]
-        
+
         createTask(module: "Mail", method: "GetMessages", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let mailsDict = result["@Collection"] as? [[String: Any]] {
                     var mails: [APIMail] = []
-                    
+
                     for mailDict in mailsDict {
                         mails.append(APIMail(input: mailDict))
                     }
-                    
+
                     completionHandler(mails, nil)
                 } else {
                     completionHandler(nil, error)
@@ -227,10 +231,11 @@ class API: NSObject {
                 for input in result {
                     let mail = APIMail(input: input)
                     mails.append(mail)
-                    StorageProvider.shared.saveMail(mail: mail)
                 }
                 
-                completionHandler(mails, nil)
+                StorageProvider.shared.saveMails(mails: mails, completionHandler: { (finished) in
+                    completionHandler(mails, nil)
+                })
             } else {
                 completionHandler(nil, error)
             }
@@ -434,27 +439,5 @@ class API: NSObject {
             completionHandler([:], nil)
         }
         
-    }
-}
-
-
-extension Date {
-    func getDateString() -> String {
-        let formatter = DateFormatter()
-        
-        let interval = Date().timeIntervalSince(self)
-        let day = 60.0 * 60.0 * 24.0
-        
-        if Calendar.current.isDateInToday(self) {
-            formatter.dateFormat = "HH:mm"
-        } else if interval < 7.0 * day {
-            formatter.dateFormat = "E, HH:mm"
-        } else if interval < 365.0 * day {
-            formatter.dateFormat = "dd MMM"
-        } else {
-            formatter.dateStyle = .short
-        }
-        
-        return formatter.string(from: self)
     }
 }

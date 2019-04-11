@@ -14,7 +14,20 @@ class MenuModelController: NSObject {
     
     var folders: [APIFolder] = []
     
-    var selectedFolder: String?
+    var selectedFolder: String = "INBOX"
+    
+    func foldersToShow() -> [APIFolder] {
+        var result: [APIFolder] = []
+        
+        for folder in folders {
+            if folder.isSubscribed ?? true {
+                result.append(folder)
+            }
+        }
+        
+        return result
+    }
+    
 }
 
 
@@ -45,8 +58,7 @@ class StorageProvider: NSObject {
     static let shared = StorageProvider()
     
     let realm = try! Realm()
-    var loadingBodies = false
-    var syncingFolder = ""
+    var syncingFolders: [String] = []
     var uids: [String: [APIMail]] = [:]
     var delegate: StorageProviderDelegate?
     
@@ -55,8 +67,17 @@ class StorageProvider: NSObject {
         Realm.Configuration.defaultConfiguration = config
     }
     
-    func syncFolderIfNeeded(folder: String) {
+    func syncFolderIfNeeded(folder: String, beganSyncing: @escaping () -> Void) {
+        if syncingFolders.contains(folder) {
+            beganSyncing()
+            return
+        }
+        
+        syncingFolders.append(folder)
+        
         API.shared.getMailsInfo(text: "", folder: folder) { (result, error) in
+            beganSyncing()
+            
             if let result = result {
                 var mails: [APIMail] = []
                 
@@ -64,17 +85,39 @@ class StorageProvider: NSObject {
                     if let uidText = item["uid"] as? String, let uid = Int(uidText) {
                         var mail = APIMail()
                         mail.uid = uid
+                        mail.folder = folder
+                        
+                        DispatchQueue.main.async {
+                            if let flags = item["flags"] as? [String] {
+                                StorageProvider.shared.updateMailFlags(mail: mail, flags: flags)
+                            }
+                        }
+                        
                         mails.append(mail)
                     }
                 }
                 
-                self.syncingFolder = folder
+                mails = mails.sorted(by: { (first, second) -> Bool in
+                    if let firstUID = first.uid, let secondUID = second.uid {
+                        return firstUID > secondUID
+                    } else {
+                        return true
+                    }
+                })
+                
+                self.removeDeletedMails(mails: mails)
+                
                 self.uids[folder] = mails
-                self.loadingBodies = false
                 
                 self.loadBodiesFor(mails: mails, limit: 50, folder: folder, completionHandler: { (success) in
                 })
             }
+        }
+    }
+    
+    func stopSyncingCurrentFolder() {
+        if let index = syncingFolders.index(of: MenuModelController.shared.selectedFolder) {
+            syncingFolders.remove(at: index)
         }
     }
     
@@ -96,8 +139,10 @@ class StorageProvider: NSObject {
         var list: [String] = []
         
         for folder in folders {
-            if let folderName = folder.name {
-                list.append(folderName)
+            if let folderName = folder.name, let isSubscribed = folder.isSubscribed {
+                if isSubscribed {
+                    list.append(folderName)
+                }
             }
         }
         
@@ -163,13 +208,46 @@ class StorageProvider: NSObject {
         }
     }
     
-    func loadBodiesFor(mails: [APIMail], limit: Int, folder: String, completionHandler: @escaping (Bool) -> Void) {
-        if loadingBodies {
-            return
+    func saveMails(mails: [APIMail], completionHandler: @escaping (Bool) -> Void) {
+        var mailsDB: [MailDB] = []
+        
+        for mail in mails {
+            if API.shared.currentUser.id > 0,
+                let uid = mail.uid,
+                let input = mail.input,
+                let folder = mail.folder,
+                let subject = mail.subject,
+                let body = mail.body,
+                let date = mail.date,
+                let isSeen = mail.isSeen,
+                let isFlagged = mail.isFlagged {
+                
+                let mailDB = MailDB()
+                mailDB.uid = uid
+                mailDB.folder = folder
+                mailDB.accountID = API.shared.currentUser.id
+                mailDB.body = body
+                mailDB.subject = subject
+                mailDB.date = date
+                mailDB.isSeen = isSeen
+                mailDB.isFlagged = isFlagged
+                
+                let data = NSKeyedArchiver.archivedData(withRootObject: input)
+                mailDB.data = NSData(data: data)
+                mailsDB.append(mailDB)
+            }
         }
         
-        loadingBodies = true
+        DispatchQueue.main.async {
+            try! self.realm.write {
+                self.realm.add(mailsDB)
+            }
+        }
         
+        completionHandler(true)
+    }
+    
+    func loadBodiesFor(mails: [APIMail], limit: Int, folder: String, completionHandler: @escaping (Bool) -> Void) {
         var uids: [Int] = []
         let loadingLimit = limit
         
@@ -197,9 +275,7 @@ class StorageProvider: NSObject {
             
             if uids.count > 0 {
                 API.shared.getMailsBodiesList(uids: uids, folder: folder, completionHandler: { (result, error) in
-                    self.loadingBodies = false
-                    
-                    if folder == self.syncingFolder {
+                    if self.syncingFolders.contains(folder) {
                         if let uids = self.uids[folder] {
                             self.loadBodiesFor(mails: uids, limit: loadingLimit, folder: folder, completionHandler: { (success) in
                             })
@@ -208,6 +284,10 @@ class StorageProvider: NSObject {
                     
                 })
             } else {
+                if let index = self.syncingFolders.index(of: folder) {
+                    self.syncingFolders.remove(at: index)
+                }
+                
                 progress = nil
             }
             
@@ -251,6 +331,42 @@ class StorageProvider: NSObject {
         }
     }
     
+    func removeDeletedMails(mails: [APIMail]) {
+        DispatchQueue.main.async {
+            let predicate = """
+            (
+            folder = \"\(MenuModelController.shared.selectedFolder)\"
+            AND accountID = \(API.shared.currentUser.id)
+            )
+            """
+            
+            let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "date", ascending: false)
+            var mailsToDelete: [MailDB] = []
+            
+            for i in 0..<result.count {
+                let object = result[i]
+                
+                var found = false
+                
+                for mail in mails {
+                    if mail.uid == object.uid {
+                        found = true
+                        break
+                    }
+                }
+                
+                if !found {
+                    mailsToDelete.append(object)
+                }
+            }
+            
+            try! self.realm.write {
+                self.realm.delete(mailsToDelete)
+            }
+            
+        }
+    }
+    
     func containsMail(mail: APIMail, completionHandler: @escaping (MailDB?) -> Void) {
         DispatchQueue.main.async {
             if let uid = mail.uid, let folder = mail.folder {
@@ -263,6 +379,39 @@ class StorageProvider: NSObject {
             } else {
                 completionHandler(nil)
             }
+        }
+    }
+    
+    func updateMailFlags(mail: APIMail) {
+        if let uid = mail.uid, let folder = mail.folder {
+            let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
+            
+            try! realm.write {
+                if let maildDB = result.first {
+                    if let isSeen = mail.isSeen {
+                        maildDB.isSeen = isSeen
+                    }
+                    
+                    if let isFlagged = mail.isFlagged {
+                        maildDB.isFlagged = isFlagged
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    func updateMailFlags(mail: APIMail, flags: [String]) {
+        if let uid = mail.uid, let folder = mail.folder {
+            let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
+            
+            try! realm.write {
+                if let maildDB = result.first {
+                    maildDB.isSeen = flags.contains("\\seen")
+                    maildDB.isFlagged = flags.contains("\\flagged")
+                }
+            }
+            
         }
     }
     

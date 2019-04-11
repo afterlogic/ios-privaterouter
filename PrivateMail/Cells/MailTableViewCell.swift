@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol MailTableViewCellDelegate {
+    func updateFlagsInMail(mail: APIMail?)
+}
+
 class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
 
     @IBOutlet var senderLabel: UILabel!
@@ -15,6 +19,8 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     @IBOutlet var dateLabel: UILabel!
     @IBOutlet var flagButton: UIButton!
     @IBOutlet var attachmentImageView: UIImageView!
+    
+    var delegate: MailTableViewCellDelegate?
     
     var isFlagged: Bool = false {
         didSet {
@@ -74,7 +80,6 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
     }
     
     @IBAction func flagButtonAction(_ sender: UIButton) {
@@ -86,6 +91,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
                 if mailDB != nil {
                     mail.isFlagged = self.isFlagged
                     StorageProvider.shared.saveMail(mail: mail)
+                    self.delegate?.updateFlagsInMail(mail: mail)
                 }
             })
         }

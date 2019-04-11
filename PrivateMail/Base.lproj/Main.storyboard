@@ -41,16 +41,63 @@
                                     <action selector="composeMailAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JLe-Kq-UPL"/>
                                 </connections>
                             </button>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VhP-98-coM">
+                                <rect key="frame" x="0.0" y="-40" width="375" height="40"/>
+                                <subviews>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="bdv-S1-bSb">
+                                        <rect key="frame" x="20" y="10" width="20" height="20"/>
+                                    </activityIndicatorView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Syncing... (0/100)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GkO-ha-btV">
+                                        <rect key="frame" x="45" y="0.0" width="315" height="39"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <view alpha="0.20000000000000001" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wws-HQ-tbz">
+                                        <rect key="frame" x="0.0" y="39" width="375" height="1"/>
+                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="1" id="U3R-nR-rgB"/>
+                                        </constraints>
+                                    </view>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jnf-xA-JaQ">
+                                        <rect key="frame" x="317" y="0.0" width="48" height="39"/>
+                                        <state key="normal" title="Cancel"/>
+                                        <connections>
+                                            <action selector="cancelSyncingButtonAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Kmu-fM-6e3"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstItem="jnf-xA-JaQ" firstAttribute="top" secondItem="VhP-98-coM" secondAttribute="top" id="4Mr-aQ-ceb"/>
+                                    <constraint firstAttribute="bottom" secondItem="Wws-HQ-tbz" secondAttribute="bottom" id="6X0-OA-7sz"/>
+                                    <constraint firstAttribute="trailing" secondItem="Wws-HQ-tbz" secondAttribute="trailing" id="EVR-7B-EeW"/>
+                                    <constraint firstItem="GkO-ha-btV" firstAttribute="leading" secondItem="bdv-S1-bSb" secondAttribute="trailing" constant="5" id="Fqi-20-nNV"/>
+                                    <constraint firstItem="bdv-S1-bSb" firstAttribute="leading" secondItem="VhP-98-coM" secondAttribute="leading" constant="20" id="LMa-Xc-mjR"/>
+                                    <constraint firstItem="Wws-HQ-tbz" firstAttribute="leading" secondItem="VhP-98-coM" secondAttribute="leading" id="N1y-vA-Y02"/>
+                                    <constraint firstItem="GkO-ha-btV" firstAttribute="top" secondItem="VhP-98-coM" secondAttribute="top" id="ZdC-02-ORS"/>
+                                    <constraint firstItem="Wws-HQ-tbz" firstAttribute="top" secondItem="jnf-xA-JaQ" secondAttribute="bottom" id="ZjO-0B-Hln"/>
+                                    <constraint firstAttribute="trailing" secondItem="jnf-xA-JaQ" secondAttribute="trailing" constant="10" id="d58-gK-lt2"/>
+                                    <constraint firstItem="Wws-HQ-tbz" firstAttribute="top" secondItem="GkO-ha-btV" secondAttribute="bottom" id="dhU-Ye-3m3"/>
+                                    <constraint firstAttribute="trailing" secondItem="GkO-ha-btV" secondAttribute="trailing" constant="15" id="q8t-YN-3VG"/>
+                                    <constraint firstItem="bdv-S1-bSb" firstAttribute="centerY" secondItem="VhP-98-coM" secondAttribute="centerY" id="udB-6r-PyD"/>
+                                    <constraint firstAttribute="height" constant="40" id="wmR-Ar-Trh"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="deA-tp-Mli" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="1lP-ed-NYR"/>
+                            <constraint firstItem="deA-tp-Mli" firstAttribute="top" secondItem="VhP-98-coM" secondAttribute="bottom" id="4YP-Ae-NOh"/>
                             <constraint firstItem="T2y-B3-uRe" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="Uvl-jc-NyR"/>
                             <constraint firstItem="deA-tp-Mli" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="XMb-cW-ut9"/>
                             <constraint firstItem="T2y-B3-uRe" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="dD3-IL-sIP"/>
+                            <constraint firstItem="VhP-98-coM" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="-40" id="feb-as-oVw"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="rDm-N1-kMN" secondAttribute="bottom" constant="20" id="hXJ-9Z-fyr"/>
+                            <constraint firstItem="VhP-98-coM" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="ibz-Mc-fAz"/>
                             <constraint firstAttribute="bottom" secondItem="deA-tp-Mli" secondAttribute="bottom" id="nHy-DT-IFE"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="rDm-N1-kMN" secondAttribute="trailing" constant="20" id="uKV-5x-V7u"/>
+                            <constraint firstItem="VhP-98-coM" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="xRf-52-Hbf"/>
                             <constraint firstItem="deA-tp-Mli" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="xuD-y7-zfm"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -85,6 +132,9 @@
                         <outlet property="emptyLabel" destination="T2y-B3-uRe" id="Uo7-sv-5h8"/>
                         <outlet property="menuButton" destination="qTk-xu-g5x" id="P7b-a6-A3G"/>
                         <outlet property="optionsButton" destination="Ush-HH-5pY" id="xw9-qM-2UZ"/>
+                        <outlet property="progressConstraint" destination="feb-as-oVw" id="hZY-In-nY1"/>
+                        <outlet property="progressHolder" destination="VhP-98-coM" id="mbe-As-Mpp"/>
+                        <outlet property="progressLabel" destination="GkO-ha-btV" id="juG-iN-F7V"/>
                         <outlet property="searchButton" destination="Dyf-Sy-Uh3" id="ifB-h3-q53"/>
                         <outlet property="tableView" destination="deA-tp-Mli" id="xPT-bI-f2a"/>
                         <segue destination="4Rb-Vv-OGZ" kind="show" identifier="MailSegue" id="esh-Gz-UW3"/>
@@ -95,7 +145,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="962" y="-591"/>
+            <point key="canvasLocation" x="960.79999999999995" y="-591.13300492610836"/>
         </scene>
         <!--Compose-->
         <scene sceneID="DK5-7m-LSd">
@@ -667,6 +717,6 @@
         <image name="side_menu" width="20" height="40"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="e4q-lW-UrO"/>
+        <segue reference="R6G-FH-6Be"/>
     </inferredMetricsTieBreakers>
 </document>

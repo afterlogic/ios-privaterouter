@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+        SVProgressHUD.setMaximumDismissTimeInterval(0.6)
         StorageProvider.migrateIfNeeded()
 //        StorageProvider.shared.deleteAllMails()
         

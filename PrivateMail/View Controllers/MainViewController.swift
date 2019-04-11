@@ -12,7 +12,7 @@ import SVProgressHUD
 import RealmSwift
 
 class MainViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     @IBOutlet var emptyLabel: UILabel!
     @IBOutlet var composeMailButton: UIButton!
@@ -23,13 +23,16 @@ class MainViewController: UIViewController {
     
     var mails: [APIMail] = []
     var selectedMail: APIMail?
-    var progressHeader: String? = nil
     
-    var loadingNextPage = false
     var lastPage = false
     
     let refreshControl = UIRefreshControl()
     let searchBar = UISearchBar()
+    
+    @IBOutlet var progressHolder: UIView!
+    @IBOutlet var progressLabel: UILabel!
+    
+    @IBOutlet var progressConstraint: NSLayoutConstraint!
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -37,7 +40,7 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         title = NSLocalizedString("Mail", comment: "")
         
         NotificationCenter.default.addObserver(self, selector: #selector(didSelectFolder), name: .didSelectFolder, object: nil)
@@ -49,88 +52,71 @@ class MainViewController: UIViewController {
         setupSearchBar()
         setupComposeMailButton()
         
-        reloadData()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        reloadData(withSyncing: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
         tableView.reloadData()
+        
+        let folder = MenuModelController.shared.selectedFolder
+        loadMails(text: searchBar.text ?? "", folder: folder, limit: 50, offset: 0)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     
     // MARK: - API
     
-    @objc func reloadData() {
+    @objc func reloadDataWithSyncing() {
+        reloadData(withSyncing: true)
+    }
+    
+    func reloadData(withSyncing: Bool) {
         refreshControl.beginRefreshing(in: tableView)
         
         lastPage = false
-        loadMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder ?? "INBOX", limit: 50, offset: 0)
-    }
-    
-    func loadMails(text: String, folder: String, limit: Int, offset: Int) {        
-        if offset > 0 && (loadingNextPage || lastPage) {
-            return
-        }
         
-        loadingNextPage = true
+        let folder = MenuModelController.shared.selectedFolder
         
-        if offset == 0 {
-            StorageProvider.shared.getMails(text: text, folder: folder, limit: nil, completionHandler: { (result) in
-                self.mails = result
-                self.tableView.reloadData()
-            })
-        }
-        
-        API.shared.getMailsList(text: text, folder: folder, limit: limit, offset: offset) { (result, error) in
-            self.loadingNextPage = false
-            
-            if error == nil {
-                if let result = result {
-                    if offset > 0 {
-                        if result.count < limit {
-                            self.lastPage = true
-                        }
-                    }
-                    
-                    for mail in result {
-                        if !self.mails.contains(where: { (item) -> Bool in
-                            return mail.uid == item.uid
-                        }) {
-                            self.mails.append(mail)
-                        }
-                    }
-                    
-                    self.mails = self.mails.sorted(by: { (a, b) -> Bool in
-                        return a.date ?? Date() > b.date ?? Date()
-                    })
-                }
-                
+        if withSyncing {
+            StorageProvider.shared.syncFolderIfNeeded(folder: folder) {
                 DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    
-                    self.scrollViewDidScroll(self.tableView)
-                }
-            }
-            
-            DispatchQueue.main.async {
-                if self.refreshControl.isRefreshing {
                     self.refreshControl.endRefreshing()
                 }
             }
+        } else {
+            DispatchQueue.main.async {
+                self.refreshControl.endRefreshing()
+            }
         }
+        
+        loadMails(text: searchBar.text ?? "", folder: folder, limit: 50, offset: 0)
+    }
+    
+    func loadMails(text: String, folder: String, limit: Int, offset: Int) {        
+        if offset > 0 && lastPage {
+            return
+        }
+        
+        StorageProvider.shared.getMails(text: text, folder: folder, limit: nil, completionHandler: { (result) in
+            DispatchQueue.main.async {
+                self.mails = result
+                self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
+                
+                self.tableView.reloadData()
+                self.scrollViewDidScroll(self.tableView)
+            }
+        })
+
     }
     
     @objc func didSelectFolder() {
-        DispatchQueue.main.async {
-            self.title = MenuModelController.shared.selectedFolder
-        }
-        
-        reloadData()
+        title = MenuModelController.shared.selectedFolder
+        reloadData(withSyncing: true)
     }
     
     
@@ -154,8 +140,9 @@ class MainViewController: UIViewController {
         let settingsButton = UIAlertAction.init(title: NSLocalizedString("Settings", comment: ""), style: .default) { (alert: UIAlertAction!) in
             self.performSegue(withIdentifier: "SettingsSegue", sender: nil)
         }
-
+        
         let deleteButton = UIAlertAction.init(title: NSLocalizedString("Clear user cache", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            SVProgressHUD.showSuccess(withStatus: NSLocalizedString("Done", comment: ""))
             StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
         }
         
@@ -198,6 +185,11 @@ class MainViewController: UIViewController {
         })
     }
     
+    @IBAction func cancelSyncingButtonAction(_ sender: Any) {
+        StorageProvider.shared.stopSyncingCurrentFolder()
+        updateHeaderWith(progress: nil, folder: MenuModelController.shared.selectedFolder)
+    }
+    
     
     // MARK: - Other
     
@@ -208,7 +200,8 @@ class MainViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: tableView.frame.size.height - composeMailButton.frame.origin.y, right: 0.0)
         tableView.refreshControl = refreshControl
-        refreshControl.addTarget(self, action: #selector(reloadData), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(reloadDataWithSyncing), for: .valueChanged)
+        
         emptyLabel.text = NSLocalizedString("No mails", comment: "")
     }
     
@@ -245,7 +238,7 @@ class MainViewController: UIViewController {
         let imageView = textField?.leftView as! UIImageView
         imageView.image = imageView.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
         imageView.tintColor = .white
-
+        
     }
     
     
@@ -282,25 +275,21 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MailTableViewCell.cellID(), for: indexPath) as! MailTableViewCell
         cell.mail = mails[indexPath.row]
-        
+        cell.delegate = self
         cell.selectionStyle = .none
         
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectedMail = mails[indexPath.row]
         performSegue(withIdentifier: "MailSegue", sender: nil)
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return progressHeader
-    }
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if mails.count > 0 {
             if scrollView.contentSize.height - scrollView.contentOffset.y < scrollView.frame.height * 1.5 {
-                loadMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder ?? "INBOX", limit: 50, offset: mails.count)
+                loadMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder, limit: 50, offset: mails.count)
             }
         }
     }
@@ -311,7 +300,7 @@ extension MainViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
         
-        reloadData()
+        reloadData(withSyncing: false)
         
         searchBar.resignFirstResponder()
         
@@ -323,7 +312,7 @@ extension MainViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        StorageProvider.shared.getMails(text: searchText, folder: MenuModelController.shared.selectedFolder ?? "INBOX", limit: nil, completionHandler: { (result) in
+        StorageProvider.shared.getMails(text: searchText, folder: MenuModelController.shared.selectedFolder, limit: nil, completionHandler: { (result) in
             self.mails = result
             self.tableView.reloadData()
         })
@@ -334,7 +323,7 @@ extension MainViewController: UISearchBarDelegate {
         if searchBar.text!.count == 0 {
             searchBarCancelButtonClicked(searchBar)
         } else {
-            reloadData()
+            reloadData(withSyncing: false)
         }
         
         searchBar.resignFirstResponder()
@@ -344,9 +333,41 @@ extension MainViewController: UISearchBarDelegate {
 
 extension MainViewController: StorageProviderDelegate {
     func updateHeaderWith(progress: String?, folder: String) {
-        if MenuModelController.shared.selectedFolder == folder {
-            progressHeader = progress
-            self.tableView.reloadData()
+        if MenuModelController.shared.selectedFolder == folder && progress != nil {
+            progressConstraint.constant = 0
+            
+            UIView.animate(withDuration: 0.2) {
+                self.view.layoutIfNeeded()
+                self.progressLabel.text = progress
+                self.progressHolder.isHidden = false
+            }
+        } else {
+            progressConstraint.constant = -progressHolder.frame.size.height
+            
+            UIView.animate(withDuration: 0.2) {
+                self.view.layoutIfNeeded()
+                self.progressHolder.isHidden = true
+            }
+        }
+        
+        if mails.count == 0 {
+            loadMails(text: searchBar.text ?? "", folder: folder, limit: 50, offset: 0)
+        } else {
+            scrollViewDidScroll(tableView)
         }
     }
+}
+
+
+extension MainViewController: MailTableViewCellDelegate {
+    func updateFlagsInMail(mail: APIMail?) {
+        if let mail = mail {
+            for i in 0..<mails.count {
+                if mails[i].uid == mail.uid {
+                    mails[i] = mail
+                }
+            }
+        }
+    }
+    
 }

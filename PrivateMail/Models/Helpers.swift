@@ -54,6 +54,27 @@ extension String {
     }
 }
 
+extension Date {
+    func getDateString() -> String {
+        let formatter = DateFormatter()
+        
+        let interval = Date().timeIntervalSince(self)
+        let day = 60.0 * 60.0 * 24.0
+        
+        if Calendar.current.isDateInToday(self) {
+            formatter.dateFormat = "HH:mm"
+        } else if interval < 7.0 * day {
+            formatter.dateFormat = "E, HH:mm"
+        } else if interval < 365.0 * day {
+            formatter.dateFormat = "dd MMM"
+        } else {
+            formatter.dateStyle = .short
+        }
+        
+        return formatter.string(from: self)
+    }
+}
+
 extension UITextView {
     @IBInspectable var doneAccessory: Bool{
         get {

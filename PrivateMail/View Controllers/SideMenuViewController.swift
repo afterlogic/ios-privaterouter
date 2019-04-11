@@ -137,7 +137,7 @@ class SideMenuViewController: UIViewController {
     }
     
     func selectCurrentFolder(withAction: Bool) {
-        let folders = MenuModelController.shared.folders
+        let folders = MenuModelController.shared.foldersToShow()
         if folders.count > 0 {
             var index = 0
             for i in 0..<folders.count {
@@ -150,11 +150,7 @@ class SideMenuViewController: UIViewController {
             }
             
             self.tableView.selectRow(at: IndexPath(row: index, section: 0), animated: true, scrollPosition: .top)
-            
-            if let folder = MenuModelController.shared.selectedFolder {
-                StorageProvider.shared.syncFolderIfNeeded(folder: folder)
-            }
-            
+
             if withAction {
                 self.tableView(tableView, didSelectRowAt: IndexPath(row: index, section: 0))
             }
@@ -174,7 +170,7 @@ class SideMenuViewController: UIViewController {
 extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return MenuModelController.shared.folders.count
+        return MenuModelController.shared.foldersToShow().count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -186,7 +182,7 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.titleLabel.text = ""
         
-        let folder = MenuModelController.shared.folders[indexPath.row]
+        let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
         
         cell.unreadCount = folder.unreadCount ?? 0
         cell.titleLabel.text = folder.name
@@ -197,11 +193,13 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        MenuModelController.shared.selectedFolder = MenuModelController.shared.folders[indexPath.row].name
+//        let folder = MenuModelController.shared.selectedFolder
+//
+//        if let index = StorageProvider.shared.syncingFolders.index(of: folder) {
+//            StorageProvider.shared.syncingFolders.remove(at: index)
+//        }
         
-        if let folder = MenuModelController.shared.selectedFolder {
-            StorageProvider.shared.syncFolderIfNeeded(folder: folder)
-        }
+        MenuModelController.shared.selectedFolder = MenuModelController.shared.foldersToShow()[indexPath.row].name ?? "INBOX"
         
         NotificationCenter.default.post(name: .didSelectFolder, object: nil)
         dismiss(animated: true, completion: nil)
