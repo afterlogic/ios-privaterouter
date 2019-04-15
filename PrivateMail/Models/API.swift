@@ -353,11 +353,11 @@ class API: NSObject {
         
         var server = "webmail"
         
-        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-            if test {
+//        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
+//            if test {
                 server = "test"
-            }
-        }
+//            }
+//        }
         
         var request = URLRequest(url: URL(string: "https://\(server).afterlogic.com/?/Api/")!)
         

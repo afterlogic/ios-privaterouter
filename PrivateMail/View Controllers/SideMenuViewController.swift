@@ -102,6 +102,7 @@ class SideMenuViewController: UIViewController {
     // MARK: - Buttons
     
     @IBAction func settingsButtonAction(_ sender: Any) {
+        return
         var server = "production"
         
         if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
