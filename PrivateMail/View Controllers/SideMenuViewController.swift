@@ -66,6 +66,12 @@ class SideMenuViewController: UIViewController {
         avatarImageView.sd_setImage(with: API.shared.currentUser.profileImageURL, placeholderImage: UIImage(named: "avatar_placeholder"))
     }
     
+    @objc func refreshControlAction() {
+        if !tableView.isDragging {
+            reloadData()
+        }
+    }
+    
     @objc func reloadData() {
         refreshControl.beginRefreshing(in: tableView)
         
@@ -134,14 +140,14 @@ class SideMenuViewController: UIViewController {
         tableView.register(cellClass: FolderTableViewCell())
         tableView.separatorStyle = .none
         tableView.refreshControl = refreshControl
-        refreshControl.addTarget(self, action: #selector(self.reloadData), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshControlAction), for: .valueChanged)
     }
     
     func selectCurrentFolder(withAction: Bool) {
         let folders = MenuModelController.shared.foldersToShow()
         if folders.count > 0 {
             var index = 0
-            for i in 0..<folders.count {
+            for i in 0 ..< folders.count {
                 if let name = folders[i].name {
                     if name == MenuModelController.shared.selectedFolder {
                         index = i
@@ -194,16 +200,15 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let folder = MenuModelController.shared.selectedFolder
-//
-//        if let index = StorageProvider.shared.syncingFolders.index(of: folder) {
-//            StorageProvider.shared.syncingFolders.remove(at: index)
-//        }
-        
         MenuModelController.shared.selectedFolder = MenuModelController.shared.foldersToShow()[indexPath.row].name ?? "INBOX"
         
         NotificationCenter.default.post(name: .didSelectFolder, object: nil)
         dismiss(animated: true, completion: nil)
     }
     
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if refreshControl.isRefreshing {
+            reloadData()
+        }
+    }
 }

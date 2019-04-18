@@ -16,6 +16,8 @@ class ComposeMailViewController: UIViewController {
     
     @IBOutlet var tableViewBottomConstraint: NSLayoutConstraint!
     
+    var cells: [UITableViewCell?] = [nil, nil, nil, nil]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -72,12 +74,14 @@ class ComposeMailViewController: UIViewController {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
                             return
                         }
+                        
                     }
+                    
                 }
                 
             }
-            
         }
+        
     }
     
     @IBAction func optionsAction(_ sender: Any) {
@@ -87,19 +91,21 @@ class ComposeMailViewController: UIViewController {
         var mail = ComposeMailModelController.shared.mail
         
         do {
-            if let body = mail.body, let publicKey = keychain["PublicKey"] {
-                let data = body.data(using: .utf8)!
-                let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
-                
-                let encrypted = try ObjectivePGP.encrypt(data, addSignature: false, using: key, passphraseForKey: { (key) -> String? in
-                    return nil
-                })
-                
-                let armoredResult = Armor.armored(encrypted, as: .message)
-
-                mail.body = armoredResult
-                ComposeMailModelController.shared.mail = mail
-                tableView.reloadData()
+            if let publicKey = keychain["PublicKey"] {
+                if let body = mail.body {
+                    let data = body.data(using: .utf8)!
+                    let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
+                    
+                    let encrypted = try ObjectivePGP.encrypt(data, addSignature: false, using: key, passphraseForKey: { (key) -> String? in
+                        return nil
+                    })
+                    
+                    let armoredResult = Armor.armored(encrypted, as: .message)
+                    
+                    mail.body = armoredResult
+                    ComposeMailModelController.shared.mail = mail
+                    tableView.reloadData()
+                }
             } else {
                 SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
             }
@@ -153,6 +159,10 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         
         let mail = ComposeMailModelController.shared.mail
         
+        if let cell = cells[indexPath.row] {
+            return cell
+        }
+        
         switch indexPath.row {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
@@ -194,6 +204,8 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         }
         
         result.selectionStyle = .none
+        
+        cells[indexPath.row] = result
         
         return result
     }

@@ -124,7 +124,7 @@ class API: NSObject {
                 
                 var updatedFolders = folders
                 
-                for i in 0..<updatedFolders.count {
+                for i in 0 ..< updatedFolders.count {
                     if let name = folders[i].name, let item = counts[name] {
                         if let totalCount = item[0] as? Int {
                             updatedFolders[i].messagesCount = totalCount
@@ -336,7 +336,7 @@ class API: NSObject {
             resultParts.append(key + "=" + dictionary[key]!)
         }
         
-        for i in 0..<resultParts.count {
+        for i in 0 ..< resultParts.count {
             var part = resultParts[i]
             part = part.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             part = part.replacingOccurrences(of: "&", with: "%26")

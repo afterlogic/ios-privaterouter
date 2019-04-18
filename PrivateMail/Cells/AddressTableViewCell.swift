@@ -59,11 +59,7 @@ class AddressTableViewCell: UITableViewCell {
             collectionView.layoutIfNeeded()
             
             if collectionView.contentSize.height > 50 {
-                if collectionView.contentSize.height > 186 {
-                    heightConstraint.constant = 186
-                } else {
-                    heightConstraint.constant = collectionView.contentSize.height
-                }
+                heightConstraint.constant = min(collectionView.contentSize.height, 186)
             } else {
                 heightConstraint.constant = 50.0
             }

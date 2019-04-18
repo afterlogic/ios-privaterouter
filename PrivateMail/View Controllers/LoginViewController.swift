@@ -35,8 +35,8 @@ class LoginViewController: UIViewController {
         passwordView.layer.cornerRadius = passwordView.frame.size.height / 2.0
         
         #if DEBUG
-        emailTextField.text = "mobilepgp@afterlogic.com"
-        passwordTextField.text = "pgp12345q"
+        emailTextField.text = "test@afterlogic.com"
+        passwordTextField.text = "p12345q"
         #endif
     }
     

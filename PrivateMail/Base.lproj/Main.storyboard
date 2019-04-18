@@ -564,7 +564,7 @@
         <!--Side Menu View Controller-->
         <scene sceneID="wuv-WF-kce">
             <objects>
-                <viewController id="wK1-LR-dxt" customClass="SideMenuViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="wK1-LR-dxt" customClass="SideMenuViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9t2-gi-dTP">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -654,7 +654,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="wzU-oJ-YND" firstAttribute="top" secondItem="raK-Kk-r5T" secondAttribute="bottom" id="1xY-Cy-5e1"/>
+                            <constraint firstItem="wzU-oJ-YND" firstAttribute="top" secondItem="raK-Kk-r5T" secondAttribute="bottom" id="CMp-mu-gAX"/>
                             <constraint firstItem="raK-Kk-r5T" firstAttribute="top" secondItem="9t2-gi-dTP" secondAttribute="top" id="FA8-Ux-cZ7"/>
                             <constraint firstAttribute="trailing" secondItem="raK-Kk-r5T" secondAttribute="trailing" id="Gut-wV-ooZ"/>
                             <constraint firstAttribute="bottom" secondItem="wzU-oJ-YND" secondAttribute="bottom" id="Jqf-QB-bvz"/>
@@ -676,7 +676,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="F0m-dL-lIb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1909.5999999999999" y="-1359.6701649175413"/>
+            <point key="canvasLocation" x="1909.5999999999999" y="-1360.344827586207"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="hSY-VY-X3c">
