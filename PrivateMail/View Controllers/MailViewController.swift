@@ -97,6 +97,7 @@ class MailViewController: UIViewController {
                 SVProgressHUD.show()
                 
                 do {
+                    #if !targetEnvironment(simulator)
                     if let body = mail.body, let privateKey = keychain["PrivateKey"] {
                         let data = try Armor.readArmored(body)
                         let key = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
@@ -109,6 +110,7 @@ class MailViewController: UIViewController {
                         self.mail = mail
                         self.tableView.reloadData()
                     }
+                    #endif
                     
                     SVProgressHUD.dismiss()
                 } catch {

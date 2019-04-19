@@ -109,25 +109,24 @@ class SideMenuViewController: UIViewController {
     // MARK: - Buttons
     
     @IBAction func settingsButtonAction(_ sender: Any) {
-        return
-        var server = "production"
-        
-        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-            UserDefaults.standard.set(!test, forKey: "Test")
-            server = !test ? "test" : "production"
-        } else {
-            UserDefaults.standard.set(true, forKey: "Test")
-            server = "test"
-        }
-        
-        let alert = UIAlertController.init(title: NSLocalizedString("Served was changed to \(server)", comment: ""), message: nil, preferredStyle: .alert)
-        
-        let okButton = UIAlertAction.init(title: NSLocalizedString("Ok", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
-        }
-        
-        alert.addAction(okButton)
-        
-        self.present(alert, animated: true, completion: nil)
+//        var server = "production"
+//
+//        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
+//            UserDefaults.standard.set(!test, forKey: "Test")
+//            server = !test ? "test" : "production"
+//        } else {
+//            UserDefaults.standard.set(true, forKey: "Test")
+//            server = "test"
+//        }
+//
+//        let alert = UIAlertController.init(title: NSLocalizedString("Served was changed to \(server)", comment: ""), message: nil, preferredStyle: .alert)
+//
+//        let okButton = UIAlertAction.init(title: NSLocalizedString("Ok", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+//        }
+//
+//        alert.addAction(okButton)
+//
+//        self.present(alert, animated: true, completion: nil)
     }
     
     
@@ -140,8 +139,15 @@ class SideMenuViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.register(cellClass: FolderTableViewCell())
         tableView.separatorStyle = .none
-        tableView.refreshControl = refreshControl
+
         refreshControl.addTarget(self, action: #selector(refreshControlAction), for: .valueChanged)
+        
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = refreshControl
+        } else {
+            tableView.addSubview(refreshControl)
+        }
+
     }
     
     func selectCurrentFolder(withAction: Bool) {

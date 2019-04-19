@@ -32,9 +32,15 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     var isSeen: Bool = false {
         didSet {
-            senderLabel.font = isSeen ? UIFont.systemFont(ofSize: senderLabel.font.pointSize, weight: .medium) : UIFont.systemFont(ofSize: senderLabel.font.pointSize, weight: .bold)
-            subjectLabel.font = isSeen ? UIFont.systemFont(ofSize: subjectLabel.font.pointSize, weight: .regular) : UIFont.systemFont(ofSize: subjectLabel.font.pointSize, weight: .bold)
-            dateLabel.font = isSeen ? UIFont.systemFont(ofSize: dateLabel.font.pointSize, weight: .regular) : UIFont.systemFont(ofSize: dateLabel.font.pointSize, weight: .bold)
+            if #available(iOS 8.2, *) {
+                senderLabel.font = isSeen ? UIFont.systemFont(ofSize: senderLabel.font.pointSize, weight: .medium) : UIFont.systemFont(ofSize: senderLabel.font.pointSize, weight: .bold)
+                subjectLabel.font = isSeen ? UIFont.systemFont(ofSize: subjectLabel.font.pointSize, weight: .regular) : UIFont.systemFont(ofSize: subjectLabel.font.pointSize, weight: .bold)
+                dateLabel.font = isSeen ? UIFont.systemFont(ofSize: dateLabel.font.pointSize, weight: .regular) : UIFont.systemFont(ofSize: dateLabel.font.pointSize, weight: .bold)
+            } else {
+                senderLabel.font = isSeen ? UIFont.systemFont(ofSize: senderLabel.font.pointSize) : UIFont.boldSystemFont(ofSize: senderLabel.font.pointSize)
+                subjectLabel.font = isSeen ? UIFont.systemFont(ofSize: subjectLabel.font.pointSize) : UIFont.boldSystemFont(ofSize: subjectLabel.font.pointSize)
+                dateLabel.font = isSeen ? UIFont.systemFont(ofSize: dateLabel.font.pointSize) : UIFont.boldSystemFont(ofSize: dateLabel.font.pointSize)
+            }
             
             subjectLabel.textColor = isSeen ? .darkGray : .black
         }
@@ -43,7 +49,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     var mail: APIMail? {
         didSet {
             if var senders = mail?.senders {
-                if let email = API.shared.currentUser.email, let index = senders.index(of: email) {
+                if let email = API.shared.currentUser.email, let index = senders.firstIndex(of: email) {
                     senders[index] = NSLocalizedString("me", comment: "")
                 }
                 

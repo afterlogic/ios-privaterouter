@@ -112,6 +112,7 @@ class ComposeMailViewController: UIViewController {
         
         do {
             if let publicKey = keychain["PublicKey"] {
+                #if !targetEnvironment(simulator)
                 if let body = mail.body, encryptSwitch.isOn {
                     let data = body.data(using: .utf8)!
                     let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
@@ -126,6 +127,7 @@ class ComposeMailViewController: UIViewController {
                     ComposeMailModelController.shared.mail = mail
                     tableView.reloadData()
                 }
+                #endif
             } else {
                 SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
             }

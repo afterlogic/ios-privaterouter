@@ -205,7 +205,7 @@ class StorageProvider: NSObject {
                 
                 // Finish syncing if nothing to update
                 if isEqual {
-                    if let index = self.syncingFolders.index(of: folder) {
+                    if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
                     }
                     
@@ -299,7 +299,7 @@ class StorageProvider: NSObject {
                                 self.delegate?.updateTableView(mails: newMails, folder: folder)
                             }
                         } else {
-                            if let index = self.syncingFolders.index(of: folder) {
+                            if let index = self.syncingFolders.firstIndex(of: folder) {
                                 self.syncingFolders.remove(at: index)
                             }
                             
@@ -308,14 +308,14 @@ class StorageProvider: NSObject {
                         }
                     }
                     
-                    if let index = self.syncingFolders.index(of: folder) {
+                    if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
                     }
                     
                     self.delegate?.updateHeaderWith(progress: nil, folder: folder)
                 }
             } else {
-                if let index = self.syncingFolders.index(of: folder) {
+                if let index = self.syncingFolders.firstIndex(of: folder) {
                     self.syncingFolders.remove(at: index)
                 }
  
@@ -326,7 +326,7 @@ class StorageProvider: NSObject {
     }
     
     func stopSyncingCurrentFolder() {
-        if let index = syncingFolders.index(of: MenuModelController.shared.selectedFolder) {
+        if let index = syncingFolders.firstIndex(of: MenuModelController.shared.selectedFolder) {
             syncingFolders.remove(at: index)
         }
     }
@@ -503,7 +503,7 @@ class StorageProvider: NSObject {
                     completionHandler(true)
                 })
             } else {
-                if let index = self.syncingFolders.index(of: folder) {
+                if let index = self.syncingFolders.firstIndex(of: folder) {
                     self.syncingFolders.remove(at: index)
                 }
                 

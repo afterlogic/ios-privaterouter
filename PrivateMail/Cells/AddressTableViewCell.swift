@@ -182,7 +182,7 @@ extension AddressTableViewCell: UICollectionViewDelegate, UICollectionViewDataSo
 
 extension AddressTableViewCell: AddressCollectionViewCellProtocol {
     func deleteAddress(email: String) {
-        if let index = items.index(of: email) {
+        if let index = items.firstIndex(of: email) {
             items.remove(at: index)
             delegate?.cellSizeDidChanged()
         }

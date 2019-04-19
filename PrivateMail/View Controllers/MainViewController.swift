@@ -54,9 +54,8 @@ class MainViewController: UIViewController {
         setupSearchBar()
         setupComposeMailButton()
      
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 5 * 60.0, repeats: true, block: { (timer) in
-            self.reloadData(withSyncing: true, completionHandler: {})
-        })
+        refreshTimer = Timer.scheduledTimer(timeInterval: 5.0 * 60.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -71,6 +70,10 @@ class MainViewController: UIViewController {
     
     
     // MARK: - API
+    
+    @objc func refreshTimerAction() {
+        reloadData(withSyncing: true, completionHandler: {})
+    }
     
     @objc func refreshControlAction() {
         if !tableView.isDragging {
@@ -237,7 +240,12 @@ class MainViewController: UIViewController {
         tableView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: tableView.frame.size.height - composeMailButton.frame.origin.y, right: 0.0)
         
         refreshControl.addTarget(self, action: #selector(refreshControlAction), for: .valueChanged)
-        tableView.refreshControl = refreshControl
+        
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = refreshControl
+        } else {
+            tableView.addSubview(refreshControl)
+        }
         
         emptyLabel.text = NSLocalizedString("No mails", comment: "")
     }

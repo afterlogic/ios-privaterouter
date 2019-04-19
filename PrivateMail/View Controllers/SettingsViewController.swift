@@ -57,6 +57,8 @@ class SettingsViewController: UIViewController {
             
             if let password = textField?.text {
                 SVProgressHUD.show()
+                
+                #if !targetEnvironment(simulator)
                 self.view.isUserInteractionEnabled = false
                 
                 if let email = API.shared.currentUser.email {
@@ -86,6 +88,8 @@ class SettingsViewController: UIViewController {
                     SVProgressHUD.showError(withStatus: NSLocalizedString("Can't generate keys", comment: ""))
                     self.view.isUserInteractionEnabled = true
                 }
+                #endif
+                
             }
         }))
         
