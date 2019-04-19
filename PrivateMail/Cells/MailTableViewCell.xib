@@ -65,6 +65,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="0vD-Vf-Ve6" firstAttribute="top" secondItem="yu9-4C-yDO" secondAttribute="top" id="633-rf-FUK"/>
+                            <constraint firstItem="t6w-H7-Pof" firstAttribute="leading" secondItem="0vD-Vf-Ve6" secondAttribute="trailing" priority="750" constant="5" id="7Oe-ge-QhI"/>
                             <constraint firstItem="dWZ-aw-lzO" firstAttribute="height" secondItem="0vD-Vf-Ve6" secondAttribute="height" id="9Ue-lZ-Nog"/>
                             <constraint firstItem="dWZ-aw-lzO" firstAttribute="top" secondItem="0vD-Vf-Ve6" secondAttribute="bottom" id="Fpk-UL-KXG"/>
                             <constraint firstItem="0vD-Vf-Ve6" firstAttribute="leading" secondItem="yu9-4C-yDO" secondAttribute="leading" id="GyN-dC-P8N"/>
@@ -97,6 +98,7 @@
                 <outlet property="flagButton" destination="gF6-CH-8sy" id="2pi-Fl-LKR"/>
                 <outlet property="senderLabel" destination="0vD-Vf-Ve6" id="7BV-AH-BYb"/>
                 <outlet property="subjectLabel" destination="dWZ-aw-lzO" id="3gN-Mb-JYa"/>
+                <outlet property="titleLeadingConstraint" destination="M0f-Gd-sPC" id="Gm1-xD-MjI"/>
             </connections>
             <point key="canvasLocation" x="52.799999999999997" y="62.968515742128943"/>
         </tableViewCell>

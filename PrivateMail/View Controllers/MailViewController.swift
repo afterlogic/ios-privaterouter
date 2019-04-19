@@ -198,8 +198,10 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: MailBodyTableViewCell.cellID(), for: indexPath) as! MailBodyTableViewCell
             cell.placeholderLabel.text = ""
-            cell.textView.text = mail.body
-            cell.updateHeight()
+            
+            cell.textView.text = (mail.body?.count ?? 0) > 0 ? mail.body : mail.htmlBody
+
+            cell.updateHeight(withAction: true)
             cell.textView.isEditable = false
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
             result = cell

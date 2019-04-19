@@ -16,7 +16,11 @@ class ComposeMailViewController: UIViewController {
     
     @IBOutlet var tableViewBottomConstraint: NSLayoutConstraint!
     
-    var cells: [UITableViewCell?] = [nil, nil, nil, nil]
+    @IBOutlet var dialogView: UIView!
+    @IBOutlet var signSwitch: UISwitch!
+    @IBOutlet var encryptSwitch: UISwitch!
+    @IBOutlet var passwordTextField: UITextField!
+    @IBOutlet var eyeButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,10 +28,16 @@ class ComposeMailViewController: UIViewController {
         title = NSLocalizedString("Compose", comment: "")
         navigationController?.isToolbarHidden = false
         
+        passwordTextField.delegate = self
+        dialogView.alpha = 0.0
+        
+        ComposeMailModelController.shared.mail = APIMail()
+        
         tableView.delegate = self
         tableView.dataSource = self
         
-        ComposeMailModelController.shared.mail = APIMail()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 50.0
         
         tableView.register(cellClass: AddressTableViewCell())
         tableView.register(cellClass: MailSubjectTableViewCell())
@@ -88,18 +98,28 @@ class ComposeMailViewController: UIViewController {
     }
     
     @IBAction func encryptAction(_ sender: Any) {
+        UIView.animate(withDuration: 0.25) {
+            self.dialogView.alpha = 1.0
+        }
+    }
+    
+    @IBAction func attachAction(_ sender: Any) {
+
+    }
+    
+    @IBAction func signEncryptButtonAction(_ sender: Any) {
         var mail = ComposeMailModelController.shared.mail
         
         do {
             if let publicKey = keychain["PublicKey"] {
-                if let body = mail.body {
+                if let body = mail.body, encryptSwitch.isOn {
                     let data = body.data(using: .utf8)!
                     let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
                     
-                    let encrypted = try ObjectivePGP.encrypt(data, addSignature: false, using: key, passphraseForKey: { (key) -> String? in
-                        return nil
+                    let encrypted = try ObjectivePGP.encrypt(data, addSignature: signSwitch.isOn && false, using: key, passphraseForKey: { (key) -> String? in
+                        return passwordTextField.text
                     })
-                    
+
                     let armoredResult = Armor.armored(encrypted, as: .message)
                     
                     mail.body = armoredResult
@@ -110,12 +130,24 @@ class ComposeMailViewController: UIViewController {
                 SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
             }
         } catch {
-           print("")
+        }
+        
+        cancelButtonAction(sender)
+    }
+    
+    @IBAction func cancelButtonAction(_ sender: Any) {
+        passwordTextField.resignFirstResponder()
+        
+        UIView.animate(withDuration: 0.25) {
+            self.dialogView.alpha = 0.0
         }
     }
     
-    @IBAction func attachAction(_ sender: Any) {
-
+    @IBAction func eyeButtonAction(_ sender: UIButton) {
+        passwordTextField.isSecureTextEntry = !passwordTextField.isSecureTextEntry
+        
+        let icon = UIImage(named: passwordTextField.isSecureTextEntry ? "password_eye_closed" : "password_eye_opened")
+        sender.setImage(icon, for: .normal)
     }
     
     
@@ -155,13 +187,9 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var result = UITableViewCell()
-        
         let mail = ComposeMailModelController.shared.mail
         
-        if let cell = cells[indexPath.row] {
-            return cell
-        }
+        var result = UITableViewCell()
         
         switch indexPath.row {
         case 0:
@@ -189,23 +217,18 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             result = cell
             break
             
-        case 3:
+        default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailBodyTableViewCell.cellID(), for: indexPath) as! MailBodyTableViewCell
             cell.textView.text = mail.body
-            cell.updateHeight()
+            cell.updateHeight(withAction: false)
             cell.delegate = self
             cell.textView.doneAccessory = true
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
             result = cell
             break
-            
-        default:
-            return UITableViewCell()
         }
         
         result.selectionStyle = .none
-        
-        cells[indexPath.row] = result
         
         return result
     }
@@ -226,5 +249,13 @@ extension ComposeMailViewController: UITableViewDelegateExtensionProtocol & UITe
 //        if diffY > 0.0 {
 //            self.tableView.setContentOffset(CGPoint.init(x: 0.0, y: self.tableView.contentOffset.y + diffY), animated: true)
 //        }
+    }
+}
+
+
+extension ComposeMailViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
     }
 }

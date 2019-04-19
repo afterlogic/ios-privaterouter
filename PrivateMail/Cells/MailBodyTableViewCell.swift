@@ -29,14 +29,16 @@ class MailBodyTableViewCell: UITableViewCell {
 
     }
     
-    func updateHeight() {
+    func updateHeight(withAction: Bool) {
         textView.isScrollEnabled = true
         let height = max(400.0, textView.contentSize.height + 25.0);
         textView.isScrollEnabled = false
         
         heightConstraint.constant = height
         
-        delegate?.cellSizeDidChanged()
+        if withAction {
+            delegate?.cellSizeDidChanged()
+        }
     }
 }
 
@@ -52,7 +54,7 @@ extension MailBodyTableViewCell: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         placeholderLabel.isHidden = textView.text.count > 0
         ComposeMailModelController.shared.mail.body = textView.text
-        updateHeight()
+        updateHeight(withAction: true)
         delegate?.textViewDidChanged(textView: textView)
     }
 }

@@ -40,16 +40,16 @@ class SideMenuViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.reloadData), name: .didRecieveUser, object: nil)
         
-        let withAction = MenuModelController.shared.folders.count == 0
+        let shouldLoadFromCache = MenuModelController.shared.folders.count == 0
         
-        if withAction {
+        if shouldLoadFromCache {
             if let folders = StorageProvider.shared.getFoldersList() {
                 MenuModelController.shared.folders = folders
             }
         }
         
         self.tableView.reloadData()
-        selectCurrentFolder(withAction: withAction)
+        selectCurrentFolder(withAction: shouldLoadFromCache)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -80,11 +80,12 @@ class SideMenuViewController: UIViewController {
                 let withAction = MenuModelController.shared.folders.count == 0
                 StorageProvider.shared.saveFoldersList(folders: folders)
                 
-                MenuModelController.shared.folders = folders
+                MenuModelController.shared.updateFolders(newFolders: folders)
                 
                 API.shared.getFoldersInfo(folders: folders, completionHandler: { (result, error) in
                     if let folders = result {
-                        MenuModelController.shared.folders = folders
+                        MenuModelController.shared.updateFolders(newFolders: folders)
+                        
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                             self.selectCurrentFolder(withAction: withAction)

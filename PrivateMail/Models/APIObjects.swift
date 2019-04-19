@@ -48,6 +48,7 @@ struct APIMail {
     var title: String?
     var subject: String?
     var body: String?
+    var htmlBody: String?
     var date: Date?
     var isFlagged: Bool?
     var isSeen: Bool?
@@ -115,6 +116,12 @@ struct APIMail {
             self.body = body
         }
         
+        if let htmlBody = input["Html"] as? String {
+            let plainText = htmlBody.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+
+            self.htmlBody = plainText
+        }
+        
         if let attachments = input["Attachments"] as? [String: Any] {
             if let list = attachments["@Collection"] as? [[String: Any]] {
                 self.attachments = list
@@ -138,7 +145,8 @@ struct APIFolder {
     var hash: String?
     var messagesCount: Int?
     var unreadCount: Int?
-
+    var mails: [APIMail] = []
+    
     var input: [String: Any]?
     
     init() {

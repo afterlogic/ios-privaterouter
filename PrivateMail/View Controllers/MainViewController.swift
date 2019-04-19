@@ -29,6 +29,8 @@ class MainViewController: UIViewController {
     let refreshControl = UIRefreshControl()
     let searchBar = UISearchBar()
     
+    var refreshTimer: Timer?
+    
     @IBOutlet var progressHolder: UIView!
     @IBOutlet var progressLabel: UILabel!
     
@@ -51,8 +53,10 @@ class MainViewController: UIViewController {
         setupTableView()
         setupSearchBar()
         setupComposeMailButton()
-        
-        reloadData(withSyncing: false)
+     
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 5 * 60.0, repeats: true, block: { (timer) in
+            self.reloadData(withSyncing: true, completionHandler: {})
+        })
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -70,11 +74,11 @@ class MainViewController: UIViewController {
     
     @objc func refreshControlAction() {
         if !tableView.isDragging {
-            reloadData(withSyncing: true)
+            reloadData(withSyncing: true, completionHandler: {})
         }
     }
     
-    func reloadData(withSyncing: Bool) {
+    func reloadData(withSyncing: Bool, completionHandler: @escaping () -> Void) {
         refreshControl.beginRefreshing(in: tableView)
         
         lastPage = false
@@ -82,15 +86,19 @@ class MainViewController: UIViewController {
         let folder = MenuModelController.shared.selectedFolder
         
         if withSyncing {
-            StorageProvider.shared.syncFolderIfNeeded(folder: folder) {
+            StorageProvider.shared.syncFolderIfNeeded(folder: folder, oldMails: mails) {
                 self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
                 
+                completionHandler()
+    
                 DispatchQueue.main.async {
                     self.refreshControl.endRefreshing()
                 }
             }
         } else {
-            loadMails(text: searchBar.text ?? "", folder: folder, limit: 50, offset: 0)
+            loadMails(text: searchBar.text ?? "", folder: folder, limit: nil, offset: nil, completionHandler: {
+                completionHandler()
+            })
             
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
@@ -98,18 +106,22 @@ class MainViewController: UIViewController {
         }
     }
     
-    func loadMails(text: String, folder: String, limit: Int, offset: Int) {        
-        if offset > 0 && lastPage || StorageProvider.shared.isFetching {
+    func loadMails(text: String, folder: String, limit: Int?, offset: Int?, completionHandler: @escaping () -> Void) {
+        if (offset ?? 0) > 0 && lastPage || StorageProvider.shared.isFetching {
             return
         }
         
-        StorageProvider.shared.getMails(text: text, folder: folder, limit: nil, additionalPredicate: nil, completionHandler: { (result) in
+        StorageProvider.shared.getMails(text: text, folder: folder, limit: limit, additionalPredicate: nil, completionHandler: { (result) in
             DispatchQueue.main.async {
                 self.mails = result
+                MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+                
                 self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
                 
                 self.tableView.reloadData()
                 self.scrollViewDidScroll(self.tableView)
+                
+                completionHandler()
             }
         })
     }
@@ -118,8 +130,23 @@ class MainViewController: UIViewController {
         if title != MenuModelController.shared.selectedFolder {
             title = MenuModelController.shared.selectedFolder
             
-            reloadData(withSyncing: false)
-            reloadData(withSyncing: true)
+            mails = MenuModelController.shared.mailsForCurrentFolder()
+            
+            var needsSyncing = true
+            
+            if let uids = StorageProvider.shared.uids[MenuModelController.shared.selectedFolder] {
+                if mails.count == uids.count {
+                    needsSyncing = false
+                }
+            }
+            
+            tableView.reloadData()
+            
+            if needsSyncing {
+                reloadData(withSyncing: false, completionHandler: {
+                    self.reloadData(withSyncing: true, completionHandler: {})
+                })
+            }
         }
     }
     
@@ -148,6 +175,11 @@ class MainViewController: UIViewController {
         let deleteButton = UIAlertAction.init(title: NSLocalizedString("Clear user cache", comment: ""), style: .default) { (alert: UIAlertAction!) in
             SVProgressHUD.showSuccess(withStatus: NSLocalizedString("Done", comment: ""))
             StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
+            
+            self.mails = []
+            MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+            
+            self.tableView.reloadData()
         }
         
         let logOutButton = UIAlertAction.init(title: NSLocalizedString("Log Out", comment: ""), style: .default) { (alert: UIAlertAction!) in
@@ -294,7 +326,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if mails.count > 0 {
             if scrollView.contentSize.height - scrollView.contentOffset.y < scrollView.frame.height * 1.5 {
-                loadMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder, limit: 50, offset: mails.count)
+//                loadMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder, limit: 50, offset: mails.count)
             }
         }
     }
@@ -312,7 +344,7 @@ extension MainViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
         
-        reloadData(withSyncing: false)
+        reloadData(withSyncing: false, completionHandler: {})
         
         searchBar.resignFirstResponder()
         
@@ -335,7 +367,7 @@ extension MainViewController: UISearchBarDelegate {
         if searchBar.text!.count == 0 {
             searchBarCancelButtonClicked(searchBar)
         } else {
-            reloadData(withSyncing: false)
+            reloadData(withSyncing: false, completionHandler: {})
         }
         
         searchBar.resignFirstResponder()
@@ -346,27 +378,40 @@ extension MainViewController: UISearchBarDelegate {
 
 extension MainViewController: StorageProviderDelegate {
     func updateHeaderWith(progress: String?, folder: String) {
-        if MenuModelController.shared.selectedFolder == folder && progress != nil {
-            progressConstraint.constant = 0
-            
-            UIView.animate(withDuration: 0.2) {
-                self.view.layoutIfNeeded()
-                self.progressLabel.text = progress
-                self.progressHolder.isHidden = false
+        DispatchQueue.main.async {
+            if MenuModelController.shared.selectedFolder == folder && progress != nil {
+                self.progressConstraint.constant = 0
+                
+                UIView.animate(withDuration: 0.2) {
+                    self.view.layoutIfNeeded()
+                    self.progressLabel.text = progress
+                    self.progressHolder.isHidden = false
+                }
+            } else {
+                self.progressConstraint.constant = -self.progressHolder.frame.size.height
+                
+                UIView.animate(withDuration: 0.2) {
+                    self.view.layoutIfNeeded()
+                    self.progressHolder.isHidden = true
+                }
             }
-        } else {
-            progressConstraint.constant = -progressHolder.frame.size.height
             
-            UIView.animate(withDuration: 0.2) {
-                self.view.layoutIfNeeded()
-                self.progressHolder.isHidden = true
+            if self.mails.count == 0 {
+                self.loadMails(text: self.searchBar.text ?? "", folder: folder, limit: 50, offset: 0, completionHandler: {})
+            } else {
+                self.scrollViewDidScroll(self.tableView)
             }
         }
-        
-        if mails.count == 0 {
-            loadMails(text: searchBar.text ?? "", folder: folder, limit: 50, offset: 0)
-        } else {
-            scrollViewDidScroll(tableView)
+    }
+    
+    func updateTableView(mails: [APIMail], folder: String) {
+        DispatchQueue.main.async {
+            if folder == self.title && self.searchBar.text == "" {
+                self.mails = mails
+                MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+                
+                self.tableView.reloadData()
+            }
         }
     }
 }

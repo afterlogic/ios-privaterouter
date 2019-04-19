@@ -84,7 +84,6 @@ class AddressTableViewCell: UITableViewCell {
                 break
             }
             
-            delegate?.cellSizeDidChanged()
         }
     }
     
@@ -122,6 +121,7 @@ class AddressTableViewCell: UITableViewCell {
                     if emailTest.evaluate(with: email) {
                         if !self.items.contains(email) {
                             self.items.append(email)
+                            self.delegate?.cellSizeDidChanged()
                         }
                     } else {
                         SVProgressHUD.showError(withStatus: NSLocalizedString("Invalid email", comment: ""))
@@ -184,6 +184,7 @@ extension AddressTableViewCell: AddressCollectionViewCellProtocol {
     func deleteAddress(email: String) {
         if let index = items.index(of: email) {
             items.remove(at: index)
+            delegate?.cellSizeDidChanged()
         }
     }
 }

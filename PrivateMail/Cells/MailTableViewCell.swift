@@ -19,11 +19,13 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     @IBOutlet var dateLabel: UILabel!
     @IBOutlet var flagButton: UIButton!
     @IBOutlet var attachmentImageView: UIImageView!
+    @IBOutlet var titleLeadingConstraint: NSLayoutConstraint!
     
     var delegate: MailTableViewCellDelegate?
     
     var isFlagged: Bool = false {
         didSet {
+            flagButton.isHidden = !isFlagged
             flagButton.tintColor = isFlagged ? UIColor(rgb: 0xF5A623) : UIColor(white: 0.85, alpha: 1.0)
         }
     }
@@ -66,6 +68,8 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
             isSeen = mail?.isSeen ?? true
             
             attachmentImageView.isHidden = !(mail?.hasAttachments ?? false)
+            
+            titleLeadingConstraint.isActive =  !attachmentImageView.isHidden
         }
     }
     
@@ -75,7 +79,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+        flagButton.isUserInteractionEnabled = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,40 +14,49 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="50" id="KGk-i7-Jjw" customClass="MailSubjectTableViewCell" customModule="PrivateMail" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subject" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eQN-Xx-B9p">
-                        <rect key="frame" x="15" y="0.0" width="50.5" height="17"/>
-                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Subject" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zLt-WR-dRg">
-                        <rect key="frame" x="75.5" y="0.0" width="229.5" height="50"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mL4-Cq-6Xf">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="50.5"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subject" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eQN-Xx-B9p">
+                                <rect key="frame" x="15" y="0.0" width="50.5" height="50.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Subject" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zLt-WR-dRg">
+                                <rect key="frame" x="75.5" y="0.0" width="229.5" height="50.5"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <connections>
+                                    <action selector="textFieldDidChanged:" destination="KGk-i7-Jjw" eventType="editingChanged" id="fBS-D5-q9o"/>
+                                </connections>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="50" id="UDw-Yn-vej"/>
+                            <constraint firstAttribute="height" constant="50" id="6pA-pr-g3R"/>
+                            <constraint firstAttribute="trailing" secondItem="zLt-WR-dRg" secondAttribute="trailing" constant="15" id="IDS-xc-7E3"/>
+                            <constraint firstItem="eQN-Xx-B9p" firstAttribute="leading" secondItem="mL4-Cq-6Xf" secondAttribute="leading" constant="15" id="Kky-Yp-3Vs"/>
+                            <constraint firstAttribute="bottom" secondItem="eQN-Xx-B9p" secondAttribute="bottom" id="LhT-eR-OXd"/>
+                            <constraint firstItem="zLt-WR-dRg" firstAttribute="top" secondItem="mL4-Cq-6Xf" secondAttribute="top" id="ZBV-9p-y8U"/>
+                            <constraint firstItem="zLt-WR-dRg" firstAttribute="leading" secondItem="eQN-Xx-B9p" secondAttribute="trailing" constant="10" id="bpP-R2-0Ax"/>
+                            <constraint firstAttribute="bottom" secondItem="zLt-WR-dRg" secondAttribute="bottom" id="eKN-yc-feR"/>
+                            <constraint firstItem="eQN-Xx-B9p" firstAttribute="top" secondItem="mL4-Cq-6Xf" secondAttribute="top" id="hbC-iN-768"/>
                         </constraints>
-                        <nil key="textColor"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                        <connections>
-                            <action selector="textFieldDidChanged:" destination="KGk-i7-Jjw" eventType="editingChanged" id="fBS-D5-q9o"/>
-                        </connections>
-                    </textField>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="zLt-WR-dRg" firstAttribute="leading" secondItem="eQN-Xx-B9p" secondAttribute="trailing" constant="10" id="362-WD-qj9"/>
-                    <constraint firstAttribute="trailing" secondItem="zLt-WR-dRg" secondAttribute="trailing" constant="15" id="4Vs-hA-oh6"/>
-                    <constraint firstItem="eQN-Xx-B9p" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="Ix1-XJ-g3V"/>
-                    <constraint firstItem="eQN-Xx-B9p" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="ZxF-Rb-290"/>
-                    <constraint firstAttribute="bottom" secondItem="eQN-Xx-B9p" secondAttribute="bottom" id="h4Y-Z3-t92"/>
-                    <constraint firstAttribute="bottom" secondItem="zLt-WR-dRg" secondAttribute="bottom" id="hZb-Fo-ktt"/>
-                    <constraint firstItem="zLt-WR-dRg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="tLu-j1-QDM"/>
+                    <constraint firstItem="mL4-Cq-6Xf" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="GGC-IB-ukU"/>
+                    <constraint firstItem="mL4-Cq-6Xf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="Wkr-Ks-DPf"/>
+                    <constraint firstAttribute="bottom" secondItem="mL4-Cq-6Xf" secondAttribute="bottom" id="g1P-XK-U2b"/>
+                    <constraint firstAttribute="trailing" secondItem="mL4-Cq-6Xf" secondAttribute="trailing" id="tby-U3-Tir"/>
                 </constraints>
             </tableViewCellContentView>
-            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="textField" destination="zLt-WR-dRg" id="rWh-u5-Fh8"/>
                 <outlet property="titleLabel" destination="eQN-Xx-B9p" id="iRl-kF-AnX"/>

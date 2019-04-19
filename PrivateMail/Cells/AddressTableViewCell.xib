@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,62 +14,71 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="50" id="KGk-i7-Jjw" customClass="AddressTableViewCell" customModule="PrivateMail" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="To" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h9Z-Ch-LuI">
-                        <rect key="frame" x="15" y="0.0" width="25" height="22"/>
-                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
-                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="bDG-Tm-kr0">
-                        <rect key="frame" x="40" y="0.0" width="234" height="50"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2vO-bE-yCl">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="50.5"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="To" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="h9Z-Ch-LuI">
+                                <rect key="frame" x="15" y="0.0" width="25" height="50.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="bDG-Tm-kr0">
+                                <rect key="frame" x="40" y="0.0" width="234" height="50.5"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <collectionViewLayout key="collectionViewLayout" id="ZZl-nc-8Ir" customClass="LeftAlignedCollectionViewFlowLayout" customModule="PrivateMail" customModuleProvider="target"/>
+                            </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LCY-1T-JUa" userLabel="Selection button">
+                                <rect key="frame" x="40" y="0.0" width="234" height="50.5"/>
+                                <connections>
+                                    <action selector="plusButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Uon-fL-gAn"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ha-yb-ccL" userLabel="Plus button">
+                                <rect key="frame" x="274" y="0.0" width="46" height="50.5"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="53Y-MT-qNC"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="plusButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="its-Wz-5t1"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="50" id="Ij4-Mb-i4K"/>
+                            <constraint firstItem="7ha-yb-ccL" firstAttribute="leading" secondItem="bDG-Tm-kr0" secondAttribute="trailing" id="7V1-eX-odD"/>
+                            <constraint firstItem="bDG-Tm-kr0" firstAttribute="leading" secondItem="h9Z-Ch-LuI" secondAttribute="trailing" id="APv-Bu-31S"/>
+                            <constraint firstAttribute="trailing" secondItem="7ha-yb-ccL" secondAttribute="trailing" id="FJq-YM-rLJ"/>
+                            <constraint firstAttribute="bottom" secondItem="7ha-yb-ccL" secondAttribute="bottom" id="It9-ke-FGa"/>
+                            <constraint firstItem="7ha-yb-ccL" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="QbC-C6-PvW"/>
+                            <constraint firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="QbX-Ck-hlM"/>
+                            <constraint firstItem="LCY-1T-JUa" firstAttribute="trailing" secondItem="bDG-Tm-kr0" secondAttribute="trailing" id="Qrz-H0-4lJ"/>
+                            <constraint firstItem="LCY-1T-JUa" firstAttribute="top" secondItem="bDG-Tm-kr0" secondAttribute="top" id="aFb-MV-WgF"/>
+                            <constraint firstItem="bDG-Tm-kr0" firstAttribute="leading" secondItem="2vO-bE-yCl" secondAttribute="leading" constant="40" id="doe-dC-sPL"/>
+                            <constraint firstItem="h9Z-Ch-LuI" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="h7u-0z-RX8"/>
+                            <constraint firstItem="LCY-1T-JUa" firstAttribute="leading" secondItem="bDG-Tm-kr0" secondAttribute="leading" id="l9L-Q4-BVa"/>
+                            <constraint firstItem="bDG-Tm-kr0" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="q2B-W7-9YM"/>
+                            <constraint firstItem="LCY-1T-JUa" firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="sXa-YY-fB5"/>
+                            <constraint firstAttribute="height" constant="50" id="tRx-aZ-ZeP"/>
+                            <constraint firstItem="h9Z-Ch-LuI" firstAttribute="leading" secondItem="2vO-bE-yCl" secondAttribute="leading" constant="15" id="uO7-UL-rm8"/>
+                            <constraint firstAttribute="bottom" secondItem="h9Z-Ch-LuI" secondAttribute="bottom" id="w9H-jF-PRU"/>
                         </constraints>
-                        <collectionViewLayout key="collectionViewLayout" id="ZZl-nc-8Ir" customClass="LeftAlignedCollectionViewFlowLayout" customModule="PrivateMail" customModuleProvider="target"/>
-                    </collectionView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LCY-1T-JUa" userLabel="Selection button">
-                        <rect key="frame" x="40" y="0.0" width="234" height="50"/>
-                        <connections>
-                            <action selector="plusButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Uon-fL-gAn"/>
-                        </connections>
-                    </button>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ha-yb-ccL" userLabel="Plus button">
-                        <rect key="frame" x="274" y="0.0" width="46" height="22"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="46" id="53Y-MT-qNC"/>
-                        </constraints>
-                        <connections>
-                            <action selector="plusButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="its-Wz-5t1"/>
-                        </connections>
-                    </button>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="7ha-yb-ccL" firstAttribute="leading" secondItem="bDG-Tm-kr0" secondAttribute="trailing" id="2J1-H0-nA5"/>
-                    <constraint firstItem="h9Z-Ch-LuI" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="C4R-Qi-CNu"/>
-                    <constraint firstItem="LCY-1T-JUa" firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="JON-qT-Z15"/>
-                    <constraint firstItem="h9Z-Ch-LuI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="L1g-aB-RZO"/>
-                    <constraint firstAttribute="bottom" secondItem="7ha-yb-ccL" secondAttribute="bottom" id="Nf1-QS-AGP"/>
-                    <constraint firstAttribute="bottom" secondItem="h9Z-Ch-LuI" secondAttribute="bottom" id="Or4-Wh-tsE"/>
-                    <constraint firstItem="bDG-Tm-kr0" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="RIn-pl-eCp"/>
-                    <constraint firstItem="LCY-1T-JUa" firstAttribute="leading" secondItem="bDG-Tm-kr0" secondAttribute="leading" id="YtM-pz-y1C"/>
-                    <constraint firstItem="LCY-1T-JUa" firstAttribute="top" secondItem="bDG-Tm-kr0" secondAttribute="top" id="b8K-JQ-bcI"/>
-                    <constraint firstItem="7ha-yb-ccL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="fGG-TW-1s6"/>
-                    <constraint firstItem="LCY-1T-JUa" firstAttribute="trailing" secondItem="bDG-Tm-kr0" secondAttribute="trailing" id="n26-J3-sv2"/>
-                    <constraint firstItem="bDG-Tm-kr0" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="40" id="sht-pO-D3l"/>
-                    <constraint firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="t4F-Su-eZG"/>
-                    <constraint firstAttribute="trailing" secondItem="7ha-yb-ccL" secondAttribute="trailing" id="wOL-8q-1sd"/>
-                    <constraint firstItem="bDG-Tm-kr0" firstAttribute="leading" secondItem="h9Z-Ch-LuI" secondAttribute="trailing" id="yDf-C1-K3z"/>
+                    <constraint firstAttribute="bottom" secondItem="2vO-bE-yCl" secondAttribute="bottom" id="A9f-it-F1N"/>
+                    <constraint firstItem="2vO-bE-yCl" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="BT1-Tx-BcZ"/>
+                    <constraint firstAttribute="trailing" secondItem="2vO-bE-yCl" secondAttribute="trailing" id="IsJ-e8-pFf"/>
+                    <constraint firstItem="2vO-bE-yCl" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="yFL-rq-IRt"/>
                 </constraints>
             </tableViewCellContentView>
-            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="collectionView" destination="bDG-Tm-kr0" id="ukV-AE-Omu"/>
-                <outlet property="heightConstraint" destination="Ij4-Mb-i4K" id="iuf-ci-elP"/>
+                <outlet property="heightConstraint" destination="tRx-aZ-ZeP" id="hWq-0v-WVK"/>
                 <outlet property="selectionButton" destination="LCY-1T-JUa" id="og4-qH-dGv"/>
                 <outlet property="titleLabel" destination="h9Z-Ch-LuI" id="dEZ-bm-EHd"/>
             </connections>
