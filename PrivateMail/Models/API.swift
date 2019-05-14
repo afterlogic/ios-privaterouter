@@ -104,11 +104,12 @@ class API: NSObject {
     }
     
     func getFoldersInfo(folders: [APIFolder], completionHandler: @escaping ([APIFolder]?, Error?) -> Void) {
-        
         var foldersName: [String] = []
         
+        //        let expandedFolders = MenuModelController.shared.expandedFolders(folders: folders)
+        
         for folder in folders {
-            if let folderName = folder.name {
+            if let folderName = folder.fullName {
                 foldersName.append(folderName)
             }
         }
@@ -124,8 +125,8 @@ class API: NSObject {
                 
                 var updatedFolders = folders
                 
-                for i in 0 ..< updatedFolders.count {
-                    if let name = folders[i].name, let item = counts[name] {
+                for i in 0..<updatedFolders.count {
+                    if let name = updatedFolders[i].fullName, let item = counts[name] {
                         if let totalCount = item[0] as? Int {
                             updatedFolders[i].messagesCount = totalCount
                         }
@@ -135,6 +136,23 @@ class API: NSObject {
                         }
                         
                         if let hash = item[3] as? String {
+//                            let systemFolders = ["INBOX", "Sent", "Drafts"]
+//                            let currentFolder = MenuModelController.shared.selectedFolder
+//
+//                            if let oldHash = updatedFolders[i].hash {
+//                                if oldHash != hash
+//                                    && (systemFolders.contains(name)
+//                                        || name == currentFolder) {
+//
+//                                    if !StorageProvider.shared.syncingFolders.contains(name) {
+//                                        let oldMails = MenuModelController.shared.mailsForFolder(name: name)
+//                                        
+//                                        StorageProvider.shared.syncFolderIfNeeded(folder: name, oldMails: oldMails, beganSyncing: {
+//                                        })
+//                                    }
+//                                }
+//                            }
+                            
                             updatedFolders[i].hash = hash
                         }
                     }
@@ -173,16 +191,16 @@ class API: NSObject {
             "Filters": "",
             "UseThreading": true
             ] as [String : Any]
-
+        
         createTask(module: "Mail", method: "GetMessages", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let mailsDict = result["@Collection"] as? [[String: Any]] {
                     var mails: [APIMail] = []
-
+                    
                     for mailDict in mailsDict {
                         mails.append(APIMail(input: mailDict))
                     }
-
+                    
                     completionHandler(mails, nil)
                 } else {
                     completionHandler(nil, error)
@@ -253,8 +271,8 @@ class API: NSObject {
             "Cc": mail.cc?.first ?? "",
             "Bcc": mail.bcc?.first ?? "",
             "Subject": mail.subject ?? "",
-            "Text": mail.body ?? "",
-            "IsHtml": false,
+            "Text": mail.plainBody ?? "",
+            "IsHtml": true,
             "Importance": 3,
             "SendReadingConfirmation": false,
             "Attachments": mail.attachments ?? [],
@@ -326,6 +344,61 @@ class API: NSObject {
         }
     }
     
+    func moveMessage(mail: APIMail, toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        let parameters = [
+            "AccountID": currentUser.id,
+            "Folder": mail.folder ?? "",
+            "ToFolder": toFolder,
+            "Uids": mail.uid ?? -1,
+            ] as [String : Any]
+        
+        createTask(module: "Mail", method: "MoveMessages", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? Bool {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+
+    func setEmailSafety(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        let parameters = [
+            "AccountID": currentUser.id,
+            "Email": mail.from?.first ?? ""
+            ] as [String : Any]
+        
+        createTask(module: "Mail", method: "SetEmailSafety", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? Bool {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    func downloadAttachementWith(url: URL, completionHandler: @escaping (Data?, Error?) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        guard let token = keychain["AccessToken"] else {
+            completionHandler(nil, nil)
+            return
+        }
+        
+        request.addValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+        
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+        
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+            completionHandler(data, error)
+            }.resume()
+    }
+    
     
     // MARK: - Helpers
     
@@ -336,7 +409,7 @@ class API: NSObject {
             resultParts.append(key + "=" + dictionary[key]!)
         }
         
-        for i in 0 ..< resultParts.count {
+        for i in 0..<resultParts.count {
             var part = resultParts[i]
             part = part.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             part = part.replacingOccurrences(of: "&", with: "%26")
@@ -349,17 +422,20 @@ class API: NSObject {
         return result.data(using: .utf8)
     }
     
-    func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
-        
+    func getServerURL() -> String {
         var server = "webmail"
         
-//        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-//            if test {
-                server = "test"
-//            }
-//        }
+        //        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
+        //            if test {
+        server = "test"
+        //            }
+        //        }
         
-        var request = URLRequest(url: URL(string: "https://\(server).afterlogic.com/?/Api/")!)
+        return "https://\(server).afterlogic.com/"
+    }
+    
+    func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
+        var request = URLRequest(url: URL(string: "\(getServerURL())?/Api/")!)
         
         request.httpMethod = "POST"
         

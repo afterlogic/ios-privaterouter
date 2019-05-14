@@ -39,6 +39,9 @@
                         </constraints>
                         <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <state key="normal" image="download"/>
+                        <connections>
+                            <action selector="downloadButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="3qI-Fv-IJV"/>
+                        </connections>
                     </button>
                 </subviews>
                 <constraints>

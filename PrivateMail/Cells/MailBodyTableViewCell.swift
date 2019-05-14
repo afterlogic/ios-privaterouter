@@ -53,7 +53,7 @@ extension MailBodyTableViewCell: UITableViewCellExtensionProtocol {
 extension MailBodyTableViewCell: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         placeholderLabel.isHidden = textView.text.count > 0
-        ComposeMailModelController.shared.mail.body = textView.text
+        ComposeMailModelController.shared.mail.plainBody = textView.text
         updateHeight(withAction: true)
         delegate?.textViewDidChanged(textView: textView)
     }

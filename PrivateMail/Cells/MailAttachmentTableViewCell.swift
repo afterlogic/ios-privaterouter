@@ -8,9 +8,15 @@
 
 import UIKit
 
+protocol MailAttachmentTableViewCellDelegate: NSObjectProtocol {
+    func shouldPreviewAttachment(url: URL?, fileName: String)
+}
+
 class MailAttachmentTableViewCell: UITableViewCell {
 
     @IBOutlet var titleLabel: UILabel!
+    var downloadLink: String?
+    var delegate: MailAttachmentTableViewCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,6 +26,14 @@ class MailAttachmentTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
     }
+    
+    @IBAction func downloadButtonAction(_ sender: Any) {
+        if let downloadLink = downloadLink {
+            let url = URL(string: "\(API.shared.getServerURL())\(downloadLink)")
+            delegate?.shouldPreviewAttachment(url: url, fileName: titleLabel.text ?? "file.txt")
+        }
+    }
+    
     
 }
 

@@ -8,22 +8,31 @@
 
 import UIKit
 import SVProgressHUD
-import ObjectivePGP
+import QuickLook
 
 class MailViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
-    var mail: APIMail = APIMail()
     
-    @IBOutlet var decryptButton: UIBarButtonItem!
+    var mail: APIMail = APIMail()
+    var attachementPreviewURL: URL?
+    var showSafe: Bool = true
+    
+    @IBOutlet var warningView: UIView!
+    @IBOutlet var warningLabel: UILabel!
+    @IBOutlet var showPicturesButton: UIButton!
+    @IBOutlet var alwaysShowPicturesButton: UIButton!
+    @IBOutlet var warningTopConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = NSLocalizedString("Mail", comment: "")
         navigationController?.isToolbarHidden = false
-        
-        decryptButton.title = NSLocalizedString("Decrypt", comment: "")
+
+        warningLabel.text = NSLocalizedString("Pictures in this message have been blocked for your safety", comment: "")
+        showPicturesButton.setTitle("Show pictures", for: .normal)
+        alwaysShowPicturesButton.setTitle("Always show pictures", for: .normal)
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -31,7 +40,7 @@ class MailViewController: UIViewController {
         
         tableView.register(cellClass: MailHeaderTableViewCell())
         tableView.register(cellClass: MailAttachmentTableViewCell())
-        tableView.register(cellClass: MailBodyTableViewCell())
+        tableView.register(cellClass: MailHTMLBodyTableViewCell())
         
         StorageProvider.shared.containsMail(mail: mail) { (contains) in
             if contains == nil {
@@ -63,10 +72,23 @@ class MailViewController: UIViewController {
                     }
                 }
             } else {
+                if self.mail.showInlineWarning() {
+                    self.warningTopConstraint.isActive = true
+                    self.warningView.isHidden = false
+                    self.tableView.contentInset.top = self.warningView.frame.size.height
+                } else {
+                    self.warningView.isHidden = true
+                    self.tableView.contentInset.top = 0.0
+                }
+                
+                self.tableView.scrollIndicatorInsets = self.tableView.contentInset
+                self.tableView.scrollRectToVisible(CGRect(x: 0.0, y: 0.0, width: 1.0, height: 1.0), animated: false)
+                
                 if self.mail.isSeen != true {
                     self.mail.isSeen = true
-                    StorageProvider.shared.saveMail(mail: self.mail)
                     
+                    StorageProvider.shared.saveMail(mail: self.mail)
+
                     API.shared.setMailSeen(mail: self.mail, completionHandler: { (resul, error) in
                         if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
@@ -78,97 +100,27 @@ class MailViewController: UIViewController {
     }
     
     
-    // MARK: - Buttons
+    // MARK: - Buttons Actions
     
-    @IBAction func decryptButtonAction(_ sender: Any) {
-        var mail = self.mail
+    @IBAction func showPicturesButtonAction(_ sender: Any) {
+        showSafe = false
+        tableView.reloadData()
         
-        let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
+        warningTopConstraint.isActive = false
         
-        alert.addTextField { (textField) in
-            textField.placeholder = NSLocalizedString("Enter password", comment: "")
-            textField.isSecureTextEntry = true
+        UIView.animate(withDuration: 0.25) {
+            self.view.layoutIfNeeded()
+            self.tableView.contentInset.top = 0.0
+            self.tableView.scrollIndicatorInsets = self.tableView.contentInset
         }
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
-            let textField = alert?.textFields![0]
-            
-            if let password = textField?.text {
-                SVProgressHUD.show()
-                
-                do {
-                    #if !targetEnvironment(simulator)
-                    if let body = mail.body, let privateKey = keychain["PrivateKey"] {
-                        let data = try Armor.readArmored(body)
-                        let key = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
-                        let decrypted = try ObjectivePGP.decrypt(data, andVerifySignature: false, using: key, passphraseForKey: { (key) -> String? in
-                            return password
-                        })
-                        
-                        let result = String(data: decrypted, encoding: .utf8)
-                        mail.body = result
-                        self.mail = mail
-                        self.tableView.reloadData()
-                    }
-                    #endif
-                    
-                    SVProgressHUD.dismiss()
-                } catch {
-                    SVProgressHUD.showError(withStatus: NSLocalizedString("Can't decrypt message", comment: ""))
-                }
-            }
-        }))
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        
-        self.present(alert, animated: true, completion: nil)
     }
     
-    @IBAction func deleteButtonAction(_ sender: Any) {
+    @IBAction func alwaysShowPicturesButtonAction(_ sender: Any) {
+        showPicturesButtonAction(sender)
         
-        let alert = UIAlertController.init(title: NSLocalizedString("Delete this message?", comment: ""), message: nil, preferredStyle: .alert)
-        
-        let yesButton = UIAlertAction.init(title: NSLocalizedString("Yes", comment: ""), style: .destructive) { (alert: UIAlertAction!) in
-            SVProgressHUD.show()
-            
-            StorageProvider.shared.deleteMail(mail: self.mail)
-            
-            API.shared.deleteMessage(mail: self.mail) { (result, error) in
-                DispatchQueue.main.async {
-                    if let success = result {
-                        if success {
-                            self.navigationController?.popViewController(animated: true)
-                        } else {
-                            SVProgressHUD.showError(withStatus: NSLocalizedString("Can't delete message", comment: ""))
-                        }
-                        
-                        SVProgressHUD.dismiss()
-                    } else {
-                        if let error = error {
-                            SVProgressHUD.showError(withStatus: error.localizedDescription)
-                        } else {
-                            SVProgressHUD.dismiss()
-                        }
-                    }
-                }
-            }
-        }
-        
-        let cancelButton = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+        API.shared.setEmailSafety(mail: mail) { (resul, error) in
             
         }
-        
-        alert.addAction(cancelButton)
-        alert.addAction(yesButton)
-        
-        present(alert, animated: true, completion: nil)
-    }
-    
-    
-    // MARK: - Navigation
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
     }
     
 }
@@ -186,45 +138,112 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailHeaderTableViewCell.cellID(), for: indexPath) as! MailHeaderTableViewCell
             cell.subjectLabel.text = mail.subject
+            cell.delegate = self
             
             if cell.subjectLabel.text?.count == 0 {
                 cell.subjectLabel.text = NSLocalizedString("(no subject)", comment: "")
             }
             
             cell.senderLabel.text = mail.senders?.first
+            
+            cell.detailedSenderLabel.text = mail.from?.joined(separator: ", ")
+            cell.detailedToLabel.text = mail.to?.joined(separator: ", ")
+            cell.detailedDateLabel.text = mail.date?.getFullDateString()
+            
             cell.dateLabel.text = mail.date?.getDateString()
             
             result = cell
             break
             
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailBodyTableViewCell.cellID(), for: indexPath) as! MailBodyTableViewCell
-            cell.placeholderLabel.text = ""
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
             
-            cell.textView.text = (mail.body?.count ?? 0) > 0 ? mail.body : mail.htmlBody
-
-            cell.updateHeight(withAction: true)
-            cell.textView.isEditable = false
+            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: nil)
+            cell.delegate = self
+            
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
             result = cell
             break
             
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
+            
             if let fileName = mail.attachments?[indexPath.row - 1]["FileName"] as? String {
                 cell.titleLabel.text = fileName
             } else {
                 cell.titleLabel.text = ""
             }
             
+            cell.downloadLink = nil
+            cell.delegate = self
+            
+            if let actions = mail.attachments?[indexPath.row - 1]["Actions"] as? [String: [String: String]] {
+                if let downloadLink = actions["download"]?["url"] {
+                    cell.downloadLink = downloadLink
+                }
+            }
+            
             result = cell
             break
-            
         }
         
         result.selectionStyle = .none
         
         return result
     }
+}
+
+
+extension MailViewController: MailAttachmentTableViewCellDelegate {
+    func shouldPreviewAttachment(url: URL?, fileName: String) {
+        if let url = url {
+            SVProgressHUD.show()
+            
+            API.shared.downloadAttachementWith(url: url) { (data, error) in
+                SVProgressHUD.dismiss()
+                
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                } else if let data = data {
+                    if let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let fileURL = directory.appendingPathComponent(fileName)
+                        
+                        do {
+                            try data.write(to: fileURL)
+                            
+                            self.attachementPreviewURL = fileURL
+                            
+                            let previewController = QLPreviewController()
+                            previewController.dataSource = self
+                            self.present(previewController, animated: true)
+                        } catch {
+                            SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                        }
+                    }
+                } else {
+                    SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                }
+            }
+        } else {
+            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+        }
+    }
+}
+
+
+extension MailViewController: QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        return 1
+    }
     
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        return attachementPreviewURL! as QLPreviewItem
+    }
+}
+
+extension MailViewController: UITableViewDelegateExtensionProtocol {
+    func cellSizeDidChanged() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
 }

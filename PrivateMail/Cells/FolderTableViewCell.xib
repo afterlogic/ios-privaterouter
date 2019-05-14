@@ -18,16 +18,16 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder" translatesAutoresizingMaskIntoConstraints="NO" id="Ifo-jx-FpC">
-                        <rect key="frame" x="15" y="12.5" width="25" height="25"/>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder_inbox" translatesAutoresizingMaskIntoConstraints="NO" id="Ifo-jx-FpC">
+                        <rect key="frame" x="15" y="15" width="20" height="20"/>
                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="Ifo-jx-FpC" secondAttribute="height" multiplier="1:1" id="fhF-iC-CU0"/>
-                            <constraint firstAttribute="width" constant="25" id="oZy-jo-n4A"/>
+                            <constraint firstAttribute="width" constant="20" id="oZy-jo-n4A"/>
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder Folder Folder Folder FolderFolderFolderFolderFolderFolderFolderFolder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sNo-bO-2rr">
-                        <rect key="frame" x="50" y="14.5" width="207.5" height="20.5"/>
+                        <rect key="frame" x="43" y="14.5" width="214.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -53,9 +53,8 @@
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="sNo-bO-2rr" secondAttribute="trailing" priority="750" constant="15" id="4HG-Co-qSH"/>
-                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="50" id="JNZ-yN-9gD"/>
                     <constraint firstItem="Ifo-jx-FpC" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="USY-1H-dBN"/>
-                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="Ifo-jx-FpC" secondAttribute="trailing" constant="10" id="fTz-F5-eyp"/>
+                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="Ifo-jx-FpC" secondAttribute="trailing" constant="8" id="fTz-F5-eyp"/>
                     <constraint firstItem="Ifo-jx-FpC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="reu-1z-Vzh"/>
                     <constraint firstItem="iCF-La-O2J" firstAttribute="leading" secondItem="sNo-bO-2rr" secondAttribute="trailing" constant="5" id="vsc-zV-7og"/>
                     <constraint firstItem="sNo-bO-2rr" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="zNh-kh-yr9"/>
@@ -67,6 +66,7 @@
             </constraints>
             <connections>
                 <outlet property="iconImageView" destination="Ifo-jx-FpC" id="GGK-s5-183"/>
+                <outlet property="sideConstraint" destination="reu-1z-Vzh" id="BWT-ng-zO0"/>
                 <outlet property="titleLabel" destination="sNo-bO-2rr" id="qKM-sB-EP3"/>
                 <outlet property="unreadCountConstraint" destination="vsc-zV-7og" id="uWJ-WJ-6O4"/>
                 <outlet property="unreadLabel" destination="pR7-YK-kJp" id="xgl-Xv-KQS"/>
@@ -76,6 +76,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="folder" width="25" height="25"/>
+        <image name="folder_inbox" width="25" height="25"/>
     </resources>
 </document>

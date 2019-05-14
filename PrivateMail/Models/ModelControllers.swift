@@ -19,9 +19,32 @@ class MenuModelController: NSObject {
     func foldersToShow() -> [APIFolder] {
         var result: [APIFolder] = []
         
-        for folder in folders {
+        for folder in expandedFolders(folders: folders) {
             if folder.isSubscribed ?? true {
                 result.append(folder)
+            }
+        }
+        
+        return result
+    }
+    
+    func expandedFolders(folders: [APIFolder]) -> [APIFolder] {
+        var result: [APIFolder] = []
+        
+        for folder in folders {
+            var newFolder = folder
+            newFolder.subFolders = nil
+            
+            result.append(newFolder)
+            
+            if let subfolders = folder.subFolders {
+                let expandedFoldersList = expandedFolders(folders: subfolders)
+                
+                for i in 0..<expandedFoldersList.count {
+                    var subfolder = expandedFoldersList[i]
+                    subfolder.depth += 1
+                    result.append(subfolder)
+                }
             }
         }
         
@@ -31,7 +54,7 @@ class MenuModelController: NSObject {
     func updateFolders(newFolders: [APIFolder]) {
         var newFolders = newFolders
         
-        for i in 0 ..< newFolders.count {
+        for i in 0..<newFolders.count {
             newFolders[i].mails = mailsForFolder(name: newFolders[i].name)
         }
         
@@ -53,12 +76,30 @@ class MenuModelController: NSObject {
     }
     
     func setMailsForCurrentFolder(mails: [APIMail]) {
-        for i in 0 ..< folders.count {
+        for i in 0..<folders.count {
             if folders[i].name == selectedFolder {
                 folders[i].mails = mails
                 return
             }
         }
+    }
+    
+    func removeMail(mail: APIMail) {
+        for i in 0..<folders.count {
+            var folder = folders[i]
+            
+            if folder.name == mail.folder {
+                var mails = folder.mails
+                
+                mails.removeAll { (item) -> Bool in
+                    return item.uid == mail.uid
+                }
+                
+                folder.mails = mails
+                folders[i] = folder
+            }
+        }
+        
     }
     
 }
@@ -79,6 +120,7 @@ class MailDB: Object {
     @objc dynamic var isSeen = true
     @objc dynamic var isFlagged = false
     @objc dynamic var date = Date()
+    @objc dynamic var attachments = ""
     @objc dynamic var data = NSData()
 }
 
@@ -171,7 +213,7 @@ class StorageProvider: NSObject {
                 for mail in mails {
                     var isFound = false
                     
-                    for i in 0 ..< newMails.count {
+                    for i in 0..<newMails.count {
                         if mail.uid == newMails[i].uid {
                             var shouldUpdateFlags = false
                             
@@ -385,7 +427,7 @@ class StorageProvider: NSObject {
             let input = mail.input,
             let folder = mail.folder,
             let subject = mail.subject,
-            let body = mail.body,
+            let body = mail.plainBody,
             let date = mail.date,
             let isSeen = mail.isSeen,
             let isFlagged = mail.isFlagged {
@@ -399,6 +441,18 @@ class StorageProvider: NSObject {
             mailDB.date = date
             mailDB.isSeen = isSeen
             mailDB.isFlagged = isFlagged
+            
+            if let attachments = mail.attachments {
+                var attachmentsNames = ""
+                
+                for attachment in attachments {
+                    if let name = attachment["FileName"] as? String {
+                        attachmentsNames += name
+                    }
+                }
+                
+                mailDB.attachments = attachmentsNames
+            }
             
             let data = NSKeyedArchiver.archivedData(withRootObject: input)
             mailDB.data = NSData(data: data)
@@ -427,7 +481,7 @@ class StorageProvider: NSObject {
                 let input = mail.input,
                 let folder = mail.folder,
                 let subject = mail.subject,
-                let body = mail.body,
+                let body = mail.plainBody,
                 let date = mail.date,
                 let isSeen = mail.isSeen,
                 let isFlagged = mail.isFlagged {
@@ -441,6 +495,18 @@ class StorageProvider: NSObject {
                 mailDB.date = date
                 mailDB.isSeen = isSeen
                 mailDB.isFlagged = isFlagged
+                
+                if let attachments = mail.attachments {
+                    var attachmentsNames = ""
+                    
+                    for attachment in attachments {
+                        if let name = attachment["FileName"] as? String {
+                            attachmentsNames += name
+                        }
+                    }
+                    
+                    mailDB.attachments = attachmentsNames
+                }
                 
                 let data = NSKeyedArchiver.archivedData(withRootObject: input)
                 mailDB.data = NSData(data: data)
@@ -536,7 +602,8 @@ class StorageProvider: NSObject {
             if text.count > 0 {
                 predicate += """
                 AND (subject CONTAINS[cd] \"\(text)\"
-                OR body CONTAINS[cd] \"\(text)\")
+                OR body CONTAINS[cd] \"\(text)\"
+                OR attachments CONTAINS[cd] \"\(text)\")
                 """
             }
             
@@ -546,7 +613,7 @@ class StorageProvider: NSObject {
             
             let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
             
-            for i in 0 ..< min(result.count, limit ?? result.count) {
+            for i in 0..<min(result.count, limit ?? result.count) {
                 let object = result[i]
                 let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
                 

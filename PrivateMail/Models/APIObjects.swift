@@ -47,7 +47,7 @@ struct APIMail {
     var folder: String?
     var title: String?
     var subject: String?
-    var body: String?
+    var plainBody: String?
     var htmlBody: String?
     var date: Date?
     var isFlagged: Bool?
@@ -58,10 +58,14 @@ struct APIMail {
     var from: [String]?
     var cc: [String]?
     var bcc: [String]?
+    var hasExternals: Bool
+    var safety: Bool
     
     var input: [String: Any]?
-
+    
     init() {
+        self.hasExternals = false
+        self.safety = false
     }
     
     init(input: [String: Any]) {
@@ -83,6 +87,30 @@ struct APIMail {
                         if let email = sender["Email"] as? String {
                             self.senders?.append(email)
                         }
+                    }
+                }
+            }
+        }
+        
+        self.from = []
+        
+        if let from = input["From"] as? [String: Any] {
+            if let collection = from["@Collection"] as? [[String: Any]] {
+                for item in collection {
+                    if let email = item["Email"] as? String {
+                        self.from?.append(email)
+                    }
+                }
+            }
+        }
+        
+        self.to = []
+        
+        if let to = input["To"] as? [String: Any] {
+            if let collection = to["@Collection"] as? [[String: Any]] {
+                for item in collection {
+                    if let email = item["Email"] as? String {
+                        self.to?.append(email)
                     }
                 }
             }
@@ -113,13 +141,11 @@ struct APIMail {
         }
         
         if let body = input["PlainRaw"] as? String {
-            self.body = body
+            self.plainBody = body
         }
         
         if let htmlBody = input["Html"] as? String {
-            let plainText = htmlBody.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
-
-            self.htmlBody = plainText
+            self.htmlBody = htmlBody
         }
         
         if let attachments = input["Attachments"] as? [String: Any] {
@@ -127,6 +153,46 @@ struct APIMail {
                 self.attachments = list
             }
         }
+        
+        self.hasExternals = false
+        
+        if let hasExternals = input["HasExternals"] as? Bool {
+            self.hasExternals = hasExternals
+        }
+        
+        self.safety = false
+        
+        if let safety = input["Safety"] as? Bool {
+            self.safety = safety
+        }
+    }
+    
+    func body(_ safe: Bool) -> String {
+        let divString = "<div style=\"width: 100%; word-break: break-word;\">"
+        
+        if var body = htmlBody, body.count > 0 {
+            
+            if hasExternals && (safety || !safe) {
+                body = body.replacingOccurrences(of: "data-x-src", with: "width=\"100%\" src")
+            }
+            
+            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
+            
+            return divString + body + "</div>"
+        }
+        
+        var plainBody = self.plainBody ?? ""
+        plainBody = plainBody.replacingOccurrences(of: "\n", with: "<br>")
+        
+        return divString + plainBody + "</div>"
+    }
+    
+    func plainedBody(_ safe: Bool) -> String {
+        return body(safe).replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+    }
+    
+    func showInlineWarning() -> Bool {
+        return hasExternals && !safety
     }
 }
 
@@ -146,6 +212,7 @@ struct APIFolder {
     var messagesCount: Int?
     var unreadCount: Int?
     var mails: [APIMail] = []
+    var depth: Int = 0
     
     var input: [String: Any]?
     
@@ -162,6 +229,10 @@ struct APIFolder {
         if let name = input["Name"] as? String {
             self.name = name
         }
+
+        if let fullName = input["FullName"] as? String {
+            self.fullName = fullName
+        }
         
         if let isSubscribed = input["IsSubscribed"] as? Bool {
             self.isSubscribed = isSubscribed
@@ -169,6 +240,17 @@ struct APIFolder {
         
         if let isSelectable = input["IsSelectable"] as? Bool {
             self.isSelectable = isSelectable
+        }
+        
+        if let subfolders = input["SubFolders"] as? [String: Any] {
+            subFolders = []
+            
+            if let folders = subfolders["@Collection"] as? [[String: Any]] {
+                for folderDict in folders {
+                    let folder = APIFolder(input: folderDict)
+                    subFolders?.append(folder)
+                }
+            }
         }
     }
 }

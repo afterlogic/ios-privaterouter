@@ -82,7 +82,7 @@ class SideMenuViewController: UIViewController {
                 
                 MenuModelController.shared.updateFolders(newFolders: folders)
                 
-                API.shared.getFoldersInfo(folders: folders, completionHandler: { (result, error) in
+                API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: folders), completionHandler: { (result, error) in
                     if let folders = result {
                         MenuModelController.shared.updateFolders(newFolders: folders)
                         
@@ -154,7 +154,7 @@ class SideMenuViewController: UIViewController {
         let folders = MenuModelController.shared.foldersToShow()
         if folders.count > 0 {
             var index = 0
-            for i in 0 ..< folders.count {
+            for i in 0..<folders.count {
                 if let name = folders[i].name {
                     if name == MenuModelController.shared.selectedFolder {
                         index = i
@@ -198,8 +198,36 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
         
+        if folder.fullName == MenuModelController.shared.selectedFolder {
+            cell.setSelected(true)
+        } else {
+            cell.setSelected(false)
+        }
+        
         cell.unreadCount = folder.unreadCount ?? 0
         cell.titleLabel.text = folder.name
+        
+        cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
+        
+        switch folder.type {
+        case 1:
+            cell.iconImageView.image = UIImage(named: "folder_inbox")
+            
+        case 2:
+            cell.iconImageView.image = UIImage(named: "folder_sent")
+            
+        case 3:
+            cell.iconImageView.image = UIImage(named: "folder_drafts")
+            
+        case 4:
+            cell.iconImageView.image = UIImage(named: "folder_spam")
+            
+        case 5:
+            cell.iconImageView.image = UIImage(named: "folder_trash")
+            
+        default:
+            cell.iconImageView.image = UIImage(named: "folder_default")
+        }
         
         cell.selectionStyle = .none
         
@@ -207,9 +235,14 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        MenuModelController.shared.selectedFolder = MenuModelController.shared.foldersToShow()[indexPath.row].name ?? "INBOX"
+        let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
+        
+        if folder.isSelectable ?? true {
+            MenuModelController.shared.selectedFolder = folder.fullName ?? "INBOX"
+        }
         
         NotificationCenter.default.post(name: .didSelectFolder, object: nil)
+        tableView.reloadData()
         dismiss(animated: true, completion: nil)
     }
     

@@ -30,9 +30,7 @@ class ComposeMailViewController: UIViewController {
         
         passwordTextField.delegate = self
         dialogView.alpha = 0.0
-        
-        ComposeMailModelController.shared.mail = APIMail()
-        
+                
         tableView.delegate = self
         tableView.dataSource = self
         
@@ -50,6 +48,7 @@ class ComposeMailViewController: UIViewController {
         super.viewDidAppear(animated)
         
         tableView.reloadData()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
     }
@@ -69,7 +68,11 @@ class ComposeMailViewController: UIViewController {
                 SVProgressHUD.show()
                 view.isUserInteractionEnabled = false
                 
-                API.shared.sendMail(mail: ComposeMailModelController.shared.mail) { (result, error) in
+                var mail = ComposeMailModelController.shared.mail
+                mail.plainBody = mail.plainBody?.replacingOccurrences(of: "\n", with: "<br>")
+                mail.plainBody = mail.plainBody?.replacingOccurrences(of: "\r", with: "<br>")
+                
+                API.shared.sendMail(mail: mail) { (result, error) in
                     DispatchQueue.main.async {
                         SVProgressHUD.dismiss()
                         self.view.isUserInteractionEnabled = true
@@ -113,7 +116,7 @@ class ComposeMailViewController: UIViewController {
         do {
             if let publicKey = keychain["PublicKey"] {
                 #if !targetEnvironment(simulator)
-                if let body = mail.body, encryptSwitch.isOn {
+                if let body = mail.plainBody, encryptSwitch.isOn {
                     let data = body.data(using: .utf8)!
                     let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
                     
@@ -123,7 +126,7 @@ class ComposeMailViewController: UIViewController {
 
                     let armoredResult = Armor.armored(encrypted, as: .message)
                     
-                    mail.body = armoredResult
+                    mail.plainBody = armoredResult
                     ComposeMailModelController.shared.mail = mail
                     tableView.reloadData()
                 }
@@ -221,7 +224,8 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailBodyTableViewCell.cellID(), for: indexPath) as! MailBodyTableViewCell
-            cell.textView.text = mail.body
+            cell.textView.text = mail.plainBody
+            cell.placeholderLabel.isHidden = mail.plainBody?.count ?? 0 > 0
             cell.updateHeight(withAction: false)
             cell.delegate = self
             cell.textView.doneAccessory = true

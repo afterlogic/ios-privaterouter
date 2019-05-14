@@ -16,6 +16,7 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     @IBOutlet var unreadView: UIView!
     
     @IBOutlet var unreadCountConstraint: NSLayoutConstraint!
+    @IBOutlet var sideConstraint: NSLayoutConstraint!
     
     var unreadCount = 0 {
         didSet {
@@ -44,7 +45,9 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
+    }
+    
+    func setSelected(_ selected: Bool) {        
         if selected {
             backgroundColor = ColorScheme.accentColor
             titleLabel.textColor = .white

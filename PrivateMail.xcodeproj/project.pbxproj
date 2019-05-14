@@ -10,8 +10,11 @@
 		0CC32E07953282CE2F7F91C3 /* Pods_PrivateMail.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */; };
 		321743B6A25A55F898A69FA7 /* Pods_PrivateMailTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */; };
 		8251612B96DDB65962FF4437 /* Pods_PrivateMailUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */; };
+		E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50122662288981D00CC7477 /* MailPageViewController.swift */; };
 		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
 		E526714E2253E54900A1D180 /* APIObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E526714D2253E54900A1D180 /* APIObjects.swift */; };
+		E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */; };
+		E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */; };
 		E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */; };
 		E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */; };
 		E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */; };
@@ -73,8 +76,11 @@
 		C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMail.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
+		E50122662288981D00CC7477 /* MailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailPageViewController.swift; sourceTree = "<group>"; };
 		E5111F042242BA420036501F /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		E526714D2253E54900A1D180 /* APIObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIObjects.swift; sourceTree = "<group>"; };
+		E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MailHTMLBodyTableViewCell.xib; sourceTree = "<group>"; };
+		E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailHTMLBodyTableViewCell.swift; sourceTree = "<group>"; };
 		E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailHeaderTableViewCell.swift; sourceTree = "<group>"; };
 		E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailHeaderTableViewCell.xib; sourceTree = "<group>"; };
 		E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAttachmentTableViewCell.swift; sourceTree = "<group>"; };
@@ -230,6 +236,7 @@
 			children = (
 				E5F28A9C223856DD002721ED /* LoginViewController.swift */,
 				E567B4672236D51C00FA9945 /* MainViewController.swift */,
+				E50122662288981D00CC7477 /* MailPageViewController.swift */,
 				E5A032EC223B1A11001BC795 /* MailViewController.swift */,
 				E5F28A9E22386172002721ED /* ComposeMailViewController.swift */,
 				E5F28AA222387ACB002721ED /* SideMenuViewController.swift */,
@@ -254,6 +261,8 @@
 				E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */,
 				E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */,
 				E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */,
+				E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */,
+				E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */,
 				E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */,
 				E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */,
 				E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */,
@@ -392,6 +401,7 @@
 				E5630A23224AE87B002A0FDA /* MailAttachmentTableViewCell.xib in Resources */,
 				E5F1D78C2242DAF2007071AA /* AddressCollectionViewCell.xib in Resources */,
 				E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */,
+				E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */,
 				E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */,
 				E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */,
 				E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */,
@@ -516,6 +526,7 @@
 				E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */,
 				E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */,
 				E5F28A972238442D002721ED /* MailTableViewCell.swift in Sources */,
+				E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */,
 				E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */,
 				E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */,
 				E5F1D78B2242DAF2007071AA /* AddressCollectionViewCell.swift in Sources */,
@@ -530,6 +541,7 @@
 				E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */,
 				E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */,
 				E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */,
+				E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */,
 				E567B4662236D51C00FA9945 /* AppDelegate.swift in Sources */,
 				E5F28A9F22386172002721ED /* ComposeMailViewController.swift in Sources */,
 			);

@@ -17,7 +17,7 @@ class SettingsViewController: UIViewController {
     @IBOutlet var privateKeyLabel: UILabel!
     @IBOutlet var publicKeyTextView: UITextView!
     @IBOutlet var privateKeyTextView: UITextView!
-    
+    @IBOutlet var scrollView: UIScrollView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,7 @@ class SettingsViewController: UIViewController {
         
         publicKeyLabel.text = NSLocalizedString("Public key", comment: "")
         privateKeyLabel.text = NSLocalizedString("Private key", comment: "")
-    
+        
         let cornerRadius : CGFloat = 10.0
         publicKeyTextView.layer.cornerRadius = cornerRadius
         privateKeyTextView.layer.cornerRadius = cornerRadius
@@ -35,7 +35,17 @@ class SettingsViewController: UIViewController {
 
         publicKeyTextView.doneAccessory = true
         privateKeyTextView.doneAccessory = true
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
+    // MARK: - Buttons
     
     @IBAction func saveButtonAction(_ sender: Any) {
         keychain["PublicKey"] = publicKeyTextView.text
@@ -63,7 +73,10 @@ class SettingsViewController: UIViewController {
                 
                 if let email = API.shared.currentUser.email {
                     DispatchQueue.global(qos: .userInitiated).async {
-                        let key = KeyGenerator().generate(for: email, passphrase: password)
+                        let generator = KeyGenerator()
+                        generator.keyBitsLength = 2048
+                        
+                        let key = generator.generate(for: email, passphrase: password)
                         
                         DispatchQueue.main.async {
                             do {
@@ -96,6 +109,25 @@ class SettingsViewController: UIViewController {
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
         
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    // MARK: - Keyboard
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: {
+                self.scrollView.contentInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: keyboardSize.height, right: 0.0)
+                self.scrollView.scrollIndicatorInsets = self.scrollView.contentInset
+            }, completion: nil)
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: {
+            self.scrollView.contentInset = UIEdgeInsets()
+            self.scrollView.scrollIndicatorInsets = self.scrollView.contentInset
+        }, completion: nil)
     }
     
 }

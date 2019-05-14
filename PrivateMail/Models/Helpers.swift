@@ -57,21 +57,37 @@ extension String {
 extension Date {
     func getDateString() -> String {
         let formatter = DateFormatter()
-        
-        let interval = Date().timeIntervalSince(self)
-        let day = 60.0 * 60.0 * 24.0
-        
+        formatter.locale = Locale.current
+        formatter.dateStyle = .none
+ 
         if Calendar.current.isDateInToday(self) {
-            formatter.dateFormat = "HH:mm"
-        } else if interval < 7.0 * day {
-            formatter.dateFormat = "E, HH:mm"
-        } else if interval < 365.0 * day {
+            formatter.timeStyle = .short
+        } else if Calendar.current.isDateInYesterday(self) {
+            formatter.timeStyle = .short
+
+            return NSLocalizedString("Yesterday \(formatter.string(from: self))", comment: "")
+        } else if Calendar.current.isDate(self, equalTo: Date(), toGranularity: .year) {
             formatter.dateFormat = "dd MMM"
         } else {
-            formatter.dateStyle = .short
+            formatter.dateStyle = .medium
         }
-        
+    
         return formatter.string(from: self)
+    }
+    
+    func getFullDateString() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateStyle = .none
+        
+        formatter.dateFormat = "E, d MMM yyyy "
+        
+        let dateString = formatter.string(from: self)
+        
+        formatter.dateFormat = ""
+        formatter.timeStyle = .short
+        
+        return dateString + formatter.string(from: self)
     }
 }
 

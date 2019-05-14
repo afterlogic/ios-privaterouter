@@ -61,6 +61,8 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
+        
+        mails = MenuModelController.shared.mailsForCurrentFolder()
         tableView.reloadData()
     }
     
@@ -87,6 +89,9 @@ class MainViewController: UIViewController {
         lastPage = false
         
         let folder = MenuModelController.shared.selectedFolder
+        
+        mails = MenuModelController.shared.mailsForFolder(name: folder)
+        tableView.reloadData()
         
         if withSyncing {
             StorageProvider.shared.syncFolderIfNeeded(folder: folder, oldMails: mails) {
@@ -291,11 +296,13 @@ class MainViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "MailSegue" {
-            let vc = segue.destination as! MailViewController
+            let vc = segue.destination as! MailPageViewController
             
             if let mail = selectedMail {
                 vc.mail = mail
             }
+        } else if segue.identifier == "ComposeSegue" {
+            ComposeMailModelController.shared.mail = APIMail()
         }
     }
     
@@ -428,7 +435,7 @@ extension MainViewController: StorageProviderDelegate {
 extension MainViewController: MailTableViewCellDelegate {
     func updateFlagsInMail(mail: APIMail?) {
         if let mail = mail {
-            for i in 0 ..< mails.count {
+            for i in 0..<mails.count {
                 if mails[i].uid == mail.uid {
                     mails[i] = mail
                 }
