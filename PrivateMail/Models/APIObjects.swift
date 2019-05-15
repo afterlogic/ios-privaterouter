@@ -208,6 +208,7 @@ struct APIFolder {
     var exists: Bool?
     var extended: Bool?
     var subFolders: [APIFolder]?
+    var subFoldersCount: Int?
     var hash: String?
     var messagesCount: Int?
     var unreadCount: Int?
@@ -251,6 +252,8 @@ struct APIFolder {
                     subFolders?.append(folder)
                 }
             }
+            
+            subFoldersCount = subFolders?.count
         }
     }
 }

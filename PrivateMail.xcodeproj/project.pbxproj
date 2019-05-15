@@ -32,6 +32,8 @@
 		E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E8223B0BDB001BC795 /* Helpers.swift */; };
 		E5A032EB223B16BB001BC795 /* ModelControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EA223B16BB001BC795 /* ModelControllers.swift */; };
 		E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EC223B1A11001BC795 /* MailViewController.swift */; };
+		E5CF520F228CA3BF00E94704 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CF520E228CA3BF00E94704 /* StorageProvider.swift */; };
+		E5CF5211228CA42400E94704 /* MenuModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CF5210228CA42400E94704 /* MenuModelController.swift */; };
 		E5F1D7842242CFE2007071AA /* ContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7832242CFE2007071AA /* ContactsViewController.swift */; };
 		E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */; };
 		E5F1D7882242D3E4007071AA /* AddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */; };
@@ -105,6 +107,8 @@
 		E5A032E8223B0BDB001BC795 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		E5A032EA223B16BB001BC795 /* ModelControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelControllers.swift; sourceTree = "<group>"; };
 		E5A032EC223B1A11001BC795 /* MailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewController.swift; sourceTree = "<group>"; };
+		E5CF520E228CA3BF00E94704 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
+		E5CF5210228CA42400E94704 /* MenuModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuModelController.swift; sourceTree = "<group>"; };
 		E5F1D7832242CFE2007071AA /* ContactsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift; sourceTree = "<group>"; };
 		E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressTableViewCell.swift; sourceTree = "<group>"; };
 		E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddressTableViewCell.xib; sourceTree = "<group>"; };
@@ -279,6 +283,8 @@
 				E5F28AA0223864B2002721ED /* ColorScheme.swift */,
 				E5A032E8223B0BDB001BC795 /* Helpers.swift */,
 				E5A032EA223B16BB001BC795 /* ModelControllers.swift */,
+				E5CF5210228CA42400E94704 /* MenuModelController.swift */,
+				E5CF520E228CA3BF00E94704 /* StorageProvider.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -537,6 +543,8 @@
 				E5F28A9D223856DD002721ED /* LoginViewController.swift in Sources */,
 				E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */,
 				E5F1D78F2242E067007071AA /* MailSubjectTableViewCell.swift in Sources */,
+				E5CF520F228CA3BF00E94704 /* StorageProvider.swift in Sources */,
+				E5CF5211228CA42400E94704 /* MenuModelController.swift in Sources */,
 				E5111F052242BA420036501F /* SettingsViewController.swift in Sources */,
 				E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */,
 				E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */,
