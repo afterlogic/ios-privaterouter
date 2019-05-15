@@ -43,13 +43,13 @@ class SideMenuViewController: UIViewController {
         let shouldLoadFromCache = MenuModelController.shared.folders.count == 0
         
         if shouldLoadFromCache {
-            if let folders = StorageProvider.shared.getFoldersList() {
-                MenuModelController.shared.folders = folders
-            }
+            StorageProvider.shared.getFolders(completionHandler: { (result) in
+                MenuModelController.shared.folders = MenuModelController.shared.compressedFolders(folders: result)
+                
+                self.tableView.reloadData()
+                self.selectCurrentFolder(withAction: shouldLoadFromCache)
+            })
         }
-        
-        self.tableView.reloadData()
-        selectCurrentFolder(withAction: shouldLoadFromCache)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -80,13 +80,12 @@ class SideMenuViewController: UIViewController {
         API.shared.getFolders(completionHandler: {(result, error) in
             if let folders = result {
                 let withAction = MenuModelController.shared.folders.count == 0
-                StorageProvider.shared.saveFoldersList(folders: folders)
-                
                 MenuModelController.shared.updateFolders(newFolders: folders)
                 
                 API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: folders), completionHandler: { (result, error) in
                     if let folders = result {
                         MenuModelController.shared.updateFolders(newFolders: folders)
+                        StorageProvider.shared.saveFolders(folders: folders)
                         
                         DispatchQueue.main.async {
                             self.tableView.reloadData()

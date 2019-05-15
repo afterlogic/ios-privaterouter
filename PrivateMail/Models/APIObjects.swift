@@ -222,6 +222,7 @@ struct APIFolder {
     
     init(input: [String: Any]) {
         self = APIFolder()
+        self.input = input
         
         if let type = input["Type"] as? Int {
             self.type = type

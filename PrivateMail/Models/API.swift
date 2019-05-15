@@ -14,7 +14,6 @@ extension Notification.Name {
 }
 
 class API: NSObject {
-    
     static let shared = API()
     
     var currentUser: APIUser = APIUser()
@@ -44,11 +43,11 @@ class API: NSObject {
                 completionHandler(false, nil)
             }
         }
-        
     }
     
     func logout(completionHandler: @escaping (Bool?, Error?) -> Void) {
         StorageProvider.shared.deleteAllMails()
+        StorageProvider.shared.deleteAllFolders(completionHandler: {})
         StorageProvider.shared.removeCurrentUserInfo()
         
         createTask(module: "Core", method: "Logout", parameters: [:]) { (result, error) in

@@ -23,6 +23,20 @@ class MailDB: Object {
     @objc dynamic var data = NSData()
 }
 
+class FolderDB: Object {
+    @objc dynamic var type = -1
+    @objc dynamic var name = ""
+    @objc dynamic var fullName = ""
+    @objc dynamic var isSubscribed = false
+    @objc dynamic var isSelectable = false
+    @objc dynamic var subFoldersCount = 0
+    @objc dynamic var hashString = ""
+    @objc dynamic var messagesCount = 0
+    @objc dynamic var unreadCount = 0
+    @objc dynamic var depth = 0
+    @objc dynamic var data = NSData()
+}
+
 extension Realm {
     func writeAsync<T : ThreadConfined>(obj: T, errorHandler: @escaping ((_ error : Swift.Error) -> Void) = { _ in return }, block: @escaping ((Realm, T?) -> Void)) {
         let wrappedObj = ThreadSafeReference(to: obj)
@@ -69,6 +83,9 @@ class StorageProvider: NSObject {
         let config = Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         Realm.Configuration.defaultConfiguration = config
     }
+
+    
+    //MARK: - Syncing
     
     func syncFolderIfNeeded(folder: String, oldMails: [APIMail], beganSyncing: @escaping () -> Void) {
         if syncingFolders.contains(folder) {
@@ -295,8 +312,144 @@ class StorageProvider: NSObject {
         }
     }
     
-    func saveCurrentUser(user: [String: Any]) {
-        UserDefaults.standard.set(user, forKey: "currentUser")
+    func loadBodiesFor(mails: [APIMail], limit: Int, folder: String, completionHandler: @escaping (Bool) -> Void) {
+        var uids: [Int] = []
+        let loadingLimit = limit
+        
+        getMails(text: "", folder: folder, limit: nil, additionalPredicate: nil) { (result) in
+            for mail in mails {
+                var found = false
+                
+                if result.count > 0 {
+                    if let first = result.first {
+                        if mail.uid ?? -1 > first.uid ?? -1 {
+                            found = true
+                        }
+                    }
+                    
+                    if let last = result.last {
+                        if mail.uid ?? -1 < last.uid ?? -1 {
+                            found = true
+                        }
+                    }
+                } else {
+                    found = true
+                }
+                
+                if found {
+                    uids.append(mail.uid ?? -1)
+                    
+                    if uids.count == loadingLimit {
+                        break
+                    }
+                }
+            }
+            
+            var progress: String? = NSLocalizedString("Syncing... (\(result.count)/\(mails.count))", comment: "")
+            
+            if uids.count > 0 {
+                API.shared.getMailsBodiesList(uids: uids, folder: folder, completionHandler: { (result, error) in
+                    if self.syncingFolders.contains(folder) {
+                        if let uids = self.uids[folder] {
+                            self.loadBodiesFor(mails: uids, limit: loadingLimit, folder: folder, completionHandler: { (success) in
+                            })
+                        }
+                    }
+                    
+                    completionHandler(true)
+                })
+            } else {
+                if let index = self.syncingFolders.firstIndex(of: folder) {
+                    self.syncingFolders.remove(at: index)
+                }
+                
+                progress = nil
+                completionHandler(true)
+            }
+            
+            self.delegate?.updateHeaderWith(progress: progress, folder: folder)
+        }
+    }
+    
+    
+    // MARK: - Fetching
+    
+    func getMails(text: String, folder: String, limit: Int?, additionalPredicate: String?, completionHandler: @escaping ([APIMail]) -> Void) {
+        let referenceDate = Date()
+        let fetchID = fetchingID
+        fetchingID += 1
+        
+        print("Fetching began: ID\(fetchID)")
+        
+        isFetching = true
+        var mails: [APIMail] = []
+        
+        DispatchQueue.main.async {
+            var predicate = """
+            (
+            folder = \"\(folder)\"
+            AND accountID = \(API.shared.currentUser.id)
+            )
+            """
+            
+            if text.count > 0 {
+                predicate += """
+                AND (subject CONTAINS[cd] \"\(text)\"
+                OR body CONTAINS[cd] \"\(text)\"
+                OR attachments CONTAINS[cd] \"\(text)\")
+                """
+            }
+            
+            if let addPart = additionalPredicate {
+                predicate += " " + addPart
+            }
+            
+            let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
+            
+            for i in 0..<min(result.count, limit ?? result.count) {
+                let object = result[i]
+                let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
+                
+                if let input = input as? [String : Any] {
+                    var mail = APIMail(input: input)
+                    mail.isSeen = object.isSeen
+                    mail.isFlagged = object.isFlagged
+                    
+                    mails.append(mail)
+                }
+            }
+            
+            self.isFetching = false
+            completionHandler(mails)
+            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
+        }
+    }
+    
+    func getFolders(completionHandler: @escaping ([APIFolder]) -> Void)  {
+        DispatchQueue.main.async {
+            var folders: [APIFolder] = []
+            let result = self.realm.objects(FolderDB.self)
+            
+            for i in 0..<result.count {
+                let object = result[i]
+                let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
+                
+                if let input = input as? [String : Any] {
+                    var folder = APIFolder(input: input)
+                    folder.subFolders = nil
+                    
+                    folder.subFoldersCount = object.subFoldersCount
+                    folder.hash = object.hashString
+                    folder.messagesCount = object.messagesCount
+                    folder.unreadCount = object.unreadCount
+                    folder.depth = object.depth
+                    
+                    folders.append(folder)
+                }
+            }
+            
+            completionHandler(folders)
+        }
     }
     
     func getCurrentUser() -> APIUser? {
@@ -309,39 +462,23 @@ class StorageProvider: NSObject {
         return nil
     }
     
-    func saveFoldersList(folders: [APIFolder]) {
-        var list: [String] = []
-        
-        for folder in folders {
-            if let folderName = folder.name, let isSubscribed = folder.isSubscribed {
-                if isSubscribed {
-                    list.append(folderName)
+    func containsMail(mail: APIMail, completionHandler: @escaping (MailDB?) -> Void) {
+        DispatchQueue.main.async {
+            if let uid = mail.uid, let folder = mail.folder {
+                let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
+                if result.count > 0 {
+                    completionHandler(result.first)
+                } else {
+                    completionHandler(nil)
                 }
+            } else {
+                completionHandler(nil)
             }
         }
-        
-        UserDefaults.standard.set(list, forKey: "folders")
     }
     
-    func getFoldersList() -> [APIFolder]? {
-        if let folders = UserDefaults.standard.object(forKey: "folders") as? [String] {
-            var result: [APIFolder] = []
-            
-            for item in folders {
-                let folder = APIFolder(input: ["Name": item])
-                result.append(folder)
-            }
-            
-            return result
-        }
-        
-        return nil
-    }
     
-    func removeCurrentUserInfo() {
-        UserDefaults.standard.removeObject(forKey: "currentUser")
-        UserDefaults.standard.removeObject(forKey: "folders")
-    }
+    //MARK: - Saving
     
     func saveMail(mail: APIMail) {
         if API.shared.currentUser.id > 0,
@@ -444,159 +581,49 @@ class StorageProvider: NSObject {
         }
     }
     
-    func loadBodiesFor(mails: [APIMail], limit: Int, folder: String, completionHandler: @escaping (Bool) -> Void) {
-        var uids: [Int] = []
-        let loadingLimit = limit
-        
-        getMails(text: "", folder: folder, limit: nil, additionalPredicate: nil) { (result) in
-            for mail in mails {
-                var found = false
-                
-                if result.count > 0 {
-                    if let first = result.first {
-                        if mail.uid ?? -1 > first.uid ?? -1 {
-                            found = true
-                        }
-                    }
-                    
-                    if let last = result.last {
-                        if mail.uid ?? -1 < last.uid ?? -1 {
-                            found = true
-                        }
-                    }
-                } else {
-                    found = true
-                }
-                
-                if found {
-                    uids.append(mail.uid ?? -1)
-                    
-                    if uids.count == loadingLimit {
-                        break
-                    }
-                }
-            }
-            
-            var progress: String? = NSLocalizedString("Syncing... (\(result.count)/\(mails.count))", comment: "")
-            
-            if uids.count > 0 {
-                API.shared.getMailsBodiesList(uids: uids, folder: folder, completionHandler: { (result, error) in
-                    if self.syncingFolders.contains(folder) {
-                        if let uids = self.uids[folder] {
-                            self.loadBodiesFor(mails: uids, limit: loadingLimit, folder: folder, completionHandler: { (success) in
-                            })
-                        }
-                    }
-                    
-                    completionHandler(true)
-                })
-            } else {
-                if let index = self.syncingFolders.firstIndex(of: folder) {
-                    self.syncingFolders.remove(at: index)
-                }
-                
-                progress = nil
-                completionHandler(true)
-            }
-            
-            self.delegate?.updateHeaderWith(progress: progress, folder: folder)
-        }
+    func saveCurrentUser(user: [String: Any]) {
+        UserDefaults.standard.set(user, forKey: "currentUser")
     }
     
-    func getMails(text: String, folder: String, limit: Int?, additionalPredicate: String?, completionHandler: @escaping ([APIMail]) -> Void) {
-        let referenceDate = Date()
-        let fetchID = fetchingID
-        fetchingID += 1
-        
-        print("Fetching began: ID\(fetchID)")
-        
-        isFetching = true
-        var mails: [APIMail] = []
-        
-        DispatchQueue.main.async {
-            var predicate = """
-            (
-            folder = \"\(folder)\"
-            AND accountID = \(API.shared.currentUser.id)
-            )
-            """
+    func saveFolders(folders: [APIFolder]) {
+        deleteAllFolders {
+            var foldersDB: [FolderDB] = []
             
-            if text.count > 0 {
-                predicate += """
-                AND (subject CONTAINS[cd] \"\(text)\"
-                OR body CONTAINS[cd] \"\(text)\"
-                OR attachments CONTAINS[cd] \"\(text)\")
-                """
-            }
-            
-            if let addPart = additionalPredicate {
-                predicate += " " + addPart
-            }
-            
-            let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
-            
-            for i in 0..<min(result.count, limit ?? result.count) {
-                let object = result[i]
-                let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
-                
-                if let input = input as? [String : Any] {
-                    var mail = APIMail(input: input)
-                    mail.isSeen = object.isSeen
-                    mail.isFlagged = object.isFlagged
+            for folder in folders {
+                if  let type = folder.type,
+                    let name = folder.name,
+                    let fullName = folder.fullName,
+                    let isSubscribed = folder.isSubscribed,
+                    let isSelectable = folder.isSelectable,
+                    let hashString = folder.hash,
+                    let messagesCount = folder.messagesCount,
+                    let unreadCount = folder.unreadCount,
+                    let input = folder.input {
+
+                    let subFoldersCount = folder.subFoldersCount ?? 0
                     
-                    mails.append(mail)
+                    let folderDB = FolderDB()
+                    folderDB.type = type
+                    folderDB.name = name
+                    folderDB.fullName = fullName
+                    folderDB.isSubscribed = isSubscribed
+                    folderDB.isSelectable = isSelectable
+                    folderDB.subFoldersCount = subFoldersCount
+                    folderDB.hashString = hashString
+                    folderDB.messagesCount = messagesCount
+                    folderDB.unreadCount = unreadCount
+                    folderDB.depth = folder.depth
+                    
+                    let data = NSKeyedArchiver.archivedData(withRootObject: input)
+                    folderDB.data = NSData(data: data)
+                    foldersDB.append(folderDB)
                 }
             }
             
-            self.isFetching = false
-            completionHandler(mails)
-            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
-        }
-    }
-    
-    func removeDeletedMails(mails: [APIMail], completionHandler: @escaping ([Int]) -> Void) {
-        var ids: [Int] = []
-        
-        for mail in mails {
-            if let id = mail.uid {
-                ids.append(id)
-            }
-        }
-        
-        let predicate = """
-        (
-        folder = \"\(MenuModelController.shared.selectedFolder)\"
-        AND accountID = \(API.shared.currentUser.id)
-        AND NOT (uid IN %@)
-        )
-        """
-        
-        let result = self.realm.objects(MailDB.self).filter(predicate, ids).sorted(byKeyPath: "date", ascending: false)
-        
-        var deletedUids: [Int] = []
-        
-        for item in result {
-            deletedUids.append(item.uid)
-        }
-        
-        try! self.realm.write {
-            self.realm.delete(result)
-        }
-        
-        completionHandler(deletedUids)
-    }
-    
-    func containsMail(mail: APIMail, completionHandler: @escaping (MailDB?) -> Void) {
-        DispatchQueue.main.async {
-            if let uid = mail.uid, let folder = mail.folder {
-                let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
-                if result.count > 0 {
-                    completionHandler(result.first)
-                } else {
-                    completionHandler(nil)
+            DispatchQueue.main.async {
+                try! self.realm.write {
+                    self.realm.add(foldersDB)
                 }
-            } else {
-                completionHandler(nil)
             }
         }
     }
@@ -634,6 +661,9 @@ class StorageProvider: NSObject {
         }
     }
     
+    
+    //MARK: - Deleting
+    
     func deleteMail(mail: APIMail) {
         DispatchQueue.main.async {
             if let uid = mail.uid, let folder = mail.folder {
@@ -660,6 +690,20 @@ class StorageProvider: NSObject {
         }
     }
     
+    func deleteAllFolders(completionHandler: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            let result = self.realm.objects(FolderDB.self)
+            
+            self.realm.writeAsync(obj: result, block: { (realm, result) in
+                if let result = result {
+                    realm.delete(result)
+                }
+                
+                completionHandler()
+            })
+        }
+    }
+    
     func deleteMailsFor(accountID: Int) {
         DispatchQueue.main.async {
             let result = self.realm.objects(MailDB.self).filter("accountID = \(accountID)")
@@ -670,6 +714,43 @@ class StorageProvider: NSObject {
                 }
             })
         }
+    }
+    
+    func removeCurrentUserInfo() {
+        UserDefaults.standard.removeObject(forKey: "currentUser")
+        UserDefaults.standard.removeObject(forKey: "folders")
+    }
+    
+    func removeDeletedMails(mails: [APIMail], completionHandler: @escaping ([Int]) -> Void) {
+        var ids: [Int] = []
+        
+        for mail in mails {
+            if let id = mail.uid {
+                ids.append(id)
+            }
+        }
+        
+        let predicate = """
+        (
+        folder = \"\(MenuModelController.shared.selectedFolder)\"
+        AND accountID = \(API.shared.currentUser.id)
+        AND NOT (uid IN %@)
+        )
+        """
+        
+        let result = self.realm.objects(MailDB.self).filter(predicate, ids).sorted(byKeyPath: "date", ascending: false)
+        
+        var deletedUids: [Int] = []
+        
+        for item in result {
+            deletedUids.append(item.uid)
+        }
+        
+        try! self.realm.write {
+            self.realm.delete(result)
+        }
+        
+        completionHandler(deletedUids)
     }
     
 }
