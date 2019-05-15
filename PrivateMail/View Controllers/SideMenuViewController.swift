@@ -64,6 +64,8 @@ class SideMenuViewController: UIViewController {
         
         emailLabel.text = currentUser?.email
         avatarImageView.sd_setImage(with: API.shared.currentUser.profileImageURL, placeholderImage: UIImage(named: "avatar_placeholder"))
+        
+        tableView.reloadData()
     }
     
     @objc func refreshControlAction() {

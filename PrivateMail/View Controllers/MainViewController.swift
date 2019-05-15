@@ -112,6 +112,12 @@ class MainViewController: UIViewController {
                 self.refreshControl.endRefreshing()
             }
         }
+        
+        API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
+            if let folders = result {
+                MenuModelController.shared.updateFolders(newFolders: folders)
+            }
+        })
     }
     
     func loadMails(text: String, folder: String, limit: Int?, offset: Int?, completionHandler: @escaping () -> Void) {

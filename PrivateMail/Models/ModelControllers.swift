@@ -51,6 +51,53 @@ class MenuModelController: NSObject {
         return result
     }
     
+    func compressedFolders(folders: [APIFolder]) -> [APIFolder] {
+        var result: [APIFolder] = folders
+        
+        var index = -1
+        var deepestFolder: APIFolder = APIFolder()
+        deepestFolder.depth = -1
+        
+        for i in 0..<result.count {
+            let folder = result[i]
+            
+            if folder.depth > deepestFolder.depth {
+                deepestFolder = folder
+                index = i
+            }
+        }
+        
+        if deepestFolder.depth > 0 {
+            result.remove(at: index)
+            
+            var pathComponents = deepestFolder.fullName?.components(separatedBy: "/")
+            pathComponents?.removeLast()
+            let expectedFolderPath = pathComponents?.joined(separator: "/")
+            
+            for i in 0..<result.count {
+                var folder = result[i]
+                
+                if folder.fullName == expectedFolderPath {
+                    deepestFolder.depth = 0
+                    
+                    if var subFolders = folder.subFolders {
+                        subFolders.append(deepestFolder)
+                        folder.subFolders = subFolders
+                    } else {
+                        folder.subFolders = [deepestFolder]
+                    }
+                    
+                    result[i] = folder
+                    break
+                }
+            }
+            
+            return compressedFolders(folders: result)
+        }
+        
+        return result
+    }
+    
     func updateFolders(newFolders: [APIFolder]) {
         var newFolders = newFolders
         
@@ -66,8 +113,8 @@ class MenuModelController: NSObject {
     }
     
     func mailsForFolder(name: String?) -> [APIMail] {
-        for folder in folders {
-            if folder.name == name {
+        for folder in expandedFolders(folders: folders) {
+            if folder.fullName == name {
                 return folder.mails
             }
         }
@@ -76,19 +123,25 @@ class MenuModelController: NSObject {
     }
     
     func setMailsForCurrentFolder(mails: [APIMail]) {
+        var folders = expandedFolders(folders: self.folders)
+        
         for i in 0..<folders.count {
-            if folders[i].name == selectedFolder {
+            if folders[i].fullName == selectedFolder {
                 folders[i].mails = mails
+                
+                self.folders = compressedFolders(folders: folders)
                 return
             }
         }
     }
     
     func removeMail(mail: APIMail) {
+        var folders = expandedFolders(folders: self.folders)
+        
         for i in 0..<folders.count {
             var folder = folders[i]
             
-            if folder.name == mail.folder {
+            if folder.fullName == mail.folder {
                 var mails = folder.mails
                 
                 mails.removeAll { (item) -> Bool in
@@ -100,6 +153,7 @@ class MenuModelController: NSObject {
             }
         }
         
+        self.folders = compressedFolders(folders: folders)
     }
     
 }
