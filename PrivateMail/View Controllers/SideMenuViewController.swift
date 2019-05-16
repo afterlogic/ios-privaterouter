@@ -12,16 +12,17 @@ import SideMenu
 
 extension Notification.Name {
     static let didSelectFolder = Notification.Name("didSelectFolder")
+    static let shouldRefreshFoldersInfo = Notification.Name("didRecieveUpdatedFoldersInfo")
 }
 
 class SideMenuViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
-    
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var emailLabel: UILabel!
-    @IBOutlet var avatarImageView: UIImageView!
     @IBOutlet var settingsButton: UIButton!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var expandImageView: UIImageView!
     
     let refreshControl = UIRefreshControl()
     
@@ -39,6 +40,7 @@ class SideMenuViewController: UIViewController {
         setupTableView()
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.reloadData), name: .didRecieveUser, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.reloadTableView), name: .shouldRefreshFoldersInfo, object: nil)
         
         let shouldLoadFromCache = MenuModelController.shared.folders.count == 0
         
@@ -54,6 +56,9 @@ class SideMenuViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        expandImageView.tintColor = .black
+        expandImageView.tintColor = .white
         
         currentUser = API.shared.currentUser
         nameLabel.text = (currentUser?.firstName ?? "") + " " + (currentUser?.lastName ?? "")
@@ -71,6 +76,12 @@ class SideMenuViewController: UIViewController {
     @objc func refreshControlAction() {
         if !tableView.isDragging {
             reloadData()
+        }
+    }
+    
+    @objc func reloadTableView() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
         }
     }
     
@@ -205,7 +216,9 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             cell.setSelected(false)
         }
         
+        cell.folder = folder
         cell.unreadCount = folder.unreadCount ?? 0
+        cell.subFoldersCount = folder.subFoldersCount ?? 0
         cell.titleLabel.text = folder.name
         
         cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
@@ -239,6 +252,12 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
         
         if folder.isSelectable ?? true {
+            let systemFolders = ["INBOX", "Sent", "Drafts"]
+            
+            if !systemFolders.contains(MenuModelController.shared.selectedFolder) {
+                StorageProvider.shared.stopSyncingFolder(MenuModelController.shared.selectedFolder)
+            }
+            
             MenuModelController.shared.selectedFolder = folder.fullName ?? "INBOX"
         }
         

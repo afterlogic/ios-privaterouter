@@ -27,7 +27,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Folder Folder Folder Folder FolderFolderFolderFolderFolderFolderFolderFolder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sNo-bO-2rr">
-                        <rect key="frame" x="43" y="14.5" width="214.5" height="20.5"/>
+                        <rect key="frame" x="61" y="14.5" width="196.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -50,11 +50,23 @@
                             <constraint firstAttribute="bottom" secondItem="pR7-YK-kJp" secondAttribute="bottom" constant="5" id="oih-DW-UYa"/>
                         </constraints>
                     </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow" translatesAutoresizingMaskIntoConstraints="NO" id="dzd-Iz-mNV">
+                        <rect key="frame" x="43" y="22.5" width="10" height="5"/>
+                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="dzd-Iz-mNV" secondAttribute="height" multiplier="2:1" id="8xo-EF-Wdi"/>
+                            <constraint firstAttribute="width" constant="10" id="WrO-NS-XXi"/>
+                        </constraints>
+                    </imageView>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="dzd-Iz-mNV" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="2b5-TB-zOx"/>
                     <constraint firstAttribute="trailing" secondItem="sNo-bO-2rr" secondAttribute="trailing" priority="750" constant="15" id="4HG-Co-qSH"/>
+                    <constraint firstItem="dzd-Iz-mNV" firstAttribute="width" secondItem="dzd-Iz-mNV" secondAttribute="height" multiplier="2:1" id="9JU-vA-2Et"/>
+                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="dzd-Iz-mNV" secondAttribute="trailing" constant="8" id="Ars-Ff-3uO"/>
+                    <constraint firstItem="dzd-Iz-mNV" firstAttribute="leading" secondItem="Ifo-jx-FpC" secondAttribute="trailing" constant="8" id="RLg-wg-gc1"/>
                     <constraint firstItem="Ifo-jx-FpC" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="USY-1H-dBN"/>
-                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="Ifo-jx-FpC" secondAttribute="trailing" constant="8" id="fTz-F5-eyp"/>
+                    <constraint firstItem="sNo-bO-2rr" firstAttribute="leading" secondItem="Ifo-jx-FpC" secondAttribute="trailing" priority="750" constant="8" id="fTz-F5-eyp"/>
                     <constraint firstItem="Ifo-jx-FpC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="reu-1z-Vzh"/>
                     <constraint firstItem="iCF-La-O2J" firstAttribute="leading" secondItem="sNo-bO-2rr" secondAttribute="trailing" constant="5" id="vsc-zV-7og"/>
                     <constraint firstItem="sNo-bO-2rr" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="zNh-kh-yr9"/>
@@ -65,6 +77,8 @@
                 <constraint firstItem="iCF-La-O2J" firstAttribute="centerY" secondItem="KGk-i7-Jjw" secondAttribute="centerY" id="SVa-Uk-LLI"/>
             </constraints>
             <connections>
+                <outlet property="expandIconConstraint" destination="Ars-Ff-3uO" id="OUo-NA-juv"/>
+                <outlet property="expandImageView" destination="dzd-Iz-mNV" id="394-Vo-9g8"/>
                 <outlet property="iconImageView" destination="Ifo-jx-FpC" id="GGK-s5-183"/>
                 <outlet property="sideConstraint" destination="reu-1z-Vzh" id="BWT-ng-zO0"/>
                 <outlet property="titleLabel" destination="sNo-bO-2rr" id="qKM-sB-EP3"/>
@@ -76,6 +90,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="arrow" width="12" height="6"/>
         <image name="folder_inbox" width="25" height="25"/>
     </resources>
 </document>

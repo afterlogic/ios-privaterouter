@@ -945,6 +945,7 @@
                     <connections>
                         <outlet property="avatarImageView" destination="tOb-f8-sig" id="LDn-DF-HpO"/>
                         <outlet property="emailLabel" destination="eLm-QA-Cct" id="ofP-dK-HYs"/>
+                        <outlet property="expandImageView" destination="7fQ-E4-1aO" id="VGo-vw-uMh"/>
                         <outlet property="nameLabel" destination="CKD-cV-2RP" id="fen-yH-sUy"/>
                         <outlet property="settingsButton" destination="Maz-Xv-tUN" id="LQ1-Rh-rAQ"/>
                         <outlet property="tableView" destination="wzU-oJ-YND" id="6Ka-pg-Oc3"/>

@@ -40,6 +40,7 @@ class ComposeMailViewController: UIViewController {
         tableView.register(cellClass: AddressTableViewCell())
         tableView.register(cellClass: MailSubjectTableViewCell())
         tableView.register(cellClass: MailBodyTableViewCell())
+        tableView.register(cellClass: MailHTMLBodyTableViewCell())
         
         tableView.tableFooterView = UIView(frame: CGRect.zero)
     }
@@ -231,6 +232,25 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             cell.textView.doneAccessory = true
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
             result = cell
+//            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
+//            
+//            let html = """
+//            <!DOCTYPE html>
+//            <html>
+//            <head>
+//            <meta name="viewport" content="initial-scale=1.0" />
+//            </head>
+//            <body>
+//            <div id="editor" contenteditable="true">\(mail.body(false))</div>
+//            </body>
+//            </html>
+//            """
+//            
+//            cell.webView.loadHTMLString(html, baseURL: nil)
+//            cell.delegate = self
+//            
+//            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+//            result = cell
             break
         }
         

@@ -194,6 +194,30 @@ struct APIMail {
     func showInlineWarning() -> Bool {
         return hasExternals && !safety
     }
+    
+    func reSubject() -> String {
+        let subject = self.subject ?? ""
+        
+        let groups = subject.groups(for: "^Re(\\[(\\d+)])?:")
+        
+        if groups.count > 0 {
+            var updatedSubject = subject
+            
+            if let range = updatedSubject.range(of: groups[0][0]) {
+                updatedSubject.removeSubrange(range)
+            }
+            
+            if groups[0].count > 2 {
+                let index = (Int(groups[0][2]) ?? 1) + 1
+                
+                return "Re[\(index)]:" + updatedSubject
+            } else {
+                return "Re[2]:" + updatedSubject
+            }
+        } else {
+            return "Re: " + subject
+        }
+    }
 }
 
 struct APIFolder {

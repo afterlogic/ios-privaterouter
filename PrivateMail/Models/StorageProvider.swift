@@ -66,6 +66,10 @@ protocol StorageProviderDelegate: NSObjectProtocol {
     func updateTableView(mails: [APIMail], folder: String)
 }
 
+struct SyncingItem {
+    var folder: APIFolder?
+    var priority: Int = 0
+}
 
 class StorageProvider: NSObject {
     static let shared = StorageProvider()
@@ -87,13 +91,15 @@ class StorageProvider: NSObject {
     
     //MARK: - Syncing
     
-    func syncFolderIfNeeded(folder: String, oldMails: [APIMail], beganSyncing: @escaping () -> Void) {
+    func syncFolderIfNeeded(folder: String, expectedHash: String, oldMails: [APIMail], beganSyncing: @escaping () -> Void) {
         if syncingFolders.contains(folder) {
             beganSyncing()
             return
         }
         
         syncingFolders.append(folder)
+        
+        NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
         
         API.shared.getMailsInfo(text: "", folder: folder) { (result, error) in
             if let result = result {
@@ -130,7 +136,7 @@ class StorageProvider: NSObject {
                 group.enter()
                 
                 DispatchQueue.main.async {
-                    self.removeDeletedMails(mails: mails, completionHandler: { (deletedUids) in
+                    self.removeDeletedMails(mails: mails, folder: folder, completionHandler: { (deletedUids) in
                         uidsToDelete = deletedUids
                         group.leave()
                     })
@@ -171,7 +177,13 @@ class StorageProvider: NSObject {
                             }
                             
                             if shouldUpdateFlags {
-                                self.updateMailFlags(mail: mail)
+                                group.enter()
+                                
+                                self.updateMailFlags(mail: mail, completionHandler: {
+                                    group.leave()
+                                })
+                                
+                                group.wait()
                             }
                             
                             isFound = true
@@ -188,6 +200,8 @@ class StorageProvider: NSObject {
                 if isEqual {
                     if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
+                        MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
+                        NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                     }
                     
                     self.delegate?.updateTableView(mails: newMails, folder: folder)
@@ -282,6 +296,7 @@ class StorageProvider: NSObject {
                         } else {
                             if let index = self.syncingFolders.firstIndex(of: folder) {
                                 self.syncingFolders.remove(at: index)
+                                NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                             }
                             
                             progress = nil
@@ -291,6 +306,8 @@ class StorageProvider: NSObject {
                     
                     if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
+                        MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
+                        NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                     }
                     
                     self.delegate?.updateHeaderWith(progress: nil, folder: folder)
@@ -298,6 +315,7 @@ class StorageProvider: NSObject {
             } else {
                 if let index = self.syncingFolders.firstIndex(of: folder) {
                     self.syncingFolders.remove(at: index)
+                    NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                 }
                 
                 beganSyncing()
@@ -306,10 +324,15 @@ class StorageProvider: NSObject {
         
     }
     
-    func stopSyncingCurrentFolder() {
-        if let index = syncingFolders.firstIndex(of: MenuModelController.shared.selectedFolder) {
+    func stopSyncingFolder(_ name: String) {
+        if let index = syncingFolders.firstIndex(of: name) {
             syncingFolders.remove(at: index)
+            NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
         }
+    }
+    
+    func stopSyncingCurrentFolder() {
+        stopSyncingFolder(MenuModelController.shared.selectedFolder)
     }
     
     func loadBodiesFor(mails: [APIMail], limit: Int, folder: String, completionHandler: @escaping (Bool) -> Void) {
@@ -361,6 +384,7 @@ class StorageProvider: NSObject {
             } else {
                 if let index = self.syncingFolders.firstIndex(of: folder) {
                     self.syncingFolders.remove(at: index)
+                    NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                 }
                 
                 progress = nil
@@ -628,7 +652,7 @@ class StorageProvider: NSObject {
         }
     }
     
-    func updateMailFlags(mail: APIMail) {
+    func updateMailFlags(mail: APIMail, completionHandler: @escaping () -> Void) {
         if let uid = mail.uid, let folder = mail.folder {
             DispatchQueue.main.async {
                 let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
@@ -642,9 +666,13 @@ class StorageProvider: NSObject {
                         if let isFlagged = mail.isFlagged {
                             maildDB.isFlagged = isFlagged
                         }
+                        
+                        completionHandler()
                     }
                 }
             }
+        } else {
+            completionHandler()
         }
     }
     
@@ -721,7 +749,7 @@ class StorageProvider: NSObject {
         UserDefaults.standard.removeObject(forKey: "folders")
     }
     
-    func removeDeletedMails(mails: [APIMail], completionHandler: @escaping ([Int]) -> Void) {
+    func removeDeletedMails(mails: [APIMail], folder: String, completionHandler: @escaping ([Int]) -> Void) {
         var ids: [Int] = []
         
         for mail in mails {
@@ -732,7 +760,7 @@ class StorageProvider: NSObject {
         
         let predicate = """
         (
-        folder = \"\(MenuModelController.shared.selectedFolder)\"
+        folder = \"\(folder)\"
         AND accountID = \(API.shared.currentUser.id)
         AND NOT (uid IN %@)
         )

@@ -105,8 +105,6 @@ class API: NSObject {
     func getFoldersInfo(folders: [APIFolder], completionHandler: @escaping ([APIFolder]?, Error?) -> Void) {
         var foldersName: [String] = []
         
-        //        let expandedFolders = MenuModelController.shared.expandedFolders(folders: folders)
-        
         for folder in folders {
             if let folderName = folder.fullName {
                 foldersName.append(folderName)
@@ -125,7 +123,7 @@ class API: NSObject {
                 var updatedFolders = folders
                 
                 for i in 0..<updatedFolders.count {
-                    if let name = updatedFolders[i].fullName, let item = counts[name] {
+                    if let folderName = updatedFolders[i].fullName, let item = counts[folderName] {
                         if let totalCount = item[0] as? Int {
                             updatedFolders[i].messagesCount = totalCount
                         }
@@ -135,22 +133,26 @@ class API: NSObject {
                         }
                         
                         if let hash = item[3] as? String {
-//                            let systemFolders = ["INBOX", "Sent", "Drafts"]
-//                            let currentFolder = MenuModelController.shared.selectedFolder
-//
-//                            if let oldHash = updatedFolders[i].hash {
-//                                if oldHash != hash
-//                                    && (systemFolders.contains(name)
-//                                        || name == currentFolder) {
-//
-//                                    if !StorageProvider.shared.syncingFolders.contains(name) {
-//                                        let oldMails = MenuModelController.shared.mailsForFolder(name: name)
-//                                        
-//                                        StorageProvider.shared.syncFolderIfNeeded(folder: name, oldMails: oldMails, beganSyncing: {
-//                                        })
-//                                    }
-//                                }
-//                            }
+                            let systemFolders = ["INBOX", "Sent", "Drafts"]
+                            let currentFolder = MenuModelController.shared.selectedFolder
+                            
+                            let oldHash = updatedFolders[i].hash ?? ""
+                            
+//                            print("Folder: \(folderName) Old: \(oldHash) New: \(hash)")
+                            
+                            if oldHash != hash
+                                && (systemFolders.contains(folderName)
+                                    || folderName == currentFolder) {
+                                
+                                if !StorageProvider.shared.syncingFolders.contains(folderName) {
+                                    StorageProvider.shared.getMails(text: "", folder: folderName, limit: nil, additionalPredicate: nil, completionHandler: { (result) in
+                                        MenuModelController.shared.setMailsForFolder(mails: result, folder: folderName)
+                                        
+                                        StorageProvider.shared.syncFolderIfNeeded(folder: folderName, expectedHash: hash, oldMails: result, beganSyncing: {
+                                        })
+                                    })
+                                }
+                            }
                             
                             updatedFolders[i].hash = hash
                         }

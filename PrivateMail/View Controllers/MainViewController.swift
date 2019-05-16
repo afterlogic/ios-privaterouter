@@ -54,7 +54,11 @@ class MainViewController: UIViewController {
         setupSearchBar()
         setupComposeMailButton()
      
+        #if DEBUG
+        refreshTimer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
+        #else
         refreshTimer = Timer.scheduledTimer(timeInterval: 5.0 * 60.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
+        #endif
         
     }
     
@@ -62,7 +66,7 @@ class MainViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
         
-        mails = MenuModelController.shared.mailsForCurrentFolder()
+        mails = MenuModelController.shared.mailsForFolder(name: title ?? "")
         tableView.reloadData()
     }
     
@@ -88,21 +92,22 @@ class MainViewController: UIViewController {
         
         lastPage = false
         
-        let folder = MenuModelController.shared.selectedFolder
+        let folder = title ?? ""
         
         mails = MenuModelController.shared.mailsForFolder(name: folder)
         tableView.reloadData()
         
         if withSyncing {
-            StorageProvider.shared.syncFolderIfNeeded(folder: folder, oldMails: mails) {
-                self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
+            API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
+                if let folders = result {
+                    MenuModelController.shared.updateFolders(newFolders: folders)
+                    NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
+                }
                 
-                completionHandler()
-    
                 DispatchQueue.main.async {
                     self.refreshControl.endRefreshing()
                 }
-            }
+            })
         } else {
             loadMails(text: searchBar.text ?? "", folder: folder, limit: nil, offset: nil, completionHandler: {
                 completionHandler()
@@ -112,12 +117,6 @@ class MainViewController: UIViewController {
                 self.refreshControl.endRefreshing()
             }
         }
-        
-        API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
-            if let folders = result {
-                MenuModelController.shared.updateFolders(newFolders: folders)
-            }
-        })
     }
     
     func loadMails(text: String, folder: String, limit: Int?, offset: Int?, completionHandler: @escaping () -> Void) {
@@ -127,8 +126,11 @@ class MainViewController: UIViewController {
         
         StorageProvider.shared.getMails(text: text, folder: folder, limit: limit, additionalPredicate: nil, completionHandler: { (result) in
             DispatchQueue.main.async {
-                self.mails = result
-                MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+                if folder == self.title {
+                    self.mails = result
+                }
+                
+                MenuModelController.shared.setMailsForFolder(mails: self.mails, folder: folder)
                 
                 self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
                 
@@ -189,6 +191,7 @@ class MainViewController: UIViewController {
         let deleteButton = UIAlertAction.init(title: NSLocalizedString("Clear user cache", comment: ""), style: .default) { (alert: UIAlertAction!) in
             SVProgressHUD.showSuccess(withStatus: NSLocalizedString("Done", comment: ""))
             StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
+            StorageProvider.shared.deleteAllFolders {}
             
             self.mails = []
             MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
@@ -429,7 +432,7 @@ extension MainViewController: StorageProviderDelegate {
         DispatchQueue.main.async {
             if folder == self.title && self.searchBar.text == "" {
                 self.mails = mails
-                MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+                MenuModelController.shared.setMailsForFolder(mails: mails, folder: folder)
                 
                 self.tableView.reloadData()
             }

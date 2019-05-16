@@ -245,7 +245,7 @@ class MailPageViewController: UIPageViewController {
                 newMail.to = mail.from
             }
             
-            newMail.subject = "Re: \(mail.subject ?? "")"
+            newMail.subject = "\(mail.reSubject())"
             newMail.plainBody = """
             
             On \(mail.date?.getFullDateString() ?? "") \(mail.from?.first ?? "") wrote

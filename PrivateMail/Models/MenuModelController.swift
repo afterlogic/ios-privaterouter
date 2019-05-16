@@ -98,13 +98,42 @@ class MenuModelController: NSObject {
     }
     
     func updateFolders(newFolders: [APIFolder]) {
-        var newFolders = newFolders
+        var newFolders = expandedFolders(folders: newFolders)
+        let expandedFolders = self.expandedFolders(folders: folders)
         
         for i in 0..<newFolders.count {
-            newFolders[i].mails = mailsForFolder(name: newFolders[i].name)
+            for folder in expandedFolders {
+                if folder.fullName == newFolders[i].fullName {
+                    newFolders[i].mails = folder.mails
+                    newFolders[i].hash = folder.hash
+                    
+                    if newFolders[i].unreadCount == nil {
+                        newFolders[i].unreadCount = folder.unreadCount
+                    }
+                    
+                    if newFolders[i].messagesCount == nil {
+                        newFolders[i].messagesCount = folder.messagesCount
+                    }
+                }
+            }
         }
         
-        folders = newFolders
+        folders = compressedFolders(folders: newFolders)
+    }
+    
+    func updateFolder(folder: String, hash: String) {
+        var expandedFolders = self.expandedFolders(folders: folders)
+        
+        for i in 0..<expandedFolders.count {
+            if expandedFolders[i].fullName == folder {
+                expandedFolders[i].hash = hash
+                break
+            }
+        }
+        
+        folders = compressedFolders(folders: expandedFolders)
+        
+        StorageProvider.shared.saveFolders(folders: folders)
     }
     
     func mailsForCurrentFolder() -> [APIMail] {
@@ -121,17 +150,21 @@ class MenuModelController: NSObject {
         return []
     }
     
-    func setMailsForCurrentFolder(mails: [APIMail]) {
+    func setMailsForFolder(mails: [APIMail], folder: String) {
         var folders = expandedFolders(folders: self.folders)
         
         for i in 0..<folders.count {
-            if folders[i].fullName == selectedFolder {
+            if folders[i].fullName == folder {
                 folders[i].mails = mails
                 
                 self.folders = compressedFolders(folders: folders)
                 return
             }
         }
+    }
+    
+    func setMailsForCurrentFolder(mails: [APIMail]) {
+        setMailsForFolder(mails: mails, folder: selectedFolder)
     }
     
     func removeMail(mail: APIMail) {
