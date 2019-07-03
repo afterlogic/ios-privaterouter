@@ -57,6 +57,10 @@ class MenuModelController: NSObject {
         var deepestFolder: APIFolder = APIFolder()
         deepestFolder.depth = -1
         
+        if result.count > 20 {
+            return result
+        }
+        
         for i in 0..<result.count {
             let folder = result[i]
             
@@ -114,6 +118,8 @@ class MenuModelController: NSObject {
                     if newFolders[i].messagesCount == nil {
                         newFolders[i].messagesCount = folder.messagesCount
                     }
+                    
+                    break
                 }
             }
         }
@@ -134,6 +140,18 @@ class MenuModelController: NSObject {
         folders = compressedFolders(folders: expandedFolders)
         
         StorageProvider.shared.saveFolders(folders: folders)
+    }
+    
+    func currentFolder() -> APIFolder? {
+        let folders = expandedFolders(folders: self.folders)
+        
+        for folder in folders {
+            if folder.fullName == selectedFolder {
+                return folder
+            }
+        }
+        
+        return nil
     }
     
     func mailsForCurrentFolder() -> [APIMail] {

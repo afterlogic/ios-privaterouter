@@ -101,7 +101,6 @@
 		E567B4852236D51D00FA9945 /* PrivateMailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateMailUITests.swift; sourceTree = "<group>"; };
 		E567B4872236D51D00FA9945 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E5A032E1223ADEA1001BC795 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		E5A032E3223ADEAB001BC795 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
 		E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderTableViewCell.xib; sourceTree = "<group>"; };
 		E5A032E8223B0BDB001BC795 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -382,7 +381,6 @@
 			knownRegions = (
 				en,
 				Base,
-				ru,
 			);
 			mainGroup = E567B4592236D51C00FA9945;
 			productRefGroup = E567B4632236D51C00FA9945 /* Products */;
@@ -607,7 +605,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				E5A032E1223ADEA1001BC795 /* en */,
-				E5A032E3223ADEAB001BC795 /* ru */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

@@ -94,9 +94,18 @@ class SideMenuViewController: UIViewController {
                 MenuModelController.shared.updateFolders(newFolders: folders)
                 
                 API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: folders), completionHandler: { (result, error) in
-                    if let folders = result {
-                        MenuModelController.shared.updateFolders(newFolders: folders)
-                        StorageProvider.shared.saveFolders(folders: folders)
+                    if let foldersWithHash = result {
+                        var folderWithoutHash: [APIFolder] = []
+                        
+                        for folder in foldersWithHash {
+                            var newFolder = folder
+                            newFolder.hash = nil
+                            folderWithoutHash.append(newFolder)
+                        }
+                        
+                        MenuModelController.shared.updateFolders(newFolders: folderWithoutHash)
+                        let expandedFolders = MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders)
+                        StorageProvider.shared.saveFolders(folders: expandedFolders)
                         
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
@@ -217,8 +226,14 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         cell.folder = folder
-        cell.unreadCount = folder.unreadCount ?? 0
-        cell.subFoldersCount = folder.subFoldersCount ?? 0
+        
+        if folder.type == 3 {
+            cell.unreadCount = folder.messagesCount ?? 0
+        } else {
+            cell.unreadCount = folder.unreadCount ?? 0
+        }
+        
+        cell.subFoldersCount = 0 //folder.subFoldersCount ?? 0
         cell.titleLabel.text = folder.name
         
         cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
@@ -240,7 +255,7 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             cell.iconImageView.image = UIImage(named: "folder_trash")
             
         default:
-            cell.iconImageView.image = UIImage(named: "folder_default")
+            cell.iconImageView.image = nil //UIImage(named: "folder_default")
         }
         
         cell.selectionStyle = .none

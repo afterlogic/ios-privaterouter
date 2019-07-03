@@ -11,6 +11,10 @@ import SideMenu
 import SVProgressHUD
 import RealmSwift
 
+extension Notification.Name {
+    static let mainViewControllerShouldRefreshData = Notification.Name("mainViewControllerShouldRefreshData")
+}
+
 class MainViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
@@ -30,6 +34,7 @@ class MainViewController: UIViewController {
     let searchBar = UISearchBar()
     
     var refreshTimer: Timer?
+    var searchTimer: Timer?
     
     @IBOutlet var progressHolder: UIView!
     @IBOutlet var progressLabel: UILabel!
@@ -46,6 +51,7 @@ class MainViewController: UIViewController {
         title = NSLocalizedString("Mail", comment: "")
         
         NotificationCenter.default.addObserver(self, selector: #selector(didSelectFolder), name: .didSelectFolder, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: .mainViewControllerShouldRefreshData, object: nil)
         
         StorageProvider.shared.delegate = self
         
@@ -95,7 +101,10 @@ class MainViewController: UIViewController {
         let folder = title ?? ""
         
         mails = MenuModelController.shared.mailsForFolder(name: folder)
-        tableView.reloadData()
+        
+        if searchBar.text?.count == 0 {
+            tableView.reloadData()
+        }
         
         if withSyncing {
             API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
@@ -194,7 +203,8 @@ class MainViewController: UIViewController {
             StorageProvider.shared.deleteAllFolders {}
             
             self.mails = []
-            MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+            MenuModelController.shared.folders = []
+//            MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
             
             self.tableView.reloadData()
         }
@@ -307,6 +317,10 @@ class MainViewController: UIViewController {
         if segue.identifier == "MailSegue" {
             let vc = segue.destination as! MailPageViewController
             
+            if let folder = MenuModelController.shared.currentFolder() {
+                vc.folder = folder
+            }
+            
             if let mail = selectedMail {
                 vc.mail = mail
             }
@@ -361,12 +375,19 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    @objc func refreshData() {
+        DispatchQueue.main.async {
+            self.mails = MenuModelController.shared.mailsForFolder(name: self.title)
+            self.tableView.reloadData()
+        }
+    }
 }
 
 
 extension MainViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
+        searchTimer?.invalidate()
         
         reloadData(withSyncing: false, completionHandler: {})
         
@@ -380,13 +401,23 @@ extension MainViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        StorageProvider.shared.getMails(text: searchText, folder: MenuModelController.shared.selectedFolder, limit: nil, additionalPredicate: nil, completionHandler: { (result) in
+        searchTimer?.invalidate()
+
+        searchTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(makeSearch), userInfo: nil, repeats: false)
+    }
+    
+    @objc func makeSearch() {
+        refreshControl.beginRefreshing(in: tableView)
+
+        StorageProvider.shared.getMails(text: searchBar.text ?? "", folder: MenuModelController.shared.selectedFolder, limit: nil, additionalPredicate: nil, completionHandler: { (result) in
             self.mails = result
             self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
         })
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchTimer?.invalidate()
         
         if searchBar.text!.count == 0 {
             searchBarCancelButtonClicked(searchBar)

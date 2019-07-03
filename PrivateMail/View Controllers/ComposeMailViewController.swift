@@ -22,6 +22,22 @@ class ComposeMailViewController: UIViewController {
     @IBOutlet var passwordTextField: UITextField!
     @IBOutlet var eyeButton: UIButton!
     
+    let editorBegin = """
+            <style>
+            #editor {
+            font-family: -apple-system;
+            font-size: 14pt;
+            .element:read-write:focus {
+            outline: none;
+            }
+            }
+            </style>
+            <body id="editor" contenteditable="true">
+            """
+    let editorEnd = """
+            </body>
+            """
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -64,35 +80,35 @@ class ComposeMailViewController: UIViewController {
     // MARK: - Button actions
     
     @IBAction func sendAction(_ sender: Any) {
-        if let to = ComposeMailModelController.shared.mail.to {
-            if to.count > 0 {
-                SVProgressHUD.show()
-                view.isUserInteractionEnabled = false
-                
-                var mail = ComposeMailModelController.shared.mail
-                mail.plainBody = mail.plainBody?.replacingOccurrences(of: "\n", with: "<br>")
-                mail.plainBody = mail.plainBody?.replacingOccurrences(of: "\r", with: "<br>")
-                
-                API.shared.sendMail(mail: mail) { (result, error) in
-                    DispatchQueue.main.async {
-                        SVProgressHUD.dismiss()
-                        self.view.isUserInteractionEnabled = true
-                        
-                        if let success = result {
-                            if success {
-                                self.navigationController?.popViewController(animated: true)
-                            } else {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Message wasn't sent", comment: ""))
+        DispatchQueue.main.async {
+            if let to = ComposeMailModelController.shared.mail.to {
+                if to.count > 0 {
+                    SVProgressHUD.show()
+                    self.view.isUserInteractionEnabled = false
+                    
+                    let mail = ComposeMailModelController.shared.mail
+                    
+                    API.shared.sendMail(mail: mail) { (result, error) in
+                        DispatchQueue.main.async {
+                            SVProgressHUD.dismiss()
+                            self.view.isUserInteractionEnabled = true
+                            
+                            if let success = result {
+                                if success {
+                                    self.navigationController?.popViewController(animated: true)
+                                } else {
+                                    SVProgressHUD.showError(withStatus: NSLocalizedString("Message wasn't sent", comment: ""))
+                                }
+                            } else if let error = error {
+                                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                                return
                             }
-                        } else if let error = error {
-                            SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            return
+                            
                         }
                         
                     }
                     
                 }
-                
             }
         }
         
@@ -117,7 +133,7 @@ class ComposeMailViewController: UIViewController {
         do {
             if let publicKey = keychain["PublicKey"] {
                 #if !targetEnvironment(simulator)
-                if let body = mail.plainBody, encryptSwitch.isOn {
+                if let body = mail.htmlBody, encryptSwitch.isOn {
                     let data = body.data(using: .utf8)!
                     let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
                     
@@ -125,9 +141,9 @@ class ComposeMailViewController: UIViewController {
                         return passwordTextField.text
                     })
 
-                    let armoredResult = Armor.armored(encrypted, as: .message)
+                    let armoredResult = Armor.armored(encrypted, as: .message).replacingOccurrences(of: "\n", with: "<br>")
                     
-                    mail.plainBody = armoredResult
+                    mail.htmlBody = armoredResult
                     ComposeMailModelController.shared.mail = mail
                     tableView.reloadData()
                 }
@@ -175,6 +191,8 @@ class ComposeMailViewController: UIViewController {
         UIView.animate(withDuration: 0.25, delay: 0, options: .curveEaseInOut, animations: {
             self.view.layoutIfNeeded()
         }, completion: nil)
+        
+//        tableView.reloadData()
     }
     
     
@@ -224,33 +242,16 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
             
         default:
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailBodyTableViewCell.cellID(), for: indexPath) as! MailBodyTableViewCell
-            cell.textView.text = mail.plainBody
-            cell.placeholderLabel.isHidden = mail.plainBody?.count ?? 0 > 0
-            cell.updateHeight(withAction: false)
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
+            
+            let html = editorBegin + ((mail.htmlBody ?? mail.plainBody) ?? "") + editorEnd
+            
+            cell.isEditor = true
+            cell.webView.loadHTMLString(html, baseURL: nil)
             cell.delegate = self
-            cell.textView.doneAccessory = true
+            
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
             result = cell
-//            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
-//            
-//            let html = """
-//            <!DOCTYPE html>
-//            <html>
-//            <head>
-//            <meta name="viewport" content="initial-scale=1.0" />
-//            </head>
-//            <body>
-//            <div id="editor" contenteditable="true">\(mail.body(false))</div>
-//            </body>
-//            </html>
-//            """
-//            
-//            cell.webView.loadHTMLString(html, baseURL: nil)
-//            cell.delegate = self
-//            
-//            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
-//            result = cell
             break
         }
         
@@ -263,8 +264,10 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
 
 extension ComposeMailViewController: UITableViewDelegateExtensionProtocol & UITextViewDelegateExtensionProtocol {
     func cellSizeDidChanged() {
+        UIView.setAnimationsEnabled(false)
         tableView.beginUpdates()
         tableView.endUpdates()
+        UIView.setAnimationsEnabled(true)
     }
     
     func textViewDidChanged(textView: UITextView) {

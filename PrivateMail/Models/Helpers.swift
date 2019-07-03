@@ -78,7 +78,7 @@ extension String {
 extension Date {
     func getDateString() -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale.current
+        formatter.locale = Locale(identifier: "en-US") //Locale.current
         formatter.dateStyle = .none
  
         if Calendar.current.isDateInToday(self) {
@@ -98,7 +98,7 @@ extension Date {
     
     func getFullDateString() -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale.current
+        formatter.locale = Locale(identifier: "en-US") //Locale.current
         formatter.dateStyle = .none
         
         formatter.dateFormat = "E, d MMM yyyy "
