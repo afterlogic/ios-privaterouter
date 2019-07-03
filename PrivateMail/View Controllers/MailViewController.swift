@@ -72,6 +72,10 @@ class MailViewController: UIViewController {
                     }
                 }
             } else {
+                self.mail = APIMail(data: contains!.data)
+                self.mail.isSeen = contains!.isSeen
+                self.mail.isFlagged = contains!.isFlagged
+                
                 if self.mail.showInlineWarning() {
                     self.warningTopConstraint.isActive = true
                     self.warningView.isHidden = false
@@ -95,6 +99,8 @@ class MailViewController: UIViewController {
                         }
                     })
                 }
+                
+                self.tableView.reloadData()
             }
         }
     }
@@ -128,9 +134,9 @@ class MailViewController: UIViewController {
 
 extension MailViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2 + (mail.attachments?.count ?? 0)
+        return 2 + mail.attachmentsToShow().count
     }
-    
+   
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var result = UITableViewCell()
         
@@ -158,7 +164,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
             
-            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: nil)
+            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: URL(string: API.shared.getServerURL()))
             cell.delegate = self
             
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
@@ -168,7 +174,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
             
-            if let fileName = mail.attachments?[indexPath.row - 1]["FileName"] as? String {
+            if let fileName = mail.attachmentsToShow()[indexPath.row - 1]["FileName"] as? String {
                 cell.titleLabel.text = fileName
             } else {
                 cell.titleLabel.text = ""
@@ -177,7 +183,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
             cell.downloadLink = nil
             cell.delegate = self
             
-            if let actions = mail.attachments?[indexPath.row - 1]["Actions"] as? [String: [String: String]] {
+            if let actions = mail.attachmentsToShow()[indexPath.row - 1]["Actions"] as? [String: [String: String]] {
                 if let downloadLink = actions["download"]?["url"] {
                     cell.downloadLink = downloadLink
                 }
@@ -243,7 +249,9 @@ extension MailViewController: QLPreviewControllerDataSource {
 
 extension MailViewController: UITableViewDelegateExtensionProtocol {
     func cellSizeDidChanged() {
+        UIView.setAnimationsEnabled(false)
         tableView.beginUpdates()
         tableView.endUpdates()
+        UIView.setAnimationsEnabled(true)
     }
 }

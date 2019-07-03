@@ -13,6 +13,8 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
     @IBOutlet var webView: UIWebView!
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     
+    var isEditor = false
+    
     weak open var delegate: UITableViewDelegateExtensionProtocol?
     
     override func awakeFromNib() {
@@ -23,6 +25,8 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         
         webView.scrollView.alwaysBounceVertical = false
         webView.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -30,11 +34,27 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
     }
     
     func updateHeight(withAction: Bool) {
-        heightConstraint.constant = webView.scrollView.contentSize.height + 25.0
+        let height = webView.stringByEvaluatingJavaScript(from: "document.body.offsetHeight;") ?? "100"
         
+        heightConstraint.constant = max(CGFloat((height as NSString).floatValue) + 25.0, 200.0)
+        
+        if isEditor {
+            ComposeMailModelController.shared.mail.htmlBody = getText()
+        }
+            
         if withAction {
             delegate?.cellSizeDidChanged()
         }
+    }
+    
+    func getText() -> String {
+        let script = "document.body.innerHTML;"
+        let text = webView.stringByEvaluatingJavaScript(from: script) ?? ""
+        return text
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        updateHeight(withAction: true)
     }
 }
 

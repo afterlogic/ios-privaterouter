@@ -12,19 +12,32 @@ import ObjectivePGP
 
 class MailPageViewController: UIPageViewController {
 
-    var mail: APIMail = APIMail() {
+    var folder: APIFolder = APIFolder() {
         didSet {
-            let notSpamFolders = ["Sent", "Drafts", "Spam", "Trash"]
-            let notASpam = notSpamFolders.contains(self.mail.folder ?? "")
-            let hideSpamButton = (self.mail.folder ?? "") == "Trash"
+            let hideSpamFolders = [2, 3]
+
+            let notASpam = (folder.type ?? -1) == 4
+            spamButton.image = UIImage(named: notASpam ? "not_spam" : "spam")
             
-            self.spamButton.tintColor = hideSpamButton ? .clear : .white
-            self.spamButton.isEnabled = !hideSpamButton
-            self.spamButton.image = UIImage(named: notASpam ? "not_spam" : "spam")
+            var buttons: [UIBarButtonItem] = [menuButton]
+            
+            if (folder.type ?? -1) != 5 {
+                buttons.append(trashButton)
+            }
+            
+            if !hideSpamFolders.contains(folder.type ?? -1) {
+                buttons.append(spamButton)
+            }
+            
+            navigationItem.rightBarButtonItems = buttons
         }
     }
     
+    var mail: APIMail = APIMail()
+    
     @IBOutlet var spamButton: UIBarButtonItem!
+    @IBOutlet var trashButton: UIBarButtonItem!
+    @IBOutlet var menuButton: UIBarButtonItem!
     @IBOutlet var decryptButton: UIBarButtonItem!
     
     override func viewDidLoad() {
@@ -47,7 +60,8 @@ class MailPageViewController: UIPageViewController {
     // MARK: - Buttons Actions
     
     @IBAction func decryptButtonAction(_ sender: Any) {
-        var mail = self.mail
+        guard let mailVC = viewControllers?.first as? MailViewController else { return }
+        var mail = mailVC.mail
         
         let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
         
@@ -64,7 +78,8 @@ class MailPageViewController: UIPageViewController {
                 
                 do {
                     #if !targetEnvironment(simulator)
-                    if let body = mail.plainBody, let privateKey = keychain["PrivateKey"] {
+                    if let privateKey = keychain["PrivateKey"] {
+                        let body = mail.plainedBody(false)
                         let data = try Armor.readArmored(body)
                         let key = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
                         let decrypted = try ObjectivePGP.decrypt(data, andVerifySignature: false, using: key, passphraseForKey: { (key) -> String? in
@@ -72,7 +87,7 @@ class MailPageViewController: UIPageViewController {
                         })
                         
                         let result = String(data: decrypted, encoding: .utf8)
-                        mail.plainBody = result
+                        mail.htmlBody = result
                         self.mail = mail
                         
                         if let mailVC = self.viewControllers?.last as? MailViewController {
@@ -95,7 +110,7 @@ class MailPageViewController: UIPageViewController {
     }
     
     @IBAction func trashButtonAction(_ sender: Any) {
-        let moveToTrash = mail.folder != "Trash"
+        let moveToTrash = (folder.type ?? -1) != 5
         
         let alert = UIAlertController.init(title: NSLocalizedString(moveToTrash ? "Move this message to trash?" : "Delete this message?", comment: ""), message: nil, preferredStyle: .alert)
         
@@ -219,12 +234,26 @@ class MailPageViewController: UIPageViewController {
         
         forwardButton.setValue(UIImage(named: "action_forward"), forKey: "image")
         
+        let removeButton = UIAlertAction.init(title: NSLocalizedString("Remove", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            self.trashButtonAction(self.trashButton as Any)
+        }
+        
         let cancel = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
         }
         
-        actionSheet.addAction(replyButton)
-        actionSheet.addAction(replyAllButton)
-        actionSheet.addAction(forwardButton)
+        if ![2, 3, 4].contains(folder.type ?? -1) {
+            actionSheet.addAction(replyButton)
+            actionSheet.addAction(replyAllButton)
+        }
+        
+        if (folder.type ?? -1) != 3 {
+            actionSheet.addAction(forwardButton)
+        }
+        
+        if (folder.type ?? -1) == 5 {
+            actionSheet.addAction(removeButton)
+        }
+        
         actionSheet.addAction(cancel)
         
         present(actionSheet, animated: true, completion: nil)
@@ -236,39 +265,70 @@ class MailPageViewController: UIPageViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         var newMail = APIMail()
         
+        guard let mailVC = viewControllers?.first as? MailViewController else { return }
+        mail = mailVC.mail
+        
         if segue.identifier == "ReplySegue" || segue.identifier == "ReplyAllSegue" {
-            if segue.identifier == "ReplySegue" {
-                if let sender = mail.from?.first {
-                    newMail.to = [sender]
-                }
+//            if segue.identifier == "ReplySegue" {
+//                if let sender = mail.from?.first {
+//                    newMail.to = [sender]
+//                }
+//            } else {
+            if let replyTo = mail.replyTo, replyTo.count > 0 {
+                newMail.to = replyTo
             } else {
                 newMail.to = mail.from
             }
+//            }
+            
+            if segue.identifier == "ReplyAllSegue" {
+                var emails: [String] = []
+                
+                var cc = mail.cc ?? []
+                cc.append(contentsOf: mail.to ?? [])
+                
+                for email in cc {
+                    if !emails.contains(email) && email != API.shared.currentUser.email {
+                        emails.append(email)
+                    }
+                }
+                
+                newMail.cc = emails
+            }
             
             newMail.subject = "\(mail.reSubject())"
-            newMail.plainBody = """
+            newMail.htmlBody = """
             
             On \(mail.date?.getFullDateString() ?? "") \(mail.from?.first ?? "") wrote
-            <blockquote>
-            \(mail.plainedBody(true))
+            <blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">
+            \(mail.body(false))
             </blockquote>
             """
         } else if segue.identifier == "ForwardSegue" {
             newMail.subject = "Fwd: \(mail.subject ?? "")"
             
-            newMail.plainBody = """
+            var body = """
             
-            –––– Original Message ––––
-            From: \(mail.from?.joined(separator: ", ") ?? "")
-            To: \(mail.to?.joined(separator: ", ") ?? "")
-            Sent: \(mail.date?.getFullDateString() ?? "")
-            Subject: \(mail.subject ?? "")
+            –––– Original Message ––––<br/>
+            From: \(mail.from?.joined(separator: ", ") ?? "")<br/>
+            To: \(mail.to?.joined(separator: ", ") ?? "")<br/>\n
+            """
+           
+            if let cc = mail.cc, cc.count > 0 {
+                body += "CC: \(cc.joined(separator: ", "))<br/>\n"
+            }
             
-            \(mail.plainedBody(true))
+            body += """
+            Sent: \(mail.date?.getFullDateString() ?? "")<br/>
+            Subject: \(mail.subject ?? "")<br/>
+            
+            \(mail.body(false))
             
             """
+            
+            newMail.htmlBody = body
         }
-        
+                
         ComposeMailModelController.shared.mail = newMail
     }
 }

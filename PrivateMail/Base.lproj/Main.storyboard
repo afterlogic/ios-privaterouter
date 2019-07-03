@@ -549,7 +549,9 @@
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="decryptButton" destination="cxD-bS-Hvg" id="8sj-2J-b1l"/>
+                        <outlet property="menuButton" destination="f7o-df-1hc" id="ZYK-IH-UQc"/>
                         <outlet property="spamButton" destination="vR1-1s-kTX" id="Zxq-3T-hjd"/>
+                        <outlet property="trashButton" destination="2vD-4f-Z5f" id="nJW-4f-Z8B"/>
                         <segue destination="4Rb-Vv-OGZ" kind="show" identifier="unusedSegue" id="JLu-8t-gQV"/>
                         <segue destination="EOn-cB-asE" kind="show" identifier="ReplySegue" id="Wur-EW-zy3"/>
                         <segue destination="EOn-cB-asE" kind="show" identifier="ReplyAllSegue" id="vsJ-2H-KhV"/>
