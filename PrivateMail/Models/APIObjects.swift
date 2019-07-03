@@ -58,6 +58,7 @@ struct APIMail {
     var from: [String]?
     var cc: [String]?
     var bcc: [String]?
+    var replyTo: [String]?
     var hasExternals: Bool
     var safety: Bool
     
@@ -68,6 +69,20 @@ struct APIMail {
         self.safety = false
     }
     
+    init(mail: MailDB) {
+        self = APIMail()
+        
+        self.uid = mail.uid
+        self.folder = mail.folder
+        self.subject = mail.subject
+//        self.htmlBody = mail.body
+        self.senders = [mail.sender]
+        self.isSeen = mail.isSeen
+        self.isFlagged = mail.isFlagged
+        self.hasAttachments = mail.attachments.count > 0
+        self.date = mail.date
+    }
+    
     init(input: [String: Any]) {
         self = APIMail()
         self.input = input
@@ -76,7 +91,8 @@ struct APIMail {
             self.date = Date(timeIntervalSince1970: timestamp)
         }
         
-        if let from = input["From"] as? [String: Any], let senders = from["@Collection"] as? [[String: Any]] {
+        if let from = input["From"] as? [String: Any],
+            let senders = from["@Collection"] as? [[String: Any]] {
             self.senders = []
             
             for sender in senders {
@@ -94,12 +110,11 @@ struct APIMail {
         
         self.from = []
         
-        if let from = input["From"] as? [String: Any] {
-            if let collection = from["@Collection"] as? [[String: Any]] {
-                for item in collection {
-                    if let email = item["Email"] as? String {
-                        self.from?.append(email)
-                    }
+        if let from = input["From"] as? [String: Any],
+            let collection = from["@Collection"] as? [[String: Any]] {
+            for item in collection {
+                if let email = item["Email"] as? String {
+                    self.from?.append(email)
                 }
             }
         }
@@ -112,6 +127,29 @@ struct APIMail {
                     if let email = item["Email"] as? String {
                         self.to?.append(email)
                     }
+                }
+            }
+        }
+        
+        self.replyTo = []
+        
+        if let replyTo = input["ReplyTo"] as? [String: Any] {
+            if let collection = replyTo["@Collection"] as? [[String: Any]] {
+                for item in collection {
+                    if let email = item["Email"] as? String {
+                        self.replyTo?.append(email)
+                    }
+                }
+            }
+        }
+        
+        self.cc = []
+        
+        if let cc = input["Cc"] as? [String: Any],
+            let collection = cc["@Collection"] as? [[String: Any]] {
+            for item in collection {
+                if let email = item["Email"] as? String {
+                    self.cc?.append(email)
                 }
             }
         }
@@ -167,16 +205,40 @@ struct APIMail {
         }
     }
     
+    init(data: NSData) {
+        let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: data))
+        
+        if let input = input as? [String : Any] {
+            self = APIMail(input: input)
+        } else {
+            self = APIMail()
+        }
+    }
+    
     func body(_ safe: Bool) -> String {
         let divString = "<div style=\"width: 100%; word-break: break-word;\">"
         
         if var body = htmlBody, body.count > 0 {
             
             if hasExternals && (safety || !safe) {
-                body = body.replacingOccurrences(of: "data-x-src", with: "width=\"100%\" src")
+                body = body.replacingOccurrences(of: "data-x-src=", with: "width=\"100%\" src=")
             }
             
-            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
+//            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
+            
+            if let attachments = attachments {
+                for attachment in attachments {
+                    if let isInline = attachment["IsInline"] as? Bool,
+                        let cid = attachment["CID"] as? String,
+                        let actions = attachment["Actions"] as? [String: [String: String]],
+                        let url = actions["view"]?["url"] {
+                        
+                        if isInline {
+                            body = body.replacingOccurrences(of: "data-x-src-cid=\"\(cid)\"", with: "width=\"100%\" src=\"\(API.shared.getServerURL())\(url)\"")
+                        }
+                    }
+                }
+            }
             
             return divString + body + "</div>"
         }
@@ -188,7 +250,40 @@ struct APIMail {
     }
     
     func plainedBody(_ safe: Bool) -> String {
-        return body(safe).replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+        var result = body(safe).replacingOccurrences(of: "<br>", with: "\n")
+        result = result.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+        return result
+    }
+    
+    func attachmentsToShow() -> [[String: Any]] {
+        var attachmentsToShow: [[String: Any]] = []
+
+        guard let attachments = self.attachments else {
+            return attachmentsToShow
+        }
+
+        for attachment in attachments {
+            if let isInline = attachment["IsInline"] as? Bool,
+                let cid = attachment["CID"] as? String {
+                if isInline {
+                    var contains = false
+                    
+                    if let htmlBody = htmlBody {
+                        contains = htmlBody.contains("data-x-src-cid=\"\(cid)\"")
+                    } else if let plainBody = plainBody {
+                        contains = plainBody.contains("data-x-src-cid=\"\(cid)\"")
+                    }
+                    
+                    if !contains {
+                        attachmentsToShow.append(attachment)
+                    }
+                } else {
+                    attachmentsToShow.append(attachment)
+                }
+            }
+        }
+
+        return attachmentsToShow
     }
     
     func showInlineWarning() -> Bool {

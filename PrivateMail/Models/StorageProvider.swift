@@ -101,6 +101,9 @@ class StorageProvider: NSObject {
         
         NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
         
+        let progress = NSLocalizedString("Syncing...", comment: "")
+        delegate?.updateHeaderWith(progress: progress, folder: folder)
+        
         API.shared.getMailsInfo(text: "", folder: folder) { (result, error) in
             if let result = result {
                 var mails: [APIMail] = []
@@ -135,7 +138,7 @@ class StorageProvider: NSObject {
                 let group = DispatchGroup()
                 group.enter()
                 
-                DispatchQueue.main.async {
+                DispatchQueue.main.sync {
                     self.removeDeletedMails(mails: mails, folder: folder, completionHandler: { (deletedUids) in
                         uidsToDelete = deletedUids
                         group.leave()
@@ -155,10 +158,13 @@ class StorageProvider: NSObject {
                 // Check if not need to sync
                 var isEqual = true
                 
-                for mail in mails {
+                for i in 0..<mails.count {
+                    let mail = mails[i]
                     var isFound = false
                     
-                    for i in 0..<newMails.count {
+//                    for i in 0..<newMails.count {
+                    
+                    if i < newMails.count {
                         if mail.uid == newMails[i].uid {
                             var shouldUpdateFlags = false
                             
@@ -187,10 +193,11 @@ class StorageProvider: NSObject {
                             }
                             
                             isFound = true
-                            break
+//                                                        break
                         }
                     }
-                    
+//                    }
+                
                     isEqual = isEqual && isFound
                 }
                 
@@ -200,10 +207,12 @@ class StorageProvider: NSObject {
                 if isEqual {
                     if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
+                        MenuModelController.shared.setMailsForFolder(mails: newMails, folder: folder)
                         MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
                         NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                     }
                     
+                    self.delegate?.updateHeaderWith(progress: nil, folder: folder)
                     self.delegate?.updateTableView(mails: newMails, folder: folder)
                     return
                 }
@@ -258,7 +267,7 @@ class StorageProvider: NSObject {
                     parts.append(uids)
                 }
                 
-                DispatchQueue.global(qos: .background).async {
+                DispatchQueue.global(qos: .default).async {
                     var progress: String?
                     var totalCount = mailsDB.count
                     
@@ -268,10 +277,12 @@ class StorageProvider: NSObject {
                     
                     self.delegate?.updateHeaderWith(progress: progress, folder: folder)
                     
+                    var success = true
+                    
                     for part in parts {
                         totalCount += part.count
                         
-                        if self.syncingFolders.contains(folder) {
+                        if self.syncingFolders.contains(folder)  {
                             group.enter()
                             
                             API.shared.getMailsBodiesList(uids: part, folder: folder, completionHandler: { (result, error) in
@@ -280,6 +291,8 @@ class StorageProvider: NSObject {
                                     newMails.sort(by: { (a, b) -> Bool in
                                         return (a.uid ?? -1) > (b.uid ?? -1)
                                     })
+                                } else {
+                                    success = false
                                 }
                                 
                                 group.leave()
@@ -287,6 +300,7 @@ class StorageProvider: NSObject {
                             
                             group.wait()
                             
+                            totalCount = newMails.count
                             progress = NSLocalizedString("Syncing... (\(totalCount)/\(mails.count))", comment: "")
                             
                             if self.syncingFolders.contains(folder) {
@@ -306,7 +320,11 @@ class StorageProvider: NSObject {
                     
                     if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
-                        MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
+
+                        if success {
+                            MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
+                        }
+                        
                         NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                     }
                     
@@ -318,6 +336,7 @@ class StorageProvider: NSObject {
                     NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                 }
                 
+                self.delegate?.updateHeaderWith(progress: nil, folder: folder)
                 beganSyncing()
             }
         }
@@ -432,18 +451,13 @@ class StorageProvider: NSObject {
             
             for i in 0..<min(result.count, limit ?? result.count) {
                 let object = result[i]
-                let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
                 
-                if let input = input as? [String : Any] {
-                    var mail = APIMail(input: input)
-                    mail.isSeen = object.isSeen
-                    mail.isFlagged = object.isFlagged
-                    
-                    mails.append(mail)
-                }
+                let mail = APIMail(mail: object)
+                mails.append(mail)
             }
             
             self.isFetching = false
+            
             completionHandler(mails)
             print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
         }
@@ -510,7 +524,8 @@ class StorageProvider: NSObject {
             let input = mail.input,
             let folder = mail.folder,
             let subject = mail.subject,
-            let body = mail.plainBody,
+            let sender = mail.senders?.first,
+//            let body = mail.plainBody,
             let date = mail.date,
             let isSeen = mail.isSeen,
             let isFlagged = mail.isFlagged {
@@ -519,7 +534,8 @@ class StorageProvider: NSObject {
             mailDB.uid = uid
             mailDB.folder = folder
             mailDB.accountID = API.shared.currentUser.id
-            mailDB.body = body
+            mailDB.body = mail.plainedBody(false)
+            mailDB.sender = sender
             mailDB.subject = subject
             mailDB.date = date
             mailDB.isSeen = isSeen
@@ -564,7 +580,8 @@ class StorageProvider: NSObject {
                 let input = mail.input,
                 let folder = mail.folder,
                 let subject = mail.subject,
-                let body = mail.plainBody,
+                let sender = mail.senders?.first,
+                //            let body = mail.plainBody,
                 let date = mail.date,
                 let isSeen = mail.isSeen,
                 let isFlagged = mail.isFlagged {
@@ -573,7 +590,8 @@ class StorageProvider: NSObject {
                 mailDB.uid = uid
                 mailDB.folder = folder
                 mailDB.accountID = API.shared.currentUser.id
-                mailDB.body = body
+                mailDB.body = mail.plainedBody(false)
+                mailDB.sender = sender
                 mailDB.subject = subject
                 mailDB.date = date
                 mailDB.isSeen = isSeen
@@ -619,7 +637,7 @@ class StorageProvider: NSObject {
                     let fullName = folder.fullName,
                     let isSubscribed = folder.isSubscribed,
                     let isSelectable = folder.isSelectable,
-                    let hashString = folder.hash,
+//                    let hashString = folder.hash,
                     let messagesCount = folder.messagesCount,
                     let unreadCount = folder.unreadCount,
                     let input = folder.input {
@@ -633,7 +651,7 @@ class StorageProvider: NSObject {
                     folderDB.isSubscribed = isSubscribed
                     folderDB.isSelectable = isSelectable
                     folderDB.subFoldersCount = subFoldersCount
-                    folderDB.hashString = hashString
+                    folderDB.hashString = folder.hash ?? ""
                     folderDB.messagesCount = messagesCount
                     folderDB.unreadCount = unreadCount
                     folderDB.depth = folder.depth
@@ -666,9 +684,9 @@ class StorageProvider: NSObject {
                         if let isFlagged = mail.isFlagged {
                             maildDB.isFlagged = isFlagged
                         }
-                        
-                        completionHandler()
                     }
+                    
+                    completionHandler()
                 }
             }
         } else {
@@ -706,6 +724,24 @@ class StorageProvider: NSObject {
         }
     }
     
+    func deleteMailsNotFromUser(_ user: APIUser) {
+        DispatchQueue.main.async {
+            let predicate = """
+            (
+            NOT accountID = \(user.id)
+            )
+            """
+            
+            let result = self.realm.objects(MailDB.self).filter(predicate)
+            
+            self.realm.writeAsync(obj: result, block: { (realm, result) in
+                if let result = result {
+                    realm.delete(result)
+                }
+            })
+        }
+    }
+
     func deleteAllMails() {
         DispatchQueue.main.async {
             let result = self.realm.objects(MailDB.self)
@@ -750,32 +786,48 @@ class StorageProvider: NSObject {
     }
     
     func removeDeletedMails(mails: [APIMail], folder: String, completionHandler: @escaping ([Int]) -> Void) {
-        var ids: [Int] = []
-        
-        for mail in mails {
-            if let id = mail.uid {
-                ids.append(id)
-            }
-        }
-        
-        let predicate = """
+        var predicate = """
         (
         folder = \"\(folder)\"
         AND accountID = \(API.shared.currentUser.id)
-        AND NOT (uid IN %@)
         )
         """
         
-        let result = self.realm.objects(MailDB.self).filter(predicate, ids).sorted(byKeyPath: "date", ascending: false)
+        let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
         
         var deletedUids: [Int] = []
+        var lastIndex = 0
         
-        for item in result {
-            deletedUids.append(item.uid)
+        for i in 0..<mails.count {
+            let uid = mails[i].uid ?? -1
+
+            while lastIndex < result.count {
+                let resultUid = result[lastIndex].uid
+                
+                if resultUid >= uid {
+                    if resultUid > uid {
+                        deletedUids.append(resultUid)
+                    }
+                    
+                    lastIndex += 1
+                } else {
+                    break
+                }
+            }
         }
         
+        predicate = """
+        (
+        folder = \"\(folder)\"
+        AND accountID = \(API.shared.currentUser.id)
+        AND (uid IN %@)
+        )
+        """
+        
+        let mailsToDelete = self.realm.objects(MailDB.self).filter(predicate, deletedUids).sorted(byKeyPath: "uid", ascending: false)
+        
         try! self.realm.write {
-            self.realm.delete(result)
+            self.realm.delete(mailsToDelete)
         }
         
         completionHandler(deletedUids)

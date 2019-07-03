@@ -20,6 +20,13 @@ class API: NSObject {
     
     let delay = 0.4
     
+    override init() {
+        super.init()
+        
+        if let token = keychain["AccessToken"] {
+            setCookie(key: "AuthToken", value: token as AnyObject)
+        }
+    }
     
     // MARK: - API Methods
     
@@ -38,6 +45,9 @@ class API: NSObject {
                 let token = res["AuthToken"]
                 
                 keychain["AccessToken"] = token
+                self.removeCookies()
+                self.setCookie(key: "AuthToken", value: token as AnyObject)
+                
                 completionHandler(true, nil)
             } else {
                 completionHandler(false, nil)
@@ -46,9 +56,12 @@ class API: NSObject {
     }
     
     func logout(completionHandler: @escaping (Bool?, Error?) -> Void) {
-        StorageProvider.shared.deleteAllMails()
+        removeCookies()
+
         StorageProvider.shared.deleteAllFolders(completionHandler: {})
         StorageProvider.shared.removeCurrentUserInfo()
+        MenuModelController.shared.folders = []
+        StorageProvider.shared.syncingFolders = []
         
         createTask(module: "Core", method: "Logout", parameters: [:]) { (result, error) in
             keychain["AccessToken"] = nil
@@ -66,6 +79,7 @@ class API: NSObject {
             if let result = result["Result"] as? [[String: Any]] {
                 self.currentUser = APIUser(input: result[0])
                 StorageProvider.shared.saveCurrentUser(user: result[0])
+                StorageProvider.shared.deleteMailsNotFromUser(self.currentUser)
                 
                 NotificationCenter.default.post(name: .didRecieveUser, object: self.currentUser)
                 
@@ -150,6 +164,59 @@ class API: NSObject {
                                         
                                         StorageProvider.shared.syncFolderIfNeeded(folder: folderName, expectedHash: hash, oldMails: result, beganSyncing: {
                                         })
+                                    })
+                                }
+                            } else {
+                                if folderName == currentFolder {
+                                    API.shared.getMailsInfo(text: "", folder: folderName, completionHandler: { (result, error) in
+                                        if let result = result {
+                                            let sortedResult = result.sorted(by: { (first, second) -> Bool in
+                                                let firstUID = Int(first["uid"] as? String ?? "-1") ?? -1
+                                                let secondUID = Int(second["uid"] as? String ?? "-1") ?? -1
+                                                
+                                                return firstUID > secondUID
+                                            })
+                                            
+                                            var index = 0
+                                            var mails = MenuModelController.shared.mailsForFolder(name: folderName)
+                                            
+                                            for item in sortedResult {
+                                                if let uidText = item["uid"] as? String,
+                                                    let uid = Int(uidText),
+                                                    let flags = item["flags"] as? [String] {
+                                                    
+                                                    for i in index ..< mails.count {
+                                                        if mails[i].uid == uid {
+                                                            let isSeen = flags.contains("\\seen")
+                                                            let isFlagged = flags.contains("\\flagged")
+                                                            
+                                                            if mails[i].isSeen != isSeen || mails[i].isFlagged != isFlagged {
+                                                                mails[i].isSeen = isSeen
+                                                                mails[i].isFlagged = isFlagged
+                                                                
+                                                                let group = DispatchGroup()
+                                                                group.enter()
+                                                                
+                                                                StorageProvider.shared.updateMailFlags(mail: mails[i], completionHandler: {
+                                                                    group.leave()
+                                                                })
+                                                                
+                                                                group.wait()
+                                                            }
+                                                                
+                                                            index = i + 1
+                                                            break
+                                                        } else if mails[i].uid ?? -1 > uid {
+                                                            break
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            MenuModelController.shared.setMailsForFolder(mails: mails, folder: folderName)
+                                            
+                                            NotificationCenter.default.post(name: .mainViewControllerShouldRefreshData, object: nil)
+                                        }
                                     })
                                 }
                             }
@@ -272,7 +339,7 @@ class API: NSObject {
             "Cc": mail.cc?.first ?? "",
             "Bcc": mail.bcc?.first ?? "",
             "Subject": mail.subject ?? "",
-            "Text": mail.plainBody ?? "",
+            "Text": mail.htmlBody ?? "",
             "IsHtml": true,
             "Importance": 3,
             "SendReadingConfirmation": false,
@@ -433,6 +500,30 @@ class API: NSObject {
         //        }
         
         return "https://\(server).afterlogic.com/"
+    }
+    
+    func setCookie(key: String, value: AnyObject) {
+        let cookieProps = [
+            .domain: "test.afterlogic.com",
+            .path: "/",
+            .name: key,
+            .value: value,
+            .secure: "TRUE",
+            .expires: NSDate(timeIntervalSinceNow: TimeInterval(60 * 60 * 24 * 365))
+            ] as [HTTPCookiePropertyKey : Any]
+        
+        let cookie = HTTPCookie(properties: cookieProps)
+        HTTPCookieStorage.shared.setCookie(cookie!)
+    }
+    
+    func removeCookies() {
+        guard let cookies = HTTPCookieStorage.shared.cookies(for: URL(string: "test.afterlogic.com")!) else {
+            return
+        }
+        
+        for cookie in cookies {
+            HTTPCookieStorage.shared.deleteCookie(cookie)
+        }
     }
     
     func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
