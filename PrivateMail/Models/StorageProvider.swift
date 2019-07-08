@@ -37,6 +37,20 @@ class FolderDB: Object {
     @objc dynamic var data = NSData()
 }
 
+class PGPKeyDB: Object {
+    @objc dynamic var accountID = -1
+    @objc dynamic var isPrivate = false
+    @objc dynamic var email = ""
+}
+
+class PGPKey: NSObject {
+    var accountID = -1
+    var isPrivate = false
+    var email = ""
+    var armoredKey = ""
+    var length = 0
+}
+
 extension Realm {
     func writeAsync<T : ThreadConfined>(obj: T, errorHandler: @escaping ((_ error : Swift.Error) -> Void) = { _ in return }, block: @escaping ((Realm, T?) -> Void)) {
         let wrappedObj = ThreadSafeReference(to: obj)
@@ -515,6 +529,48 @@ class StorageProvider: NSObject {
         }
     }
     
+    func getPGPKeys(_ isPrivate: Bool) -> [PGPKey] {
+        let keys = self.realm.objects(PGPKeyDB.self).filter("isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+        var result: [PGPKey] = []
+        
+        for key in keys {
+            let newKey = PGPKey()
+            newKey.accountID = key.accountID
+            newKey.email = key.email
+            newKey.isPrivate = key.isPrivate
+            
+            if newKey.isPrivate {
+                newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            } else {
+                newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            }
+            
+            result.append(newKey)
+        }
+        
+        return result
+    }
+    
+    func getPGPKey(_ email: String?, isPrivate: Bool) -> PGPKey? {
+        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"\(email ?? "")\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+        
+        if let key = keys.first {
+            let newKey = PGPKey()
+            newKey.accountID = key.accountID
+            newKey.email = key.email
+            newKey.isPrivate = key.isPrivate
+            
+            if newKey.isPrivate {
+                newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            } else {
+                newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            }
+            
+            return newKey
+        }
+        
+        return nil
+    }
     
     //MARK: - Saving
     
@@ -670,6 +726,23 @@ class StorageProvider: NSObject {
         }
     }
     
+    func savePGPKey(_ email: String, isPrivate: Bool, armoredKey: String) {
+        let key = PGPKeyDB()
+        key.accountID = API.shared.currentUser.id
+        key.email = email
+        key.isPrivate = isPrivate
+        
+        if isPrivate {
+            keychain["PrivateKey\(API.shared.currentUser.id)-\(email)"] = armoredKey
+        } else {
+            keychain["PublicKey\(API.shared.currentUser.id)-\(email)"] = armoredKey
+        }
+        
+        try! realm.write {
+            realm.add(key)
+        }
+    }
+    
     func updateMailFlags(mail: APIMail, completionHandler: @escaping () -> Void) {
         if let uid = mail.uid, let folder = mail.folder {
             DispatchQueue.main.async {
@@ -777,6 +850,20 @@ class StorageProvider: NSObject {
                     realm.delete(result)
                 }
             })
+        }
+    }
+    
+    func deletePGPKey(_ email: String, isPrivate: Bool) {
+        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"\(email)\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+        
+        if isPrivate {
+            keychain["PrivateKey\(API.shared.currentUser.id)-\(email)"] = nil
+        } else {
+            keychain["PublicKey\(API.shared.currentUser.id)-\(email)"] = nil
+        }
+        
+        try! realm.write {
+            realm.delete(keys)
         }
     }
     

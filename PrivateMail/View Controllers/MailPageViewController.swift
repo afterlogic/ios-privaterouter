@@ -34,6 +34,7 @@ class MailPageViewController: UIPageViewController {
     }
     
     var mail: APIMail = APIMail()
+    var keysToImport: String?
     
     @IBOutlet var spamButton: UIBarButtonItem!
     @IBOutlet var trashButton: UIBarButtonItem!
@@ -54,6 +55,15 @@ class MailPageViewController: UIPageViewController {
         view.backgroundColor = .white
         
         decryptButton.title = NSLocalizedString("Decrypt", comment: "")
+        
+        NotificationCenter.default.addObserver(forName: .shouldImportKey, object: nil, queue: nil) { (notification) in
+            DispatchQueue.main.async {
+                if let keys = notification.object as? String {
+                    self.keysToImport = keys
+                    self.performSegue(withIdentifier: "ImportKeysSegue", sender: nil)
+                }
+            }
+        }
     }
 
     
@@ -78,7 +88,7 @@ class MailPageViewController: UIPageViewController {
                 
                 do {
                     #if !targetEnvironment(simulator)
-                    if let privateKey = keychain["PrivateKey"] {
+                    if let privateKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
                         let body = mail.plainedBody(false)
                         let data = try Armor.readArmored(body)
                         let key = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
@@ -263,6 +273,12 @@ class MailPageViewController: UIPageViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ImportKeysSegue" {
+            let vc = segue.destination as! ImportKeysListViewController
+            vc.keyString = keysToImport
+            return
+        }
+        
         var newMail = APIMail()
         
         guard let mailVC = viewControllers?.first as? MailViewController else { return }

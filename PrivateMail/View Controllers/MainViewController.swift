@@ -60,12 +60,7 @@ class MainViewController: UIViewController {
         setupSearchBar()
         setupComposeMailButton()
      
-        #if DEBUG
-        refreshTimer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
-        #else
-        refreshTimer = Timer.scheduledTimer(timeInterval: 5.0 * 60.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
-        #endif
-        
+        refreshTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(refreshTimerAction), userInfo: nil, repeats: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -84,7 +79,22 @@ class MainViewController: UIViewController {
     // MARK: - API
     
     @objc func refreshTimerAction() {
-        reloadData(withSyncing: true, completionHandler: {})
+        let refreshTime = (SettingsModelController.shared.getValueFor(.syncFrequency) as? Int) ?? -1
+        
+        if refreshTime > 0 {
+            let lastRefreshDate = (SettingsModelController.shared.getValueFor(.lastRefresh) as? Date) ?? Date(timeIntervalSince1970: 0.0)
+            
+            #if DEBUG
+                let timeInterval = TimeInterval(refreshTime * 5)
+            #else
+                let timeInterval = TimeInterval(refreshTime * 60)
+            #endif
+            
+            if Date().timeIntervalSince(lastRefreshDate) >= timeInterval {
+                SettingsModelController.shared.setValue(Date(), for: .lastRefresh)
+                reloadData(withSyncing: true, completionHandler: {})
+            }
+        }
     }
     
     @objc func refreshControlAction() {

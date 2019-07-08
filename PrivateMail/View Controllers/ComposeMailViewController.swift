@@ -131,7 +131,7 @@ class ComposeMailViewController: UIViewController {
         var mail = ComposeMailModelController.shared.mail
         
         do {
-            if let publicKey = keychain["PublicKey"] {
+            if let publicKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: false)?.armoredKey {
                 #if !targetEnvironment(simulator)
                 if let body = mail.htmlBody, encryptSwitch.isOn {
                     let data = body.data(using: .utf8)!

@@ -9,12 +9,17 @@
 import UIKit
 
 protocol MailAttachmentTableViewCellDelegate: NSObjectProtocol {
+    func shouldOpenImportScreen(url: URL?, fileName: String)
+    
     func shouldPreviewAttachment(url: URL?, fileName: String)
 }
 
 class MailAttachmentTableViewCell: UITableViewCell {
 
+    @IBOutlet var importKeyButton: UIButton!
     @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var importConstraint: NSLayoutConstraint!
+    
     var downloadLink: String?
     var delegate: MailAttachmentTableViewCellDelegate?
     
@@ -34,6 +39,12 @@ class MailAttachmentTableViewCell: UITableViewCell {
         }
     }
     
+    @IBAction func importKeyButtonAction(_ sender: Any) {
+        if let downloadLink = downloadLink {
+            let url = URL(string: "\(API.shared.getServerURL())\(downloadLink)")
+            delegate?.shouldOpenImportScreen(url: url, fileName: titleLabel.text ?? "file.txt")
+        }
+    }
     
 }
 

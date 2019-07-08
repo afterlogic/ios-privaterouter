@@ -10,6 +10,10 @@ import UIKit
 import SVProgressHUD
 import QuickLook
 
+extension Notification.Name {
+    static let shouldImportKey = Notification.Name("shouldImportKey")
+}
+
 class MailViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
@@ -174,8 +178,17 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
             
+            cell.importKeyButton.isHidden = true
+            cell.importConstraint.isActive = false
+            
             if let fileName = mail.attachmentsToShow()[indexPath.row - 1]["FileName"] as? String {
                 cell.titleLabel.text = fileName
+                
+                if (fileName as NSString).pathExtension == "asc" {
+                    cell.importKeyButton.isHidden = false
+                    cell.importConstraint.isActive = true
+                }
+                
             } else {
                 cell.titleLabel.text = ""
             }
@@ -201,6 +214,27 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
 
 
 extension MailViewController: MailAttachmentTableViewCellDelegate {
+    func shouldOpenImportScreen(url: URL?, fileName: String) {
+        if let url = url {
+            SVProgressHUD.show()
+            
+            API.shared.downloadAttachementWith(url: url) { (data, error) in
+                SVProgressHUD.dismiss()
+                
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                } else if let data = data {
+                    let keys = String(data: data, encoding: .utf8)
+                    NotificationCenter.default.post(name: .shouldImportKey, object: keys)
+                } else {
+                    SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                }
+            }
+        } else {
+            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+        }
+    }
+    
     func shouldPreviewAttachment(url: URL?, fileName: String) {
         if let url = url {
             SVProgressHUD.show()

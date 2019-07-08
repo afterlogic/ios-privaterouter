@@ -81,10 +81,12 @@ extension Date {
         formatter.locale = Locale(identifier: "en-US") //Locale.current
         formatter.dateStyle = .none
  
+        let isAMPM = (SettingsModelController.shared.getValueFor(.timeFormat) as? Bool) ?? true
+        
         if Calendar.current.isDateInToday(self) {
-            formatter.timeStyle = .short
+            formatter.dateFormat = isAMPM ? "hh:mm a" : "HH:mm"
         } else if Calendar.current.isDateInYesterday(self) {
-            formatter.timeStyle = .short
+            formatter.dateFormat = isAMPM ? "hh:mm a" : "HH:mm"
 
             return NSLocalizedString("Yesterday \(formatter.string(from: self))", comment: "")
         } else if Calendar.current.isDate(self, equalTo: Date(), toGranularity: .year) {
@@ -98,17 +100,14 @@ extension Date {
     
     func getFullDateString() -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en-US") //Locale.current
-        formatter.dateStyle = .none
+        formatter.locale = Locale(identifier: "en-US")
+        
+        let isAMPM = (SettingsModelController.shared.getValueFor(.timeFormat) as? Bool) ?? true
         
         formatter.dateFormat = "E, d MMM yyyy "
+        formatter.dateFormat += isAMPM ? "hh:mm a" : "HH:mm"
         
-        let dateString = formatter.string(from: self)
-        
-        formatter.dateFormat = ""
-        formatter.timeStyle = .short
-        
-        return dateString + formatter.string(from: self)
+        return formatter.string(from: self)
     }
 }
 
@@ -142,4 +141,24 @@ extension UITextView {
         self.resignFirstResponder()
     }
     
+}
+
+
+extension UIViewController {
+    func presentAlertView(_ title: String?, message: String?, style: UIAlertController.Style, actions: [UIAlertAction], addCancelButton: Bool = false) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: style)
+
+        for action in actions {
+            alertController.addAction(action)
+        }
+        
+        if addCancelButton {
+            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
+            }
+            
+            alertController.addAction(cancelAction)
+        }
+        
+        present(alertController, animated: true, completion: nil)
+    }
 }

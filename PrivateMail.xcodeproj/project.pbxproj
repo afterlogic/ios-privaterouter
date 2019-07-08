@@ -26,6 +26,16 @@
 		E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E567B46E2236D51D00FA9945 /* LaunchScreen.storyboard */; };
 		E567B47B2236D51D00FA9945 /* PrivateMailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B47A2236D51D00FA9945 /* PrivateMailTests.swift */; };
 		E567B4862236D51D00FA9945 /* PrivateMailUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E567B4852236D51D00FA9945 /* PrivateMailUITests.swift */; };
+		E5690D5F22CFCC7C003493E1 /* PGPSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D5E22CFCC7C003493E1 /* PGPSettingsViewController.swift */; };
+		E5690D6222CFD23B003493E1 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6022CFD23B003493E1 /* SettingsTableViewCell.swift */; };
+		E5690D6322CFD23B003493E1 /* SettingsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5690D6122CFD23B003493E1 /* SettingsTableViewCell.xib */; };
+		E5690D6622CFDC5F003493E1 /* CommonSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6522CFDC5F003493E1 /* CommonSettingsViewController.swift */; };
+		E5690D6822CFEB0A003493E1 /* SyncSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6722CFEB0A003493E1 /* SyncSettingsViewController.swift */; };
+		E5690D6B22CFFF0E003493E1 /* SettingsButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6922CFFF0E003493E1 /* SettingsButtonTableViewCell.swift */; };
+		E5690D6C22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5690D6A22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib */; };
+		E5690D6E22D0100F003493E1 /* PGPKeyPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6D22D0100F003493E1 /* PGPKeyPreviewViewController.swift */; };
+		E5690D7022D03659003493E1 /* ImportKeysFromTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */; };
+		E5690D7222D042B1003493E1 /* ImportKeysListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */; };
 		E5A032E0223ADEA1001BC795 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E2223ADEA1001BC795 /* Localizable.strings */; };
 		E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */; };
 		E5A032E7223B0AFC001BC795 /* FolderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */; };
@@ -100,6 +110,16 @@
 		E567B4812236D51D00FA9945 /* PrivateMailUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PrivateMailUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E567B4852236D51D00FA9945 /* PrivateMailUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateMailUITests.swift; sourceTree = "<group>"; };
 		E567B4872236D51D00FA9945 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E5690D5E22CFCC7C003493E1 /* PGPSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGPSettingsViewController.swift; sourceTree = "<group>"; };
+		E5690D6022CFD23B003493E1 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
+		E5690D6122CFD23B003493E1 /* SettingsTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsTableViewCell.xib; sourceTree = "<group>"; };
+		E5690D6522CFDC5F003493E1 /* CommonSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonSettingsViewController.swift; sourceTree = "<group>"; };
+		E5690D6722CFEB0A003493E1 /* SyncSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettingsViewController.swift; sourceTree = "<group>"; };
+		E5690D6922CFFF0E003493E1 /* SettingsButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButtonTableViewCell.swift; sourceTree = "<group>"; };
+		E5690D6A22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsButtonTableViewCell.xib; sourceTree = "<group>"; };
+		E5690D6D22D0100F003493E1 /* PGPKeyPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGPKeyPreviewViewController.swift; sourceTree = "<group>"; };
+		E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportKeysFromTextViewController.swift; sourceTree = "<group>"; };
+		E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportKeysListViewController.swift; sourceTree = "<group>"; };
 		E5A032E1223ADEA1001BC795 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
 		E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderTableViewCell.xib; sourceTree = "<group>"; };
@@ -234,6 +254,18 @@
 			path = PrivateMailUITests;
 			sourceTree = "<group>";
 		};
+		E5690D6422CFDC3F003493E1 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				E5111F042242BA420036501F /* SettingsViewController.swift */,
+				E5690D6522CFDC5F003493E1 /* CommonSettingsViewController.swift */,
+				E5690D6722CFEB0A003493E1 /* SyncSettingsViewController.swift */,
+				E5690D5E22CFCC7C003493E1 /* PGPSettingsViewController.swift */,
+				E5690D6D22D0100F003493E1 /* PGPKeyPreviewViewController.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		E5F28A93223843E9002721ED /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -243,8 +275,10 @@
 				E5A032EC223B1A11001BC795 /* MailViewController.swift */,
 				E5F28A9E22386172002721ED /* ComposeMailViewController.swift */,
 				E5F28AA222387ACB002721ED /* SideMenuViewController.swift */,
-				E5111F042242BA420036501F /* SettingsViewController.swift */,
 				E5F1D7832242CFE2007071AA /* ContactsViewController.swift */,
+				E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */,
+				E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */,
+				E5690D6422CFDC3F003493E1 /* Settings */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -270,6 +304,10 @@
 				E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */,
 				E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */,
 				E5630A21224AE87B002A0FDA /* MailAttachmentTableViewCell.xib */,
+				E5690D6022CFD23B003493E1 /* SettingsTableViewCell.swift */,
+				E5690D6122CFD23B003493E1 /* SettingsTableViewCell.xib */,
+				E5690D6922CFFF0E003493E1 /* SettingsButtonTableViewCell.swift */,
+				E5690D6A22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -399,6 +437,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5690D6322CFD23B003493E1 /* SettingsTableViewCell.xib in Resources */,
 				E5A032E0223ADEA1001BC795 /* Localizable.strings in Resources */,
 				E5A032E7223B0AFC001BC795 /* FolderTableViewCell.xib in Resources */,
 				E5F28A982238442D002721ED /* MailTableViewCell.xib in Resources */,
@@ -406,6 +445,7 @@
 				E5F1D78C2242DAF2007071AA /* AddressCollectionViewCell.xib in Resources */,
 				E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */,
 				E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */,
+				E5690D6C22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib in Resources */,
 				E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */,
 				E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */,
 				E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */,
@@ -525,18 +565,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5690D6B22CFFF0E003493E1 /* SettingsButtonTableViewCell.swift in Sources */,
 				E5A032EB223B16BB001BC795 /* ModelControllers.swift in Sources */,
 				E5F1D7842242CFE2007071AA /* ContactsViewController.swift in Sources */,
+				E5690D6622CFDC5F003493E1 /* CommonSettingsViewController.swift in Sources */,
+				E5690D6222CFD23B003493E1 /* SettingsTableViewCell.swift in Sources */,
 				E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */,
 				E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */,
 				E5F28A972238442D002721ED /* MailTableViewCell.swift in Sources */,
+				E5690D7222D042B1003493E1 /* ImportKeysListViewController.swift in Sources */,
 				E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */,
 				E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */,
 				E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */,
 				E5F1D78B2242DAF2007071AA /* AddressCollectionViewCell.swift in Sources */,
+				E5690D6E22D0100F003493E1 /* PGPKeyPreviewViewController.swift in Sources */,
 				E5F28A9B22384A56002721ED /* API.swift in Sources */,
 				E5F28AA1223864B2002721ED /* ColorScheme.swift in Sources */,
 				E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */,
+				E5690D7022D03659003493E1 /* ImportKeysFromTextViewController.swift in Sources */,
 				E526714E2253E54900A1D180 /* APIObjects.swift in Sources */,
 				E5F28A9D223856DD002721ED /* LoginViewController.swift in Sources */,
 				E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */,
@@ -544,10 +590,12 @@
 				E5CF520F228CA3BF00E94704 /* StorageProvider.swift in Sources */,
 				E5CF5211228CA42400E94704 /* MenuModelController.swift in Sources */,
 				E5111F052242BA420036501F /* SettingsViewController.swift in Sources */,
+				E5690D6822CFEB0A003493E1 /* SyncSettingsViewController.swift in Sources */,
 				E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */,
 				E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */,
 				E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */,
 				E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */,
+				E5690D5F22CFCC7C003493E1 /* PGPSettingsViewController.swift in Sources */,
 				E567B4662236D51C00FA9945 /* AppDelegate.swift in Sources */,
 				E5F28A9F22386172002721ED /* ComposeMailViewController.swift in Sources */,
 			);
