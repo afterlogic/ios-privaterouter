@@ -158,18 +158,18 @@
                         <viewControllerLayoutGuide type="bottom" id="BGN-H8-3Bm"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="7hc-XX-gf5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="6A1-A0-G6B">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="44" width="375" height="768"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Xp-NJ-FIO">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="44" width="375" height="768"/>
                                 <subviews>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IDm-WY-dVn">
-                                        <rect key="frame" x="47.666666666666657" y="201.66666666666669" width="280" height="241"/>
+                                        <rect key="frame" x="47.666666666666657" y="223.66666666666669" width="280" height="241"/>
                                         <subviews>
                                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n4y-Jw-tLm">
                                                 <rect key="frame" x="0.0" y="0.0" width="280" height="241"/>
@@ -371,12 +371,63 @@
                         <outlet property="signSwitch" destination="Faw-Vk-gHe" id="eFZ-wh-fkb"/>
                         <outlet property="tableView" destination="6A1-A0-G6B" id="SzP-Dq-7Ms"/>
                         <outlet property="tableViewBottomConstraint" destination="N80-TA-jcR" id="KIO-iS-KEc"/>
-                        <segue destination="KHX-tI-2PR" kind="show" identifier="ContactsSegue" id="e4q-lW-UrO"/>
+                        <segue destination="KHX-tI-2PR" kind="show" identifier="AddContact" id="DBZ-Gj-4Il"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Q2y-zu-IlB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1909.5999999999999" y="164.77832512315271"/>
+            <point key="canvasLocation" x="2841" y="165"/>
+        </scene>
+        <!--Contact-->
+        <scene sceneID="Z6V-BB-vdW">
+            <objects>
+                <viewController id="ypO-gt-dUc" customClass="ContactDetailsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="tbS-Qc-Kjd"/>
+                        <viewControllerLayoutGuide type="bottom" id="hGE-mh-1Le"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="93F-26-bAe">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="UzB-FU-xRu">
+                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="UzB-FU-xRu" firstAttribute="top" secondItem="tbS-Qc-Kjd" secondAttribute="bottom" id="3z7-fE-fs7"/>
+                            <constraint firstItem="UzB-FU-xRu" firstAttribute="leading" secondItem="93F-26-bAe" secondAttribute="leading" id="Erx-Wr-vqG"/>
+                            <constraint firstAttribute="bottom" secondItem="UzB-FU-xRu" secondAttribute="bottom" id="Jug-Cu-oeH"/>
+                            <constraint firstAttribute="trailing" secondItem="UzB-FU-xRu" secondAttribute="trailing" id="KRB-Lf-55C"/>
+                        </constraints>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Contact" id="TdY-CB-1lq">
+                        <rightBarButtonItems>
+                            <barButtonItem title="Edit" id="zVZ-Ak-cw9">
+                                <connections>
+                                    <action selector="editButtonAction:" destination="ypO-gt-dUc" id="Z6a-dS-cZX"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="compose" id="FnI-pT-6N1">
+                                <connections>
+                                    <action selector="composeButtonAction:" destination="ypO-gt-dUc" id="EAa-AC-K3M"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="composeButton" destination="FnI-pT-6N1" id="r8m-be-Jow"/>
+                        <outlet property="editButton" destination="zVZ-Ak-cw9" id="jMg-9t-y8B"/>
+                        <outlet property="tableView" destination="UzB-FU-xRu" id="2wn-tN-RKG"/>
+                        <segue destination="EOn-cB-asE" kind="show" identifier="ComposeSegue" id="G4f-PZ-t7x"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zyZ-nD-gyw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2.3999999999999999" y="164.77832512315271"/>
         </scene>
         <!--Contacts-->
         <scene sceneID="xXC-U1-xEd">
@@ -387,12 +438,12 @@
                         <viewControllerLayoutGuide type="bottom" id="fTI-XG-Zvc"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="TTQ-HI-v3t">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="8na-we-pMI">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -403,13 +454,33 @@
                             <constraint firstItem="8na-we-pMI" firstAttribute="leading" secondItem="TTQ-HI-v3t" secondAttribute="leading" id="lhu-em-M1Z"/>
                         </constraints>
                     </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Contacts" id="Q8J-sq-BOF">
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="eNL-3p-B0E">
+                                <connections>
+                                    <action selector="addButtonAction:" destination="KHX-tI-2PR" id="TBv-EP-az0"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="search" id="HMm-fv-vba">
+                                <connections>
+                                    <action selector="searchButtonAction:" destination="KHX-tI-2PR" id="D2T-T5-sjS"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
+                        <outlet property="addButton" destination="eNL-3p-B0E" id="Xk0-Y8-p5c"/>
+                        <outlet property="searchButton" destination="HMm-fv-vba" id="VMk-vJ-LWW"/>
                         <outlet property="tableView" destination="8na-we-pMI" id="zrG-iT-Axw"/>
+                        <segue destination="ypO-gt-dUc" kind="show" identifier="ShowContactSegue" id="67v-HK-w7Z"/>
+                        <segue destination="ypO-gt-dUc" kind="show" identifier="AddContactSegue" id="cAx-WG-7Li"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fVW-1S-tBN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2.3999999999999999" y="164.77832512315271"/>
+            <point key="canvasLocation" x="961" y="165"/>
         </scene>
         <!--Mail-->
         <scene sceneID="0Sw-wu-E7Y">
@@ -593,6 +664,7 @@
                         <segue destination="Vzz-Dm-XIh" kind="show" identifier="PreviewSegue" id="4lM-Os-CAf"/>
                         <segue destination="Vzz-Dm-XIh" kind="show" identifier="MultiplePreviewSegue" id="gGo-gR-10m"/>
                         <segue destination="2t8-kH-sE8" kind="show" identifier="ImportFromTextSegue" id="HiG-61-b09"/>
+                        <segue destination="fxH-8q-bMe" kind="show" identifier="ImportFromFileSegue" id="ShJ-eP-Qpt"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dTc-16-IVe" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -740,7 +812,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wyq-1G-FAn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="960.79999999999995" y="164.77832512315271"/>
+            <point key="canvasLocation" x="1910" y="165"/>
         </scene>
         <!--Common-->
         <scene sceneID="Boy-hj-Mnz">
@@ -1214,7 +1286,8 @@
     <inferredMetricsTieBreakers>
         <segue reference="ZCy-BS-EsO"/>
         <segue reference="gGo-gR-10m"/>
-        <segue reference="e4q-lW-UrO"/>
-        <segue reference="vsJ-2H-KhV"/>
+        <segue reference="DBZ-Gj-4Il"/>
+        <segue reference="cAx-WG-7Li"/>
+        <segue reference="G4f-PZ-t7x"/>
     </inferredMetricsTieBreakers>
 </document>

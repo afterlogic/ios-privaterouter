@@ -15,6 +15,9 @@
 		E526714E2253E54900A1D180 /* APIObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E526714D2253E54900A1D180 /* APIObjects.swift */; };
 		E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */; };
 		E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */; };
+		E544D2F622EA328A00FA468F /* ContactDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E544D2F522EA328A00FA468F /* ContactDetailsViewController.swift */; };
+		E544D2FC22EA35FF00FA468F /* ContactDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E544D2FA22EA35FF00FA468F /* ContactDetailTableViewCell.swift */; };
+		E544D2FD22EA35FF00FA468F /* ContactDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E544D2FB22EA35FF00FA468F /* ContactDetailTableViewCell.xib */; };
 		E5630A1E224AD1D7002A0FDA /* MailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */; };
 		E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */; };
 		E5630A22224AE87B002A0FDA /* MailAttachmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */; };
@@ -36,12 +39,18 @@
 		E5690D6E22D0100F003493E1 /* PGPKeyPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6D22D0100F003493E1 /* PGPKeyPreviewViewController.swift */; };
 		E5690D7022D03659003493E1 /* ImportKeysFromTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */; };
 		E5690D7222D042B1003493E1 /* ImportKeysListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */; };
+		E580A2DE22EBAA2200E90C89 /* KeyImportTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E580A2DC22EBAA2200E90C89 /* KeyImportTableViewCell.swift */; };
+		E580A2DF22EBAA2200E90C89 /* KeyImportTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E580A2DD22EBAA2200E90C89 /* KeyImportTableViewCell.xib */; };
+		E58493DA22E9027700E6F160 /* ContactTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58493D822E9027700E6F160 /* ContactTableViewCell.swift */; };
+		E58493DB22E9027700E6F160 /* ContactTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E58493D922E9027700E6F160 /* ContactTableViewCell.xib */; };
 		E5A032E0223ADEA1001BC795 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E2223ADEA1001BC795 /* Localizable.strings */; };
 		E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */; };
 		E5A032E7223B0AFC001BC795 /* FolderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */; };
 		E5A032E9223B0BDB001BC795 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032E8223B0BDB001BC795 /* Helpers.swift */; };
 		E5A032EB223B16BB001BC795 /* ModelControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EA223B16BB001BC795 /* ModelControllers.swift */; };
 		E5A032ED223B1A11001BC795 /* MailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A032EC223B1A11001BC795 /* MailViewController.swift */; };
+		E5B2DD6722FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5B2DD6522FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.swift */; };
+		E5B2DD6822FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E5B2DD6622FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib */; };
 		E5CF520F228CA3BF00E94704 /* StorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CF520E228CA3BF00E94704 /* StorageProvider.swift */; };
 		E5CF5211228CA42400E94704 /* MenuModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5CF5210228CA42400E94704 /* MenuModelController.swift */; };
 		E5F1D7842242CFE2007071AA /* ContactsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F1D7832242CFE2007071AA /* ContactsViewController.swift */; };
@@ -93,6 +102,10 @@
 		E526714D2253E54900A1D180 /* APIObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIObjects.swift; sourceTree = "<group>"; };
 		E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MailHTMLBodyTableViewCell.xib; sourceTree = "<group>"; };
 		E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailHTMLBodyTableViewCell.swift; sourceTree = "<group>"; };
+		E544D2F522EA328A00FA468F /* ContactDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailsViewController.swift; sourceTree = "<group>"; };
+		E544D2FA22EA35FF00FA468F /* ContactDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactDetailTableViewCell.swift; sourceTree = "<group>"; };
+		E544D2FB22EA35FF00FA468F /* ContactDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ContactDetailTableViewCell.xib; sourceTree = "<group>"; };
+		E5559CB722E1145D0034BF3C /* PrivateMail.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PrivateMail.entitlements; sourceTree = "<group>"; };
 		E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailHeaderTableViewCell.swift; sourceTree = "<group>"; };
 		E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MailHeaderTableViewCell.xib; sourceTree = "<group>"; };
 		E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAttachmentTableViewCell.swift; sourceTree = "<group>"; };
@@ -120,12 +133,18 @@
 		E5690D6D22D0100F003493E1 /* PGPKeyPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGPKeyPreviewViewController.swift; sourceTree = "<group>"; };
 		E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportKeysFromTextViewController.swift; sourceTree = "<group>"; };
 		E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportKeysListViewController.swift; sourceTree = "<group>"; };
+		E580A2DC22EBAA2200E90C89 /* KeyImportTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyImportTableViewCell.swift; sourceTree = "<group>"; };
+		E580A2DD22EBAA2200E90C89 /* KeyImportTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = KeyImportTableViewCell.xib; sourceTree = "<group>"; };
+		E58493D822E9027700E6F160 /* ContactTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTableViewCell.swift; sourceTree = "<group>"; };
+		E58493D922E9027700E6F160 /* ContactTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ContactTableViewCell.xib; sourceTree = "<group>"; };
 		E5A032E1223ADEA1001BC795 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
 		E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderTableViewCell.xib; sourceTree = "<group>"; };
 		E5A032E8223B0BDB001BC795 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		E5A032EA223B16BB001BC795 /* ModelControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelControllers.swift; sourceTree = "<group>"; };
 		E5A032EC223B1A11001BC795 /* MailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailViewController.swift; sourceTree = "<group>"; };
+		E5B2DD6522FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressFieldCollectionViewCell.swift; sourceTree = "<group>"; };
+		E5B2DD6622FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddressFieldCollectionViewCell.xib; sourceTree = "<group>"; };
 		E5CF520E228CA3BF00E94704 /* StorageProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageProvider.swift; sourceTree = "<group>"; };
 		E5CF5210228CA42400E94704 /* MenuModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuModelController.swift; sourceTree = "<group>"; };
 		E5F1D7832242CFE2007071AA /* ContactsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewController.swift; sourceTree = "<group>"; };
@@ -198,6 +217,34 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E544D2F722EA329300FA468F /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				E5F1D7832242CFE2007071AA /* ContactsViewController.swift */,
+				E544D2F522EA328A00FA468F /* ContactDetailsViewController.swift */,
+			);
+			path = Contacts;
+			sourceTree = "<group>";
+		};
+		E544D2F822EA329C00FA468F /* Import Keys */ = {
+			isa = PBXGroup;
+			children = (
+				E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */,
+				E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */,
+			);
+			path = "Import Keys";
+			sourceTree = "<group>";
+		};
+		E544D2F922EA32AF00FA468F /* Mails */ = {
+			isa = PBXGroup;
+			children = (
+				E50122662288981D00CC7477 /* MailPageViewController.swift */,
+				E5A032EC223B1A11001BC795 /* MailViewController.swift */,
+				E5F28A9E22386172002721ED /* ComposeMailViewController.swift */,
+			);
+			path = Mails;
+			sourceTree = "<group>";
+		};
 		E567B4592236D51C00FA9945 = {
 			isa = PBXGroup;
 			children = (
@@ -223,6 +270,7 @@
 		E567B4642236D51C00FA9945 /* PrivateMail */ = {
 			isa = PBXGroup;
 			children = (
+				E5559CB722E1145D0034BF3C /* PrivateMail.entitlements */,
 				E567B4652236D51C00FA9945 /* AppDelegate.swift */,
 				E5F28A9922384A33002721ED /* Models */,
 				E5F28A93223843E9002721ED /* View Controllers */,
@@ -271,13 +319,10 @@
 			children = (
 				E5F28A9C223856DD002721ED /* LoginViewController.swift */,
 				E567B4672236D51C00FA9945 /* MainViewController.swift */,
-				E50122662288981D00CC7477 /* MailPageViewController.swift */,
-				E5A032EC223B1A11001BC795 /* MailViewController.swift */,
-				E5F28A9E22386172002721ED /* ComposeMailViewController.swift */,
 				E5F28AA222387ACB002721ED /* SideMenuViewController.swift */,
-				E5F1D7832242CFE2007071AA /* ContactsViewController.swift */,
-				E5690D6F22D03659003493E1 /* ImportKeysFromTextViewController.swift */,
-				E5690D7122D042B1003493E1 /* ImportKeysListViewController.swift */,
+				E544D2F922EA32AF00FA468F /* Mails */,
+				E544D2F722EA329300FA468F /* Contacts */,
+				E544D2F822EA329C00FA468F /* Import Keys */,
 				E5690D6422CFDC3F003493E1 /* Settings */,
 			);
 			path = "View Controllers";
@@ -286,28 +331,36 @@
 		E5F28A94223843FA002721ED /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				E5F28A952238442D002721ED /* MailTableViewCell.swift */,
-				E5F28A962238442D002721ED /* MailTableViewCell.xib */,
-				E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */,
-				E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */,
-				E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */,
-				E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */,
 				E5F1D7892242DAF2007071AA /* AddressCollectionViewCell.swift */,
 				E5F1D78A2242DAF2007071AA /* AddressCollectionViewCell.xib */,
-				E5F1D78D2242E067007071AA /* MailSubjectTableViewCell.swift */,
-				E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */,
-				E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */,
-				E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */,
-				E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */,
-				E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */,
-				E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */,
-				E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */,
+				E5B2DD6522FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.swift */,
+				E5B2DD6622FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib */,
+				E5F1D7852242D3E4007071AA /* AddressTableViewCell.swift */,
+				E5F1D7862242D3E4007071AA /* AddressTableViewCell.xib */,
+				E544D2FA22EA35FF00FA468F /* ContactDetailTableViewCell.swift */,
+				E544D2FB22EA35FF00FA468F /* ContactDetailTableViewCell.xib */,
+				E58493D822E9027700E6F160 /* ContactTableViewCell.swift */,
+				E58493D922E9027700E6F160 /* ContactTableViewCell.xib */,
+				E5A032E4223B0AFC001BC795 /* FolderTableViewCell.swift */,
+				E5A032E5223B0AFC001BC795 /* FolderTableViewCell.xib */,
+				E580A2DC22EBAA2200E90C89 /* KeyImportTableViewCell.swift */,
+				E580A2DD22EBAA2200E90C89 /* KeyImportTableViewCell.xib */,
 				E5630A20224AE87B002A0FDA /* MailAttachmentTableViewCell.swift */,
 				E5630A21224AE87B002A0FDA /* MailAttachmentTableViewCell.xib */,
-				E5690D6022CFD23B003493E1 /* SettingsTableViewCell.swift */,
-				E5690D6122CFD23B003493E1 /* SettingsTableViewCell.xib */,
+				E5F1D7912242E626007071AA /* MailBodyTableViewCell.swift */,
+				E5F1D7922242E626007071AA /* MailBodyTableViewCell.xib */,
+				E5630A1C224AD1D7002A0FDA /* MailHeaderTableViewCell.swift */,
+				E5630A1D224AD1D7002A0FDA /* MailHeaderTableViewCell.xib */,
+				E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */,
+				E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */,
+				E5F1D78D2242E067007071AA /* MailSubjectTableViewCell.swift */,
+				E5F1D78E2242E067007071AA /* MailSubjectTableViewCell.xib */,
+				E5F28A952238442D002721ED /* MailTableViewCell.swift */,
+				E5F28A962238442D002721ED /* MailTableViewCell.xib */,
 				E5690D6922CFFF0E003493E1 /* SettingsButtonTableViewCell.swift */,
 				E5690D6A22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib */,
+				E5690D6022CFD23B003493E1 /* SettingsTableViewCell.swift */,
+				E5690D6122CFD23B003493E1 /* SettingsTableViewCell.xib */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -399,6 +452,14 @@
 					E567B4612236D51C00FA9945 = {
 						CreatedOnToolsVersion = 10.1;
 						LastSwiftMigration = 1020;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 					E567B4752236D51D00FA9945 = {
 						CreatedOnToolsVersion = 10.1;
@@ -445,8 +506,12 @@
 				E5F1D78C2242DAF2007071AA /* AddressCollectionViewCell.xib in Resources */,
 				E5630A1F224AD1D7002A0FDA /* MailHeaderTableViewCell.xib in Resources */,
 				E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */,
+				E58493DB22E9027700E6F160 /* ContactTableViewCell.xib in Resources */,
+				E544D2FD22EA35FF00FA468F /* ContactDetailTableViewCell.xib in Resources */,
 				E5690D6C22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib in Resources */,
 				E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */,
+				E5B2DD6822FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib in Resources */,
+				E580A2DF22EBAA2200E90C89 /* KeyImportTableViewCell.xib in Resources */,
 				E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */,
 				E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */,
 				E5F1D7882242D3E4007071AA /* AddressTableViewCell.xib in Resources */,
@@ -580,7 +645,11 @@
 				E5F1D78B2242DAF2007071AA /* AddressCollectionViewCell.swift in Sources */,
 				E5690D6E22D0100F003493E1 /* PGPKeyPreviewViewController.swift in Sources */,
 				E5F28A9B22384A56002721ED /* API.swift in Sources */,
+				E544D2F622EA328A00FA468F /* ContactDetailsViewController.swift in Sources */,
 				E5F28AA1223864B2002721ED /* ColorScheme.swift in Sources */,
+				E58493DA22E9027700E6F160 /* ContactTableViewCell.swift in Sources */,
+				E5B2DD6722FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.swift in Sources */,
+				E544D2FC22EA35FF00FA468F /* ContactDetailTableViewCell.swift in Sources */,
 				E5A032E6223B0AFC001BC795 /* FolderTableViewCell.swift in Sources */,
 				E5690D7022D03659003493E1 /* ImportKeysFromTextViewController.swift in Sources */,
 				E526714E2253E54900A1D180 /* APIObjects.swift in Sources */,
@@ -590,6 +659,7 @@
 				E5CF520F228CA3BF00E94704 /* StorageProvider.swift in Sources */,
 				E5CF5211228CA42400E94704 /* MenuModelController.swift in Sources */,
 				E5111F052242BA420036501F /* SettingsViewController.swift in Sources */,
+				E580A2DE22EBAA2200E90C89 /* KeyImportTableViewCell.swift in Sources */,
 				E5690D6822CFEB0A003493E1 /* SyncSettingsViewController.swift in Sources */,
 				E5F1D7932242E626007071AA /* MailBodyTableViewCell.swift in Sources */,
 				E5F1D7872242D3E4007071AA /* AddressTableViewCell.swift in Sources */,
@@ -783,6 +853,7 @@
 			baseConfigurationReference = 40D2CBDF1905F6336C38A08A /* Pods-PrivateMail.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 72664T4RU7;
@@ -805,6 +876,7 @@
 			baseConfigurationReference = 348916663F4D5598C1A29D4E /* Pods-PrivateMail.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 72664T4RU7;

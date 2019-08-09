@@ -79,6 +79,10 @@ class MailViewController: UIViewController {
                 self.mail = APIMail(data: contains!.data)
                 self.mail.isSeen = contains!.isSeen
                 self.mail.isFlagged = contains!.isFlagged
+                self.mail.isForwarded = contains!.isForwarded
+                self.mail.isDeleted = contains!.isDeleted
+                self.mail.isDraft = contains!.isDraft
+                self.mail.isRecent = contains!.isRecent
                 
                 if self.mail.showInlineWarning() {
                     self.warningTopConstraint.isActive = true
@@ -219,15 +223,17 @@ extension MailViewController: MailAttachmentTableViewCellDelegate {
             SVProgressHUD.show()
             
             API.shared.downloadAttachementWith(url: url) { (data, error) in
-                SVProgressHUD.dismiss()
-                
-                if let error = error {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
-                } else if let data = data {
-                    let keys = String(data: data, encoding: .utf8)
-                    NotificationCenter.default.post(name: .shouldImportKey, object: keys)
-                } else {
-                    SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    } else if let data = data {
+                        let keys = String(data: data, encoding: .utf8)
+                        NotificationCenter.default.post(name: .shouldImportKey, object: keys)
+                    } else {
+                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                    }
                 }
             }
         } else {

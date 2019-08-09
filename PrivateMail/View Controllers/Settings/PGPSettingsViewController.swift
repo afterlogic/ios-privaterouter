@@ -20,7 +20,7 @@ class PGPSettingsViewController: UIViewController {
     
     var selectedKey: PGPKey?
     
-    let buttons = [
+    var buttons = [
         NSLocalizedString("EXPORT ALL PUBLIC KEYS", comment: ""),
         NSLocalizedString("IMPORT KEYS FROM TEXT", comment: ""),
         NSLocalizedString("IMPORT KEYS FROM FILE", comment: ""),
@@ -30,7 +30,7 @@ class PGPSettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = NSLocalizedString("OpenPGP", comment: "")
-        
+   
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(cellClass: SettingsTableViewCell())
@@ -127,6 +127,9 @@ class PGPSettingsViewController: UIViewController {
             let vc = segue.destination as! PGPKeyPreviewViewController
             vc.key = selectedKey
             vc.showForMultiple = true
+        } else if segue.identifier == "ImportFromFileSegue" {
+            let vc = segue.destination as! ImportKeysListViewController
+            vc.keyString = sender as? String
         }
     }
 }
@@ -164,12 +167,6 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
             cell.titleLabel.text = buttons[indexPath.row]
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: tableView.bounds.width, bottom: 0.0, right: 0.0)
             
-            if indexPath.row == 2 {
-                cell.contentView.alpha = 0.5
-            } else {
-                cell.contentView.alpha = 1.0
-            }
-            
             return cell
         }
     }
@@ -191,7 +188,9 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
             selectedKey = indexPath.section == 0 ? publicKeys[indexPath.row] : privateKeys[indexPath.row]
             performSegue(withIdentifier: "PreviewSegue", sender: nil)
         } else {
-            if indexPath.row == 0 {
+            let button = buttons[indexPath.row]
+            
+            if button == NSLocalizedString("EXPORT ALL PUBLIC KEYS", comment: "") {
                 selectedKey = PGPKey()
                 
                 for key in publicKeys {
@@ -199,12 +198,46 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
                 }
 
                 performSegue(withIdentifier: "MultiplePreviewSegue", sender: nil)
-            } else if indexPath.row == 1 {
+            } else if button == NSLocalizedString("IMPORT KEYS FROM TEXT", comment: "") {
               performSegue(withIdentifier: "ImportFromTextSegue", sender: nil)
-            } else if indexPath.row == 3 {
+            } else if button == NSLocalizedString("GENERATE KEYS", comment: ""){
                 generateKeys()
+            } else if button == NSLocalizedString("IMPORT KEYS FROM FILE", comment: "") {
+                let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
+                documentPicker.delegate = self
+                documentPicker.modalPresentationStyle = .formSheet
+                
+                if #available(iOS 11.0, *) {
+                    documentPicker.allowsMultipleSelection = false
+                }
+                
+                present(documentPicker, animated: true, completion: nil)
             }
         }
     }
+}
+
+extension PGPSettingsViewController: UIDocumentPickerDelegate {
+    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else {
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let keys = String(data: data, encoding: .utf8)
+            performSegue(withIdentifier: "ImportFromFileSegue", sender: keys)
+        } catch {
+            presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("Can't open file", comment: ""), style: .alert, actions: [], addCancelButton: true)
+        }
+    }
     
+    public func documentMenu(_ documentMenu:UIDocumentMenuViewController, didPickDocumentPicker documentPicker: UIDocumentPickerViewController) {
+        documentPicker.delegate = self
+        present(documentPicker, animated: true, completion: nil)
+    }
+    
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        dismiss(animated: true, completion: nil)
+    }
 }

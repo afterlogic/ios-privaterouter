@@ -9,7 +9,11 @@
 import UIKit
 
 protocol MailTableViewCellDelegate {
+    
     func updateFlagsInMail(mail: APIMail?)
+
+    func unfoldThreadWith(id: Int)
+    
 }
 
 class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
@@ -19,7 +23,22 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     @IBOutlet var dateLabel: UILabel!
     @IBOutlet var flagButton: UIButton!
     @IBOutlet var attachmentImageView: UIImageView!
-    @IBOutlet var titleLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet var titleTrailingConstraint: NSLayoutConstraint!
+    
+    @IBOutlet var threadConstraint: NSLayoutConstraint!
+    @IBOutlet var threadBackground: UIView!
+    @IBOutlet var unfoldButton: UIButton!
+    @IBOutlet var unfoldLayoutConstraint: NSLayoutConstraint!
+
+    @IBOutlet var answeredImageView: UIImageView!
+    @IBOutlet var forwardedImageView: UIImageView!
+    @IBOutlet var flagConstraint: NSLayoutConstraint!
+    @IBOutlet var forwardedConstraint: NSLayoutConstraint!
+    
+    @IBOutlet var selectionSwitch: UISwitch!
+    @IBOutlet var switchTrailingContstraint: NSLayoutConstraint!
+    
+    var longPressGestureRecognizer = UILongPressGestureRecognizer()
     
     var delegate: MailTableViewCellDelegate?
     
@@ -27,6 +46,29 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
         didSet {
             flagButton.isHidden = !isFlagged
             flagButton.tintColor = isFlagged ? UIColor(rgb: 0xF5A623) : UIColor(white: 0.85, alpha: 1.0)
+            flagConstraint.isActive = isFlagged
+            layoutSubviews()
+        }
+    }
+    
+    var isSelection = true {
+        didSet {
+            selectionSwitch.isHidden = !isSelection
+            switchTrailingContstraint.isActive = isSelection
+        }
+    }
+    
+    var isAnswered: Bool = false {
+        didSet {
+            answeredImageView.isHidden = !isAnswered
+        }
+    }
+    
+    var isForwarded: Bool = false {
+        didSet {
+            forwardedImageView.isHidden = !isForwarded
+            forwardedConstraint.isActive = isForwarded
+            layoutSubviews()
         }
     }
     
@@ -72,10 +114,27 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
             
             isFlagged = mail?.isFlagged ?? false
             isSeen = mail?.isSeen ?? true
+            isAnswered = mail?.isAnswered ?? false
+            isForwarded = mail?.isForwarded ?? false
             
             attachmentImageView.isHidden = !(mail?.hasAttachments ?? false)
             
-            titleLeadingConstraint.isActive =  !attachmentImageView.isHidden
+            titleTrailingConstraint.isActive =  !attachmentImageView.isHidden
+            
+            threadConstraint.isActive = false
+            threadBackground.isHidden = true
+            unfoldButton.isHidden = true
+            unfoldLayoutConstraint.isActive = false
+            
+            if let threadUID = mail?.threadUID {
+                if threadUID != mail?.uid {
+                    threadConstraint.isActive = true
+                    threadBackground.isHidden = false
+                } else if mail?.thread.count ?? 0 > 0 {
+                    unfoldButton.isHidden = false
+                    unfoldLayoutConstraint.isActive = true
+                }
+            }
         }
     }
     
@@ -86,6 +145,10 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     override func awakeFromNib() {
         super.awakeFromNib()
         flagButton.isUserInteractionEnabled = false
+        
+        longPressGestureRecognizer.addTarget(self, action: #selector(self.longPressGestureAction(_:)))
+        longPressGestureRecognizer.delegate = self
+        contentView.addGestureRecognizer(longPressGestureRecognizer)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -120,8 +183,25 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
         }
     }
     
+    @IBAction func unfoldButtonAction(_ sender: Any) {
+        if let threadUID = mail?.threadUID {
+            delegate?.unfoldThreadWith(id: threadUID)
+        }
+    }
+    
     override func prepareForReuse() {
         mail = nil
     }
+    
+    @objc func longPressGestureAction(_ sender: UILongPressGestureRecognizer) {
+        if !isSelection && sender.state == .began {
+            NotificationCenter.default.post(name: .mainViewControllerShouldGoToSelectionMode, object: nil)
+            
+            if #available(iOS 10.0, *) {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            }
+        }
+    }
+    
     
 }

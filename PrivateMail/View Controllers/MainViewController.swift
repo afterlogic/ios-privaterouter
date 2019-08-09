@@ -13,6 +13,7 @@ import RealmSwift
 
 extension Notification.Name {
     static let mainViewControllerShouldRefreshData = Notification.Name("mainViewControllerShouldRefreshData")
+    static let mainViewControllerShouldGoToSelectionMode = Notification.Name("mainViewControllerShouldGoToSelectionMode")
 }
 
 class MainViewController: UIViewController {
@@ -25,10 +26,99 @@ class MainViewController: UIViewController {
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
     
-    var mails: [APIMail] = []
+    var mails: [APIMail] = [] {
+        didSet {
+            var threadedList: [APIMail] = []
+            
+            for i in 0 ..< mails.count {
+                var mail = mails[i]
+                
+                if let threadUID = mail.threadUID {
+                    if threadUID == mail.uid {
+                        for threadMail in mails {
+                            if (threadMail.threadUID == threadUID) && (threadUID != threadMail.uid) {
+                                mail.thread.append(threadMail)
+                            }
+                        }
+                        
+                        mail.thread.sort { (a, b) -> Bool in
+                            return a.date?.timeIntervalSince1970 ?? 0.0 > b.date?.timeIntervalSince1970 ?? 0.0
+                        }
+                        
+                        threadedList.append(mail)
+                    }
+                } else {
+                    threadedList.append(mail)
+                }
+            }
+            
+            threadedList.sort { (a, b) -> Bool in
+                return a.date?.timeIntervalSince1970 ?? 0.0 > b.date?.timeIntervalSince1970 ?? 0.0
+            }
+            
+            self.mails = threadedList
+        }
+    }
+    
     var selectedMail: APIMail?
+    var selectedFolder = "Mail"
+    
+    var unfoldedThreads: [Int] = []
     
     var lastPage = false
+    var isSelection = false {
+        didSet {
+            selectedCells = []
+            tableView.reloadData()
+            
+            UIView.transition(with: navigationController!.navigationBar, duration: 0.1, options: .transitionCrossDissolve, animations: {
+                self.navigationItem.titleView = nil
+                
+                self.composeMailButton.isHidden = self.isSelection
+                
+                if !self.isSelection {
+                    self.title = self.selectedFolder
+                    self.navigationItem.rightBarButtonItems = [self.optionsButton, self.searchButton]
+                    self.navigationItem.leftBarButtonItem = self.menuButton
+                } else {
+                    guard let folder = MenuModelController.shared.currentFolder() else {
+                        return
+                    }
+                    
+                    let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(self.trashButtonAction(_:)))
+                    
+                    let hideSpamFolders = [2, 3]
+                    
+                    let notASpam = (folder.type ?? -1) == 4
+                    let spamButton = UIBarButtonItem(image: UIImage(named: notASpam ? "not_spam" : "spam"), style: .plain, target: self, action: #selector(self.spamButtonAction(_:)))
+                    
+                    var buttons: [UIBarButtonItem] = []
+                    
+                    if (folder.type ?? -1) != 5 {
+                        buttons.append(trashButton)
+                    }
+                    
+                    if !hideSpamFolders.contains(folder.type ?? -1) {
+                        buttons.append(spamButton)
+                    }
+                    
+                    self.navigationItem.rightBarButtonItems = buttons
+                    
+                    let cancelSelectionButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(self.cancelSelectionButtonAction(_:)))
+                    self.navigationItem.leftBarButtonItem = cancelSelectionButton
+                }
+                
+            }, completion: nil)
+        }
+    }
+    
+    var selectedCells: [IndexPath] = [] {
+        didSet {
+            if isSelection {
+                title = String(format: NSLocalizedString("Selected: %d", comment: ""), selectedCells.count)
+            }
+        }
+    }
     
     let refreshControl = UIRefreshControl()
     let searchBar = UISearchBar()
@@ -52,6 +142,9 @@ class MainViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(didSelectFolder), name: .didSelectFolder, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: .mainViewControllerShouldRefreshData, object: nil)
+        NotificationCenter.default.addObserver(forName: .mainViewControllerShouldGoToSelectionMode, object: nil, queue: .main) { (notification) in
+            self.isSelection = true
+        }
         
         StorageProvider.shared.delegate = self
         
@@ -67,7 +160,7 @@ class MainViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
         
-        mails = MenuModelController.shared.mailsForFolder(name: title ?? "")
+        mails = MenuModelController.shared.mailsForFolder(name: selectedFolder)
         tableView.reloadData()
     }
     
@@ -104,11 +197,16 @@ class MainViewController: UIViewController {
     }
     
     func reloadData(withSyncing: Bool, completionHandler: @escaping () -> Void) {
+        if isSelection {
+            refreshControl.endRefreshing()
+            return
+        }
+        
         refreshControl.beginRefreshing(in: tableView)
         
         lastPage = false
         
-        let folder = title ?? ""
+        let folder = selectedFolder
         
         mails = MenuModelController.shared.mailsForFolder(name: folder)
         
@@ -145,11 +243,11 @@ class MainViewController: UIViewController {
         
         StorageProvider.shared.getMails(text: text, folder: folder, limit: limit, additionalPredicate: nil, completionHandler: { (result) in
             DispatchQueue.main.async {
-                if folder == self.title {
+                if folder == self.selectedFolder {
                     self.mails = result
                 }
                 
-                MenuModelController.shared.setMailsForFolder(mails: self.mails, folder: folder)
+                MenuModelController.shared.setMailsForFolder(mails: result, folder: folder)
                 
                 self.lastPage = self.mails.count == StorageProvider.shared.uids[folder]?.count
                 
@@ -162,8 +260,11 @@ class MainViewController: UIViewController {
     }
     
     @objc func didSelectFolder() {
-        if title != MenuModelController.shared.selectedFolder {
+        isSelection = false
+        
+        if selectedFolder != MenuModelController.shared.selectedFolder {
             title = MenuModelController.shared.selectedFolder
+            selectedFolder = MenuModelController.shared.selectedFolder
             
             mails = MenuModelController.shared.mailsForCurrentFolder()
             
@@ -208,15 +309,18 @@ class MainViewController: UIViewController {
         }
         
         let deleteButton = UIAlertAction.init(title: NSLocalizedString("Clear user cache", comment: ""), style: .default) { (alert: UIAlertAction!) in
-            SVProgressHUD.showSuccess(withStatus: NSLocalizedString("Done", comment: ""))
-            StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
-            StorageProvider.shared.deleteAllFolders {}
-            
-            self.mails = []
-            MenuModelController.shared.folders = []
-//            MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
-            
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                SVProgressHUD.showSuccess(withStatus: NSLocalizedString("Done", comment: ""))
+                StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
+                StorageProvider.shared.deleteAllFolders {}
+                StorageProvider.shared.deleteAllContacts()
+                
+                self.mails = []
+                MenuModelController.shared.folders = []
+                //            MenuModelController.shared.setMailsForCurrentFolder(mails: self.mails)
+                
+                self.tableView.reloadData()
+            }
         }
         
         let logOutButton = UIAlertAction.init(title: NSLocalizedString("Log Out", comment: ""), style: .default) { (alert: UIAlertAction!) in
@@ -263,6 +367,171 @@ class MainViewController: UIViewController {
         updateHeaderWith(progress: nil, folder: MenuModelController.shared.selectedFolder)
     }
     
+    @objc func cancelSelectionButtonAction(_ sender: Any) {
+        isSelection = false
+    }
+    
+    @objc func trashButtonAction(_ sender: Any) {
+        guard let folder = MenuModelController.shared.currentFolder() else {
+            return
+        }
+        
+        let moveToTrash = (folder.type ?? -1) != 5
+        
+        let alert = UIAlertController.init(title: NSLocalizedString(moveToTrash ? "Move this messages to trash?" : "Delete this messages?", comment: ""), message: nil, preferredStyle: .alert)
+        
+        let yesButton = UIAlertAction.init(title: NSLocalizedString("Yes", comment: ""), style: .destructive) { (alert: UIAlertAction!) in
+            SVProgressHUD.show()
+            
+            var mails: [APIMail] = []
+            
+            for item in self.selectedCells {
+                var mail = self.mails[item.section]
+                
+                if item.row > 0 {
+                    if item.row < mail.thread.count {
+                        mail = mail.thread[item.row]
+                    } else {
+                        continue
+                    }
+                }
+                
+                mails.append(mail)
+            }
+            
+            if moveToTrash {
+                API.shared.moveMessages(mails: mails, toFolder: "Trash") { (result, error) in
+                    DispatchQueue.main.async {
+                        if let success = result {
+                            if success {
+                                for mail in mails {
+                                    StorageProvider.shared.deleteMail(mail: mail)
+                                    MenuModelController.shared.removeMail(mail: mail)
+                                }
+                                
+                                self.mails = MenuModelController.shared.mailsForCurrentFolder()
+                                self.isSelection = false
+                            } else {
+                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                            }
+                            
+                            SVProgressHUD.dismiss()
+                        } else {
+                            if let error = error {
+                                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                            } else {
+                                SVProgressHUD.dismiss()
+                            }
+                        }
+                        
+                        self.selectedCells = []
+                        self.tableView.reloadData()
+                    }
+                }
+            } else {
+                API.shared.deleteMessages(mails: mails) { (result, error) in
+                    DispatchQueue.main.async {
+                        if let success = result {
+                            if success {
+                                for mail in mails {
+                                    StorageProvider.shared.deleteMail(mail: mail)
+                                    MenuModelController.shared.removeMail(mail: mail)
+                                }
+                                
+                                self.mails = MenuModelController.shared.mailsForCurrentFolder()
+                                self.isSelection = false
+                            } else {
+                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't delete message", comment: ""))
+                            }
+                            
+                            SVProgressHUD.dismiss()
+                        } else {
+                            if let error = error {
+                                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                            } else {
+                                SVProgressHUD.dismiss()
+                            }
+                        }
+                    }
+                    
+                    self.selectedCells = []
+                    self.tableView.reloadData()
+                }
+            }
+        }
+        
+        let cancelButton = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+        }
+        
+        alert.addAction(cancelButton)
+        alert.addAction(yesButton)
+        
+        present(alert, animated: true, completion: nil)
+    }
+
+    @objc func spamButtonAction(_ sender: Any) {
+        let markAsSpam = selectedFolder != "Spam"
+        
+        let alert = UIAlertController.init(title: NSLocalizedString(markAsSpam ? "Mark this messages as spam?" :  "Mark this messages as not spam?", comment: ""), message: nil, preferredStyle: .alert)
+        
+        var mails: [APIMail] = []
+        
+        for item in self.selectedCells {
+            var mail = self.mails[item.section]
+            
+            if item.row > 0 {
+                if item.row < mail.thread.count {
+                    mail = mail.thread[item.row]
+                } else {
+                    continue
+                }
+            }
+            
+            mails.append(mail)
+        }
+        
+        let yesButton = UIAlertAction.init(title: NSLocalizedString("Yes", comment: ""), style: .destructive) { (alert: UIAlertAction!) in
+            SVProgressHUD.show()
+            
+            API.shared.moveMessages(mails: mails, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
+                DispatchQueue.main.async {
+                    if let success = result {
+                        if success {
+                            for mail in mails {
+                                StorageProvider.shared.deleteMail(mail: mail)
+                                MenuModelController.shared.removeMail(mail: mail)
+                            }
+                            
+                            self.mails = MenuModelController.shared.mailsForCurrentFolder()
+                            self.isSelection = false
+                        } else {
+                            SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                        }
+                        
+                        SVProgressHUD.dismiss()
+                    } else {
+                        if let error = error {
+                            SVProgressHUD.showError(withStatus: error.localizedDescription)
+                        } else {
+                            SVProgressHUD.dismiss()
+                        }
+                    }
+                    
+                    self.selectedCells = []
+                    self.tableView.reloadData()
+                }
+            }
+        }
+        
+        let cancelButton = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+        }
+        
+        alert.addAction(cancelButton)
+        alert.addAction(yesButton)
+        
+        present(alert, animated: true, completion: nil)
+    }
+
     
     // MARK: - Other
     
@@ -343,7 +612,7 @@ class MainViewController: UIViewController {
 
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         if mails.count > 0 {
             emptyLabel.isHidden = true
         } else {
@@ -353,22 +622,56 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         return mails.count;
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if unfoldedThreads.contains(mails[section].threadUID ?? -1) || unfoldedThreads.contains(-999) {
+            return mails[section].thread.count + 1;
+        } else {
+            return 1
+        }
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80.0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MailTableViewCell.cellID(), for: indexPath) as! MailTableViewCell
-        cell.mail = mails[indexPath.row]
+        
+        var mail = mails[indexPath.section]
+        
+        if indexPath.row > 0 {
+            mail = mail.thread[indexPath.row - 1]
+        }
+        
+        cell.mail = mail
         cell.delegate = self
+        cell.isSelection = isSelection
+        
+        cell.selectionSwitch.isOn = selectedCells.contains(indexPath)
+        
         cell.selectionStyle = .none
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedMail = mails[indexPath.row]
-        performSegue(withIdentifier: "MailSegue", sender: nil)
+        if isSelection {
+            if selectedCells.contains(indexPath) {
+                selectedCells.remove(at: selectedCells.firstIndex(of: indexPath)!)
+            } else {
+                selectedCells.append(indexPath)
+            }
+            
+            tableView.reloadData()
+        } else {
+            if indexPath.row > 0 {
+                selectedMail = mails[indexPath.section].thread[indexPath.row - 1]
+            } else {
+                selectedMail = mails[indexPath.section]
+            }
+            
+            performSegue(withIdentifier: "MailSegue", sender: nil)
+        }
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -387,7 +690,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     
     @objc func refreshData() {
         DispatchQueue.main.async {
-            self.mails = MenuModelController.shared.mailsForFolder(name: self.title)
+            self.mails = MenuModelController.shared.mailsForFolder(name: self.selectedFolder)
             self.tableView.reloadData()
         }
     }
@@ -471,8 +774,11 @@ extension MainViewController: StorageProviderDelegate {
     
     func updateTableView(mails: [APIMail], folder: String) {
         DispatchQueue.main.async {
-            if folder == self.title && self.searchBar.text == "" {
-                self.mails = mails
+            if folder == self.selectedFolder {
+                if self.searchBar.text?.count ?? 0 < 1 {
+                    self.mails = mails
+                }
+                
                 MenuModelController.shared.setMailsForFolder(mails: mails, folder: folder)
                 
                 self.tableView.reloadData()
@@ -485,7 +791,7 @@ extension MainViewController: StorageProviderDelegate {
 extension MainViewController: MailTableViewCellDelegate {
     func updateFlagsInMail(mail: APIMail?) {
         if let mail = mail {
-            for i in 0..<mails.count {
+            for i in 0 ..< mails.count {
                 if mails[i].uid == mail.uid {
                     mails[i] = mail
                 }
@@ -493,4 +799,20 @@ extension MainViewController: MailTableViewCellDelegate {
         }
     }
     
+    func unfoldThreadWith(id: Int) {
+        if unfoldedThreads.contains(id) {
+            unfoldedThreads.removeAll { (item) -> Bool in
+                return item == id
+            }
+        } else {
+            unfoldedThreads.append(id)
+        }
+        
+        for i in 0 ..< mails.count {
+            if mails[i].threadUID == id {
+                tableView.reloadSections([i], with: .automatic)
+                break
+            }
+        }
+    }
 }

@@ -52,6 +52,11 @@ struct APIMail {
     var date: Date?
     var isFlagged: Bool?
     var isSeen: Bool?
+    var isAnswered: Bool?
+    var isForwarded: Bool?
+    var isDeleted: Bool?
+    var isDraft: Bool?
+    var isRecent: Bool?
     var hasAttachments: Bool?
     var attachments: [[String: Any]]?
     var to: [String]?
@@ -61,6 +66,8 @@ struct APIMail {
     var replyTo: [String]?
     var hasExternals: Bool
     var safety: Bool
+    var threadUID: Int?
+    var thread: [APIMail] = []
     
     var input: [String: Any]?
     
@@ -79,8 +86,17 @@ struct APIMail {
         self.senders = [mail.sender]
         self.isSeen = mail.isSeen
         self.isFlagged = mail.isFlagged
+        self.isAnswered = mail.isAnswered
+        self.isForwarded = mail.isForwarded
+        self.isDeleted = mail.isDeleted
+        self.isDraft = mail.isDraft
+        self.isRecent = mail.isRecent
         self.hasAttachments = mail.attachments.count > 0
         self.date = mail.date
+        
+        if mail.threadUID > 0 {
+            self.threadUID = mail.threadUID
+        }
     }
     
     init(input: [String: Any]) {
@@ -176,6 +192,26 @@ struct APIMail {
         
         if let isSeen = input["IsSeen"] as? Bool {
             self.isSeen = isSeen
+        }
+        
+        if let isAnswered = input["IsAnswered"] as? Bool {
+            self.isAnswered = isAnswered
+        }
+        
+        if let isForwarded = input["IsForwarded"] as? Bool {
+            self.isForwarded = isForwarded
+        }
+        
+        if let isDeleted = input["IsDeleted"] as? Bool {
+            self.isDeleted = isDeleted
+        }
+        
+        if let isDraft = input["IsDraft"] as? Bool {
+            self.isDraft = isDraft
+        }
+        
+        if let isRecent = input["IsRecent"] as? Bool {
+            self.isRecent = isRecent
         }
         
         if let body = input["PlainRaw"] as? String {
@@ -375,5 +411,149 @@ struct APIFolder {
             
             subFoldersCount = subFolders?.count
         }
+    }
+}
+
+struct APIContact {
+    var uuid: String?
+    var group: String?
+    var fullName: String?
+    var eTag: String?
+    var viewEmail: String?
+    var personalEmail: String?
+    var businessEmail: String?
+    var otherEmail: String?
+    var primaryEmail: String?
+    var skype: String?
+    var facebook: String?
+    var personalMobile: String?
+    var personalAddress: String?
+    var firstName: String?
+    var lastName: String?
+    var nickName: String?
+    var personalPhone: String?
+    
+    var input: [String: Any]?
+    
+    var asJSON: [String: Any] {
+        get {
+            if let input = input {
+                return input
+            } else {
+                let result: [String: Any] = [
+                    "UUID": (uuid ?? ""),
+                    "Storage": (group ?? "personal"),
+                    "FullName": (fullName ?? ""),
+                    "ETag": (eTag ?? ""),
+                    "ViewEmail": (viewEmail ?? ""),
+                    "PersonalEmail": (viewEmail ?? ""),
+                    "BusinessEmail": (businessEmail ?? ""),
+                    "OtherEmail": (primaryEmail ?? ""),
+                    "Skype": (skype ?? ""),
+                    "Facebook": (facebook ?? ""),
+                    "PersonalMobile": (personalMobile ?? ""),
+                    "PersonalAddress": (personalAddress ?? ""),
+                    "FirstName": (firstName ?? ""),
+                    "LastName": (lastName ?? ""),
+                    "NickName": (nickName ?? ""),
+                    "PersonalPhone": (personalPhone ?? ""),
+                ]
+                
+                return result
+            }
+        }
+    }
+    
+    init() {
+        
+    }
+    
+    init(input: [String: Any]) {
+        self.input = input
+        
+        if let uuid = input["UUID"] as? String {
+            self.uuid = uuid
+        }
+        
+        if let group = input["Storage"] as? String {
+            self.group = group
+        }
+        
+        if let fullName = input["FullName"] as? String {
+            self.fullName = fullName
+        }
+        
+        if let eTag = input["ETag"] as? String {
+            self.eTag = eTag
+        }
+        
+        if let email = input["ViewEmail"] as? String {
+            self.viewEmail = email
+        }
+        
+        if let otherEmail = input["OtherEmail"] as? String {
+            self.otherEmail = otherEmail
+        }
+        
+        if let personalEmail = input["PersonalEmail"] as? String {
+            self.personalEmail = personalEmail
+        }
+        
+        if let primaryEmail = input["PrimaryEmail"] as? String {
+            self.primaryEmail = primaryEmail
+        }
+        
+        if let skype = input["Skype"] as? String {
+            self.skype = skype
+        }
+        
+        if let facebook = input["Facebook"] as? String {
+            self.facebook = facebook
+        }
+
+        if let personalMobile = input["PersonalMobile"] as? String {
+            self.personalMobile = personalMobile
+        }
+
+        if let address = input["PersonalAddress"] as? String {
+            self.personalAddress = address
+        }
+        
+        if let firstName = input["FirstName"] as? String {
+            self.firstName = firstName
+        }
+        
+        if let secondName = input["LastName"] as? String {
+            self.lastName = secondName
+        }
+        
+        if let nick = input["NickName"] as? String {
+            self.nickName = nick
+        }
+        
+        if let phone = input["PersonalPhone"] as? String {
+            self.personalPhone = phone
+        }
+
+    }
+    
+    init(_ contact: ContactDB) {
+        self.uuid = contact.uuid
+        self.group = contact.group
+        self.fullName = contact.fullName
+        self.eTag = contact.eTag
+        self.viewEmail = contact.viewEmail
+        self.personalEmail = contact.primaryEmail
+        self.businessEmail = contact.businessEmail
+        self.otherEmail = contact.otherEmail
+        self.primaryEmail = contact.primaryEmail
+        self.skype = contact.skype
+        self.facebook = contact.facebook
+        self.personalMobile = contact.personalMobile
+        self.personalAddress = contact.personalAddress
+        self.firstName = contact.firstName
+        self.lastName = contact.lastName
+        self.nickName = contact.nickName
+        self.personalPhone = contact.personalPhone
     }
 }

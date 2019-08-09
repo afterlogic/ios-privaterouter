@@ -39,7 +39,7 @@ class MenuModelController: NSObject {
             if let subfolders = folder.subFolders {
                 let expandedFoldersList = expandedFolders(folders: subfolders)
                 
-                for i in 0..<expandedFoldersList.count {
+                for i in 0 ..< expandedFoldersList.count {
                     var subfolder = expandedFoldersList[i]
                     subfolder.depth += 1
                     result.append(subfolder)
@@ -61,7 +61,7 @@ class MenuModelController: NSObject {
             return result
         }
         
-        for i in 0..<result.count {
+        for i in 0 ..< result.count {
             let folder = result[i]
             
             if folder.depth > deepestFolder.depth {
@@ -77,7 +77,7 @@ class MenuModelController: NSObject {
             pathComponents?.removeLast()
             let expectedFolderPath = pathComponents?.joined(separator: "/")
             
-            for i in 0..<result.count {
+            for i in 0 ..< result.count {
                 var folder = result[i]
                 
                 if folder.fullName == expectedFolderPath {
@@ -105,7 +105,7 @@ class MenuModelController: NSObject {
         var newFolders = expandedFolders(folders: newFolders)
         let expandedFolders = self.expandedFolders(folders: folders)
         
-        for i in 0..<newFolders.count {
+        for i in 0 ..< newFolders.count {
             for folder in expandedFolders {
                 if folder.fullName == newFolders[i].fullName {
                     newFolders[i].mails = folder.mails
@@ -130,11 +130,23 @@ class MenuModelController: NSObject {
     func updateFolder(folder: String, hash: String) {
         var expandedFolders = self.expandedFolders(folders: folders)
         
-        for i in 0..<expandedFolders.count {
+        for i in 0 ..< expandedFolders.count {
             if expandedFolders[i].fullName == folder {
                 expandedFolders[i].hash = hash
                 break
             }
+        }
+        
+        folders = compressedFolders(folders: expandedFolders)
+        
+        StorageProvider.shared.saveFolders(folders: folders)
+    }
+    
+    func resetAllHashes() {
+        var expandedFolders = self.expandedFolders(folders: folders)
+        
+        for i in 0 ..< expandedFolders.count {
+            expandedFolders[i].hash = nil
         }
         
         folders = compressedFolders(folders: expandedFolders)
@@ -171,7 +183,7 @@ class MenuModelController: NSObject {
     func setMailsForFolder(mails: [APIMail], folder: String) {
         var folders = expandedFolders(folders: self.folders)
         
-        for i in 0..<folders.count {
+        for i in 0 ..< folders.count {
             if folders[i].fullName == folder {
                 folders[i].mails = mails
                 
@@ -188,7 +200,7 @@ class MenuModelController: NSObject {
     func removeMail(mail: APIMail) {
         var folders = expandedFolders(folders: self.folders)
         
-        for i in 0..<folders.count {
+        for i in 0 ..< folders.count {
             var folder = folders[i]
             
             if folder.fullName == mail.folder {

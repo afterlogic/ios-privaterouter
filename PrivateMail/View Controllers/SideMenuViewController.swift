@@ -175,7 +175,7 @@ class SideMenuViewController: UIViewController {
         let folders = MenuModelController.shared.foldersToShow()
         if folders.count > 0 {
             var index = 0
-            for i in 0..<folders.count {
+            for i in 0 ..< folders.count {
                 if let name = folders[i].name {
                     if name == MenuModelController.shared.selectedFolder {
                         index = i

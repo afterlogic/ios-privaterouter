@@ -11,6 +11,7 @@ import RealmSwift
 
 class MailDB: Object {
     @objc dynamic var uid = -1
+    @objc dynamic var threadUID = -1
     @objc dynamic var accountID = -1
     @objc dynamic var folder = ""
     @objc dynamic var subject = ""
@@ -18,6 +19,11 @@ class MailDB: Object {
     @objc dynamic var sender = ""
     @objc dynamic var isSeen = true
     @objc dynamic var isFlagged = false
+    @objc dynamic var isAnswered = false
+    @objc dynamic var isForwarded = false
+    @objc dynamic var isDeleted = false
+    @objc dynamic var isDraft = false
+    @objc dynamic var isRecent = false
     @objc dynamic var date = Date()
     @objc dynamic var attachments = ""
     @objc dynamic var data = NSData()
@@ -49,6 +55,33 @@ class PGPKey: NSObject {
     var email = ""
     var armoredKey = ""
     var length = 0
+}
+
+class ContactsGroupDB: Object {
+    @objc dynamic var accountID = -1
+    @objc dynamic var name = ""
+    @objc dynamic var cTag = -1
+}
+
+class ContactDB: Object {
+    @objc dynamic var accountID = -1
+    @objc dynamic var uuid = ""
+    @objc dynamic var group = ""
+    @objc dynamic var fullName = ""
+    @objc dynamic var eTag = ""
+    @objc dynamic var viewEmail = ""
+    @objc dynamic var personalEmail = ""
+    @objc dynamic var businessEmail = ""
+    @objc dynamic var otherEmail = ""
+    @objc dynamic var primaryEmail = ""
+    @objc dynamic var skype = ""
+    @objc dynamic var facebook = ""
+    @objc dynamic var personalMobile = ""
+    @objc dynamic var personalAddress = ""
+    @objc dynamic var firstName = ""
+    @objc dynamic var lastName = ""
+    @objc dynamic var nickName = ""
+    @objc dynamic var personalPhone = ""
 }
 
 extension Realm {
@@ -117,13 +150,21 @@ class StorageProvider: NSObject {
         
         let progress = NSLocalizedString("Syncing...", comment: "")
         delegate?.updateHeaderWith(progress: progress, folder: folder)
-        
-        API.shared.getMailsInfo(text: "", folder: folder) { (result, error) in
+                
+        API.shared.getMailsInfo(folder: folder) { (result, error) in
             if let result = result {
                 var mails: [APIMail] = []
                 
                 for item in result {
-                    if let uidText = item["uid"] as? String, let uid = Int(uidText) {
+                    var uid = item["uid"] as? Int
+                    
+                    if uid == nil {
+                        if let uidText = item["uid"] as? String {
+                            uid = Int(uidText)
+                        }
+                    }
+                    
+                    if uid != nil {
                         var mail = APIMail()
                         mail.uid = uid
                         mail.folder = folder
@@ -131,7 +172,21 @@ class StorageProvider: NSObject {
                         if let flags = item["flags"] as? [String] {
                             mail.isSeen = flags.contains("\\seen")
                             mail.isFlagged = flags.contains("\\flagged")
+                            mail.isAnswered = flags.contains("\\answered")
+                            mail.isForwarded = flags.contains("$forwarded")
+                            mail.isDeleted = flags.contains("\\deleted")
+                            mail.isDraft = flags.contains("\\draft")
+                            mail.isRecent = flags.contains("\\recent")
                         }
+                        
+                        var threadUID = item["threadUID"] as? Int
+                        
+                        if threadUID == nil {
+                            let threadUIDText = item["threadUID"] as? String
+                            threadUID = Int(threadUIDText ?? "")
+                        }
+                                                
+                        mail.threadUID = threadUID
                         
                         mails.append(mail)
                     }
@@ -171,29 +226,70 @@ class StorageProvider: NSObject {
                 
                 // Check if not need to sync
                 var isEqual = true
+                var c = 0
                 
-                for i in 0..<mails.count {
+                for i in 0 ..< mails.count {
                     let mail = mails[i]
                     var isFound = false
-                    
-//                    for i in 0..<newMails.count {
-                    
-                    if i < newMails.count {
-                        if mail.uid == newMails[i].uid {
+
+                    if c < newMails.count {
+                        
+                        while mail.uid ?? -1 < newMails[c].uid ?? -1 {
+                            if (c + 1) < newMails.count {
+                                c += 1
+                            } else {
+                                break
+                            }
+                        }
+                        
+                        if mail.uid == newMails[c].uid {
                             var shouldUpdateFlags = false
                             
                             if let isSeen = mail.isSeen {
-                                if newMails[i].isSeen != isSeen {
-                                    newMails[i].isSeen = isSeen
+                                if newMails[c].isSeen != isSeen {
+                                    newMails[c].isSeen = isSeen
                                     shouldUpdateFlags = true
                                 }
                             }
                             
                             if let isFlagged = mail.isFlagged {
-                                if newMails[i].isFlagged != isFlagged {
-                                    newMails[i].isFlagged = isFlagged
+                                if newMails[c].isFlagged != isFlagged {
+                                    newMails[c].isFlagged = isFlagged
                                     shouldUpdateFlags = true
                                 }
+                            }
+                            
+                            if let isForwarded = mail.isForwarded {
+                                if newMails[c].isForwarded != isForwarded {
+                                    newMails[c].isForwarded = isForwarded
+                                    shouldUpdateFlags = true
+                                }
+                            }
+                            
+                            if let isDeleted = mail.isDeleted {
+                                if newMails[c].isDeleted != isDeleted {
+                                    newMails[c].isDeleted = isDeleted
+                                    shouldUpdateFlags = true
+                                }
+                            }
+                            
+                            if let isDraft = mail.isDraft {
+                                if newMails[c].isDraft != isDraft {
+                                    newMails[c].isDraft = isDraft
+                                    shouldUpdateFlags = true
+                                }
+                            }
+                            
+                            if let isRecent = mail.isRecent {
+                                if newMails[c].isRecent != isRecent {
+                                    newMails[c].isRecent = isRecent
+                                    shouldUpdateFlags = true
+                                }
+                            }
+                            
+                            if newMails[c].threadUID != mail.threadUID {
+                                newMails[c].threadUID = mail.threadUID
+                                shouldUpdateFlags = true
                             }
                             
                             if shouldUpdateFlags {
@@ -207,10 +303,8 @@ class StorageProvider: NSObject {
                             }
                             
                             isFound = true
-//                                                        break
                         }
                     }
-//                    }
                 
                     isEqual = isEqual && isFound
                 }
@@ -248,10 +342,41 @@ class StorageProvider: NSObject {
                 var parts: [[Int]] = []
                 var uids: [Int] = []
                 
-                for mail in mails {
+//                for mail in mails {
+//                    var found = false
+//
+//                    if mailsDB.count > 0 {
+//                        if let first = mailsDB.first {
+//                            if mail.uid ?? -1 > first.uid ?? -1 {
+//                                found = true
+//                            }
+//                        }
+//
+//                        if let last = mailsDB.last {
+//                            if mail.uid ?? -1 < last.uid ?? -1 {
+//                                found = true
+//                            }
+//                        }
+//                    } else {
+//                        found = true
+//                    }
+//
+//                    if found {
+//                        uids.append(mail.uid ?? -1)
+//
+//                        if uids.count == 50 {
+//                            parts.append(uids)
+//                            uids = []
+//                        }
+//                    }
+//                }
+                
+                for i in 0 ..< mails.count {
                     var found = false
+                    let mail = mails[i]
                     
-                    if mailsDB.count > 0 {
+                    if i < mailsDB.count {
+                        
                         if let first = mailsDB.first {
                             if mail.uid ?? -1 > first.uid ?? -1 {
                                 found = true
@@ -261,6 +386,17 @@ class StorageProvider: NSObject {
                         if let last = mailsDB.last {
                             if mail.uid ?? -1 < last.uid ?? -1 {
                                 found = true
+                            }
+                        }
+                        
+                        for c in i ..< mailsDB.count {
+                            if mail.uid ?? -1 == mailsDB[c].uid ?? -1 {
+                                break
+                            }
+                            
+                            if mail.uid ?? -1 < mailsDB[c].uid ?? -1 {
+                                found = true
+                                break
                             }
                         }
                     } else {
@@ -300,7 +436,16 @@ class StorageProvider: NSObject {
                             group.enter()
                             
                             API.shared.getMailsBodiesList(uids: part, folder: folder, completionHandler: { (result, error) in
-                                if let result = result {
+                                if var result = result {
+                                    for i in 0 ..< result.count {
+                                        for mail in mails {
+                                            if mail.uid == result[i].uid {
+                                                result[i].threadUID = mail.threadUID
+                                                break
+                                            }
+                                        }
+                                    }
+                                    
                                     newMails.append(contentsOf: result)
                                     newMails.sort(by: { (a, b) -> Bool in
                                         return (a.uid ?? -1) > (b.uid ?? -1)
@@ -436,7 +581,7 @@ class StorageProvider: NSObject {
         let fetchID = fetchingID
         fetchingID += 1
         
-        print("Fetching began: ID\(fetchID)")
+//        print("Fetching began: ID\(fetchID)")
         
         isFetching = true
         var mails: [APIMail] = []
@@ -463,7 +608,7 @@ class StorageProvider: NSObject {
             
             let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
             
-            for i in 0..<min(result.count, limit ?? result.count) {
+            for i in 0 ..< min(result.count, limit ?? result.count) {
                 let object = result[i]
                 
                 let mail = APIMail(mail: object)
@@ -473,7 +618,7 @@ class StorageProvider: NSObject {
             self.isFetching = false
             
             completionHandler(mails)
-            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
+//            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
         }
     }
     
@@ -482,7 +627,7 @@ class StorageProvider: NSObject {
             var folders: [APIFolder] = []
             let result = self.realm.objects(FolderDB.self)
             
-            for i in 0..<result.count {
+            for i in 0 ..< result.count {
                 let object = result[i]
                 let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
                 
@@ -572,6 +717,34 @@ class StorageProvider: NSObject {
         return nil
     }
     
+    func getContactsGroup(_ name: String? = nil) -> ContactsGroupDB? {
+        let groups = self.realm.objects(ContactsGroupDB.self).filter("name = \"\(name ?? "personal")\" AND accountID = \(API.shared.currentUser.id)")
+        return groups.first
+    }
+    
+    func getContacts(_ group: String? = nil, search: String? = nil) -> [APIContact] {
+        var predicate = "(group = \"\(group ?? "personal")\" AND accountID = \(API.shared.currentUser.id)) "
+        
+        if let search = search, search.count > 0 {
+            predicate += """
+            AND (fullName CONTAINS[cd] \"\(search)\"
+            OR viewEmail CONTAINS[cd] \"\(search)\")
+            """
+        }
+        
+        let result = self.realm.objects(ContactDB.self).filter(predicate)
+        
+        var contacts: [APIContact] = []
+        
+        for item in result {
+            let contact = APIContact(item)
+            contacts.append(contact)
+        }
+        
+        return contacts
+    }
+    
+    
     //MARK: - Saving
     
     func saveMail(mail: APIMail) {
@@ -596,6 +769,12 @@ class StorageProvider: NSObject {
             mailDB.date = date
             mailDB.isSeen = isSeen
             mailDB.isFlagged = isFlagged
+            mailDB.threadUID = mail.threadUID ?? -1
+            mailDB.isAnswered = mail.isAnswered ?? false
+            mailDB.isForwarded = mail.isForwarded ?? false
+            mailDB.isDeleted = mail.isDeleted ?? false
+            mailDB.isDraft = mail.isDraft ?? false
+            mailDB.isRecent = mail.isRecent ?? false
             
             if let attachments = mail.attachments {
                 var attachmentsNames = ""
@@ -618,6 +797,10 @@ class StorageProvider: NSObject {
                         if let mail = mail {
                             mail.isSeen = mailDB.isSeen
                             mail.isFlagged = mailDB.isFlagged
+                            mail.isForwarded = mailDB.isForwarded
+                            mail.isDeleted = mailDB.isDeleted
+                            mail.isDraft = mailDB.isDraft
+                            mail.isRecent = mailDB.isRecent
                         } else {
                             self.realm.add(mailDB)
                         }
@@ -637,7 +820,6 @@ class StorageProvider: NSObject {
                 let folder = mail.folder,
                 let subject = mail.subject,
                 let sender = mail.senders?.first,
-                //            let body = mail.plainBody,
                 let date = mail.date,
                 let isSeen = mail.isSeen,
                 let isFlagged = mail.isFlagged {
@@ -652,6 +834,12 @@ class StorageProvider: NSObject {
                 mailDB.date = date
                 mailDB.isSeen = isSeen
                 mailDB.isFlagged = isFlagged
+                mailDB.threadUID = mail.threadUID ?? -1
+                mailDB.isAnswered = mail.isAnswered ?? false
+                mailDB.isForwarded = mail.isForwarded ?? false
+                mailDB.isDeleted = mail.isDeleted ?? false
+                mailDB.isDraft = mail.isDraft ?? false
+                mailDB.isRecent = mail.isRecent ?? false
                 
                 if let attachments = mail.attachments {
                     var attachmentsNames = ""
@@ -757,6 +945,26 @@ class StorageProvider: NSObject {
                         if let isFlagged = mail.isFlagged {
                             maildDB.isFlagged = isFlagged
                         }
+                        
+                        if let isForwarded = mail.isForwarded {
+                            maildDB.isForwarded = isForwarded
+                        }
+                        
+                        if let isDeleted = mail.isDeleted {
+                            maildDB.isDeleted = isDeleted
+                        }
+                        
+                        if let isDraft = mail.isDraft {
+                            maildDB.isDraft = isDraft
+                        }
+                        
+                        if let isRecent = mail.isRecent {
+                            maildDB.isRecent = isRecent
+                        }
+                        
+                        if let threadUID = mail.threadUID {
+                            maildDB.threadUID = threadUID
+                        }
                     }
                     
                     completionHandler()
@@ -767,16 +975,42 @@ class StorageProvider: NSObject {
         }
     }
     
-    func updateMailFlags(mail: APIMail, flags: [String]) {
-        if let uid = mail.uid, let folder = mail.folder {
-            let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
+    func saveContactsGroup(group: ContactsGroupDB) {
+        try! self.realm.write {
+            self.realm.add(group)
+        }
+    }
+    
+    func saveContacts(contacts: [APIContact]) {
+        var contactsDB: [ContactDB] = []
+        
+        for contact in contacts {
+            let contactDB = ContactDB()
             
-            try! realm.write {
-                if let maildDB = result.first {
-                    maildDB.isSeen = flags.contains("\\seen")
-                    maildDB.isFlagged = flags.contains("\\flagged")
-                }
-            }
+            contactDB.accountID = API.shared.currentUser.id
+            contactDB.uuid = contact.uuid ?? ""
+            contactDB.group = contact.group ?? ""
+            contactDB.fullName = contact.fullName ?? ""
+            contactDB.eTag = contact.eTag ?? ""
+            contactDB.viewEmail = contact.viewEmail ?? ""
+            contactDB.personalEmail = contact.primaryEmail ?? ""
+            contactDB.businessEmail = contact.businessEmail ?? ""
+            contactDB.otherEmail = contact.otherEmail ?? ""
+            contactDB.primaryEmail = contact.primaryEmail ?? ""
+            contactDB.skype = contact.skype ?? ""
+            contactDB.facebook = contact.facebook ?? ""
+            contactDB.personalMobile = contact.personalMobile ?? ""
+            contactDB.personalAddress = contact.personalAddress ?? ""
+            contactDB.firstName = contact.firstName ?? ""
+            contactDB.lastName = contact.lastName ?? ""
+            contactDB.nickName = contact.nickName ?? ""
+            contactDB.personalPhone = contact.personalPhone ?? ""
+            
+            contactsDB.append(contactDB)
+        }
+        
+        try! self.realm.write {
+            self.realm.add(contactsDB)
         }
     }
     
@@ -827,17 +1061,25 @@ class StorageProvider: NSObject {
         }
     }
     
+    func deleteAllContacts() {
+        let contacts = self.realm.objects(ContactDB.self)
+        let groups = self.realm.objects(ContactsGroupDB.self)
+        
+        try! self.realm.write {
+            self.realm.delete(contacts)
+            self.realm.delete(groups)
+        }
+    }
+    
     func deleteAllFolders(completionHandler: @escaping () -> Void) {
         DispatchQueue.main.async {
             let result = self.realm.objects(FolderDB.self)
             
-            self.realm.writeAsync(obj: result, block: { (realm, result) in
-                if let result = result {
-                    realm.delete(result)
-                }
-                
-                completionHandler()
-            })
+            try! self.realm.write {
+                self.realm.delete(result)
+            }
+            
+            completionHandler()
         }
     }
     
@@ -867,6 +1109,25 @@ class StorageProvider: NSObject {
         }
     }
     
+    func deleteGroup(group: ContactsGroupDB) {
+        let result = self.realm.objects(ContactsGroupDB.self).filter("name = \"\(group.name)\" AND accountID = \(API.shared.currentUser.id)")
+        
+        try! self.realm.write {
+            self.realm.delete(result)
+        }
+    }
+    
+    func deleteContact(contact: APIContact) {
+        if let uuid = contact.uuid,
+            let group = contact.group {
+            let result = self.realm.objects(ContactDB.self).filter("uuid = \"\(uuid)\" AND group = \"\(group)\" AND accountID = \(API.shared.currentUser.id)")
+            
+            try! self.realm.write {
+                self.realm.delete(result)
+            }
+        }
+    }
+    
     func removeCurrentUserInfo() {
         UserDefaults.standard.removeObject(forKey: "currentUser")
         UserDefaults.standard.removeObject(forKey: "folders")
@@ -885,7 +1146,7 @@ class StorageProvider: NSObject {
         var deletedUids: [Int] = []
         var lastIndex = 0
         
-        for i in 0..<mails.count {
+        for i in 0 ..< mails.count {
             let uid = mails[i].uid ?? -1
 
             while lastIndex < result.count {
@@ -899,6 +1160,13 @@ class StorageProvider: NSObject {
                     lastIndex += 1
                 } else {
                     break
+                }
+            }
+            
+            if (i == mails.count - 1) && (lastIndex < result.count) {
+                while lastIndex < result.count {
+                    deletedUids.append(result[lastIndex].uid)
+                    lastIndex += 1
                 }
             }
         }

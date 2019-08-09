@@ -39,6 +39,15 @@ extension UIRefreshControl {
 }
 
 extension String {
+    var isEmail: Bool {
+        get {
+            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+            
+            return emailTest.evaluate(with: self)
+        }
+    }
+    
     func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
@@ -60,7 +69,7 @@ extension String {
             let matches = regex.matches(in: text,
                                         range: NSRange(text.startIndex..., in: text))
             return matches.map { match in
-                return (0..<match.numberOfRanges).map {
+                return (0 ..< match.numberOfRanges).map {
                     let rangeBounds = match.range(at: $0)
                     guard let range = Range(rangeBounds, in: text) else {
                         return ""
@@ -73,6 +82,7 @@ extension String {
             return []
         }
     }
+    
 }
 
 extension Date {
@@ -90,7 +100,7 @@ extension Date {
 
             return NSLocalizedString("Yesterday \(formatter.string(from: self))", comment: "")
         } else if Calendar.current.isDate(self, equalTo: Date(), toGranularity: .year) {
-            formatter.dateFormat = "dd MMM"
+            formatter.dateFormat = "MMM dd"
         } else {
             formatter.dateStyle = .medium
         }

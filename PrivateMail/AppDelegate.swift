@@ -22,6 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setMaximumDismissTimeInterval(0.6)
         StorageProvider.migrateIfNeeded()
 //        StorageProvider.shared.deleteAllMails()
+//        StorageProvider.shared.deleteAllContacts()
         
         NotificationCenter.default.addObserver(self, selector: #selector(presentLoginViewController(notification:)), name: .failedToLogin, object: nil)
         

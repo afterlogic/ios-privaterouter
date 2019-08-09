@@ -13,6 +13,10 @@ class ComposeMailModelController: NSObject {
     var mail: APIMail = APIMail()
 }
 
+class ContactsModelController: NSObject {
+    static let shared = ContactsModelController()
+    var contact: APIContact = APIContact()
+}
 
 enum SettingsParameter {
     case timeFormat

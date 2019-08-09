@@ -89,7 +89,7 @@ class ImportKeysListViewController: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(cellClass: SettingsTableViewCell())
+        tableView.register(cellClass: KeyImportTableViewCell())
         tableView.tableFooterView = UIView(frame: .zero)
     }
 
@@ -126,14 +126,11 @@ extension ImportKeysListViewController: UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.cellID(), for: indexPath) as! SettingsTableViewCell
-        cell.titleLabel?.text = "\(keys[indexPath.row].email) (\(keys[indexPath.row].isPrivate ? "Private" : "Public"))"
+        let cell = tableView.dequeueReusableCell(withIdentifier: KeyImportTableViewCell.cellID(), for: indexPath) as! KeyImportTableViewCell
+        cell.emailLabel.text = keys[indexPath.row].email
+        cell.descriptionLabel.text =  "(2048-bit, \(keys[indexPath.row].isPrivate ? "private" : "public"))"
         
-        if selectedIndexPaths.contains(indexPath) {
-            cell.iconImageView.image = UIImage(named: "checkmark")
-        } else {
-            cell.iconImageView.image = nil
-        }
+        cell.switch.isOn = selectedIndexPaths.contains(indexPath)
         
         if keys[indexPath.row].accountID == 0 {
             cell.contentView.alpha = 0.5

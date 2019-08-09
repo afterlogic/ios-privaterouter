@@ -17,6 +17,12 @@ enum AddressTableViewCellStyle {
 }
 
 
+struct AddressCellContent {
+    var fullName: String?
+    var email: String
+}
+
+
 class AddressTableViewCell: UITableViewCell {
     
     @IBOutlet var titleLabel: UILabel!
@@ -51,9 +57,7 @@ class AddressTableViewCell: UITableViewCell {
         }
     }
     
-    @IBOutlet var selectionButton: UIButton!
-    
-    var items: [String] = [] {
+    var items: [AddressCellContent] = [] {
         didSet {
             collectionView.reloadData()
             collectionView.layoutIfNeeded()
@@ -64,23 +68,27 @@ class AddressTableViewCell: UITableViewCell {
                 heightConstraint.constant = 50.0
             }
             
-            selectionButton.isHidden = items.count > 0
+            var emails: [String] = []
+            
+            for item in items {
+                emails.append(item.email)
+            }
             
             switch style {
             case .from:
-                ComposeMailModelController.shared.mail.from = items
+                ComposeMailModelController.shared.mail.from = emails
                 break
                 
             case .to:
-                ComposeMailModelController.shared.mail.to = items
+                ComposeMailModelController.shared.mail.to = emails
                 break
                 
             case .cc:
-                ComposeMailModelController.shared.mail.cc = items
+                ComposeMailModelController.shared.mail.cc = emails
                 break
                 
             case .bcc:
-                ComposeMailModelController.shared.mail.bcc = items
+                ComposeMailModelController.shared.mail.bcc = emails
                 break
             }
             
@@ -93,6 +101,7 @@ class AddressTableViewCell: UITableViewCell {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(UINib(nibName: AddressCollectionViewCell.cellID(), bundle: Bundle.main), forCellWithReuseIdentifier: AddressCollectionViewCell.cellID())
+        collectionView.register(UINib(nibName: AddressFieldCollectionViewCell.cellID(), bundle: Bundle.main), forCellWithReuseIdentifier: AddressFieldCollectionViewCell.cellID())
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -101,39 +110,24 @@ class AddressTableViewCell: UITableViewCell {
     }
     
     @IBAction func plusButtonAction(_ sender: Any) {
-        let alert = UIAlertController(title: NSLocalizedString("Add email", comment: ""), message: nil, preferredStyle: .alert)
-        
-        alert.addTextField { (textField) in
-            textField.placeholder = NSLocalizedString("Enter email", comment: "")
-            textField.keyboardType = .emailAddress
+        if let vc = self.delegate as? UIViewController {
+            vc.performSegue(withIdentifier: "AddContact", sender: self)
         }
+    }
+    
+    func setItems(_ emails: [String]) {
+        items = []
         
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
-            let textField = alert?.textFields![0]
+        for email in emails {
+            let contacts = StorageProvider.shared.getContacts(nil, search: email)
+            var fullName: String? = nil
             
-            if var email = textField?.text {
-                email = email.replacingOccurrences(of: " ", with: "")
-                
-                let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-                let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-                
-                if email.count > 0 {
-                    if emailTest.evaluate(with: email) {
-                        if !self.items.contains(email) {
-                            self.items.append(email)
-                            self.delegate?.cellSizeDidChanged()
-                        }
-                    } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Invalid email", comment: ""))
-                    }
-                }
+            if contacts.count > 0 {
+                fullName = contacts[0].fullName
             }
-        }))
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        
-        if let vc = delegate as? UIViewController {
-            vc.present(alert, animated: true, completion: nil)
+            
+            let contact = AddressCellContent(fullName: fullName, email: email)
+            items.append(contact)
         }
     }
     
@@ -149,44 +143,93 @@ extension AddressTableViewCell: UITableViewCellExtensionProtocol {
 
 extension AddressTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
+        return items.count + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AddressCollectionViewCell.cellID(), for: indexPath) as! AddressCollectionViewCell
-        
-        cell.delegate = self
-        cell.titleLabel.text = items[indexPath.item]
-        cell.email = items[indexPath.item]
-        cell.backView.layer.cornerRadius = cell.frame.size.height / 2.0
-        
-        return cell
+        if indexPath.item < items.count {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AddressCollectionViewCell.cellID(), for: indexPath) as! AddressCollectionViewCell
+            
+            cell.delegate = self
+            
+            if items[indexPath.item].fullName != nil {
+                cell.titleLabel.text = items[indexPath.item].fullName
+            } else {
+                cell.titleLabel.text = items[indexPath.item].email
+            }
+            
+            cell.email = items[indexPath.item].email
+            cell.backView.layer.cornerRadius = cell.frame.size.height / 2.0
+            
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AddressFieldCollectionViewCell.cellID(), for: indexPath) as! AddressFieldCollectionViewCell
+            cell.delegate = self
+            
+            return cell
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let height = CGFloat(AddressCollectionViewCell.cellHeight)
-        let font = UIFont.systemFont(ofSize: 14.0)
         
-        var width = items[indexPath.row].width(withConstrainedHeight: height, font: font)
-        
-        width += 16.0 + height
-        
-        if width > collectionView.frame.size.width {
-            width = collectionView.frame.size.width
+        if indexPath.item < items.count {
+            let font = UIFont.systemFont(ofSize: 14.0)
+            
+            let label = items[indexPath.row].fullName ?? items[indexPath.row].email
+            var width = label.width(withConstrainedHeight: height, font: font)
+            
+            width += 16.0 + height
+            
+            if width > collectionView.frame.size.width {
+                width = collectionView.frame.size.width
+            }
+            
+            return CGSize(width: width, height: height)
+        } else {
+            return CGSize(width: collectionView.frame.width, height: height)
         }
-        
-        return CGSize(width: width, height: height)
     }
 }
 
 
 extension AddressTableViewCell: AddressCollectionViewCellProtocol {
     func deleteAddress(email: String) {
-        if let index = items.firstIndex(of: email) {
+        if let index = items.firstIndex(where: { (item) -> Bool in
+            return item.email == email
+        }) {
             items.remove(at: index)
             delegate?.cellSizeDidChanged()
         }
     }
+}
+
+
+extension AddressTableViewCell: AddressFieldCollectionViewCellProtocol {
+    func addAddress(email: String?) {
+        if let email = email?.replacingOccurrences(of: " ", with: ""), email.count > 0 {
+            if email.isEmail {
+                let contacts = StorageProvider.shared.getContacts(nil, search: email)
+                var fullName: String? = nil
+                
+                if contacts.count > 0 {
+                    fullName = contacts[0].fullName
+                }
+                
+                let contact = AddressCellContent(fullName: fullName, email: email)
+                
+                if !self.items.contains(where: { (item) -> Bool in
+                    return item.email == contact.email && item.fullName == contact.fullName
+                }) {
+                    self.items.append(contact)
+                    self.delegate?.cellSizeDidChanged()
+                }
+            } else {
+                SVProgressHUD.showError(withStatus: NSLocalizedString("Invalid email", comment: ""))
+            }
+        }
+    }
+    
 }
 
 

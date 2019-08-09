@@ -117,6 +117,10 @@ extension SyncSettingsViewController: UITableViewDelegate, UITableViewDataSource
                 for period in periods {
                     let action = UIAlertAction(title: periodOptions[period], style: .default) { (action) in
                         SettingsModelController.shared.setValue(period, for: .syncPeriod)
+                        MenuModelController.shared.resetAllHashes()
+//                        StorageProvider.shared.deleteMailsFor(accountID: API.shared.currentUser.id)
+                        SettingsModelController.shared.setValue(Date(timeIntervalSince1970: 0.0), for: .lastRefresh)
+                        
                         self.tableView.reloadData()
                     }
                     

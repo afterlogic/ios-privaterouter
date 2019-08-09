@@ -28,10 +28,12 @@ class API: NSObject {
         }
     }
     
+    
     // MARK: - API Methods
     
     func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
         let parameters = ["Login": login, "Password": password]
+        removeCookies()
         
         createTask(module: "Core", method: "Login", parameters: parameters) { (result, error) in
             
@@ -45,7 +47,6 @@ class API: NSObject {
                 let token = res["AuthToken"]
                 
                 keychain["AccessToken"] = token
-                self.removeCookies()
                 self.setCookie(key: "AuthToken", value: token as AnyObject)
                 
                 completionHandler(true, nil)
@@ -73,6 +74,7 @@ class API: NSObject {
             }
         }
     }
+    
     
     func getAccounts(completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
         createTask(module: "Mail", method: "GetAccounts", parameters: [:]) { (result, error) in
@@ -136,7 +138,7 @@ class API: NSObject {
                 
                 var updatedFolders = folders
                 
-                for i in 0..<updatedFolders.count {
+                for i in 0 ..< updatedFolders.count {
                     if let folderName = updatedFolders[i].fullName, let item = counts[folderName] {
                         if let totalCount = item[0] as? Int {
                             updatedFolders[i].messagesCount = totalCount
@@ -152,8 +154,6 @@ class API: NSObject {
                             
                             let oldHash = updatedFolders[i].hash ?? ""
                             
-//                            print("Folder: \(folderName) Old: \(oldHash) New: \(hash)")
-                            
                             if oldHash != hash
                                 && (systemFolders.contains(folderName)
                                     || folderName == currentFolder) {
@@ -168,7 +168,7 @@ class API: NSObject {
                                 }
                             } else {
                                 if folderName == currentFolder {
-                                    API.shared.getMailsInfo(text: "", folder: folderName, completionHandler: { (result, error) in
+                                    API.shared.getMailsInfo(folder: folderName, completionHandler: { (result, error) in
                                         if let result = result {
                                             let sortedResult = result.sorted(by: { (first, second) -> Bool in
                                                 let firstUID = Int(first["uid"] as? String ?? "-1") ?? -1
@@ -181,18 +181,51 @@ class API: NSObject {
                                             var mails = MenuModelController.shared.mailsForFolder(name: folderName)
                                             
                                             for item in sortedResult {
-                                                if let uidText = item["uid"] as? String,
-                                                    let uid = Int(uidText),
-                                                    let flags = item["flags"] as? [String] {
+                                                var uid = item["uid"] as? Int
+
+                                                if uid == nil {
+                                                    if let uidText = item["uid"] as? String {
+                                                        uid = Int(uidText)
+                                                    }
+                                                }
+                                                
+                                                if uid != nil {
+                                                    let flags = item["flags"] as? [String] ?? []
                                                     
                                                     for i in index ..< mails.count {
                                                         if mails[i].uid == uid {
                                                             let isSeen = flags.contains("\\seen")
                                                             let isFlagged = flags.contains("\\flagged")
+                                                            let isAnswered = flags.contains("\\answered")
+                                                            let isForwarded = flags.contains("$forwarded")
+                                                            let isDeleted = flags.contains("\\deleted")
+                                                            let isDraft = flags.contains("\\draft")
+                                                            let isRecent = flags.contains("\\recent")
                                                             
-                                                            if mails[i].isSeen != isSeen || mails[i].isFlagged != isFlagged {
+                                                            var threadUID = item["threadUID"] as? Int
+                                                            
+                                                            if threadUID == nil {
+                                                                let threadUIDText = item["threadUID"] as? String
+                                                                threadUID = Int(threadUIDText ?? "")
+                                                            }
+
+                                                            if mails[i].isSeen != isSeen
+                                                                || mails[i].isFlagged != isFlagged
+                                                                || mails[i].threadUID != threadUID
+                                                                || mails[i].isAnswered != isAnswered
+                                                                || mails[i].isForwarded != isForwarded
+                                                                || mails[i].isDeleted != isDeleted
+                                                                || mails[i].isDraft != isDraft
+                                                                || mails[i].isRecent != isRecent
+                                                            {
                                                                 mails[i].isSeen = isSeen
                                                                 mails[i].isFlagged = isFlagged
+                                                                mails[i].threadUID = threadUID
+                                                                mails[i].isAnswered = isAnswered
+                                                                mails[i].isForwarded = isForwarded
+                                                                mails[i].isDeleted = isDeleted
+                                                                mails[i].isDraft = isDraft
+                                                                mails[i].isRecent = isRecent
                                                                 
                                                                 let group = DispatchGroup()
                                                                 group.enter()
@@ -206,13 +239,13 @@ class API: NSObject {
                                                                 
                                                             index = i + 1
                                                             break
-                                                        } else if mails[i].uid ?? -1 > uid {
+                                                        } else if mails[i].uid ?? -1 > uid ?? -1 {
                                                             break
                                                         }
                                                     }
                                                 }
                                             }
-                                            
+                                                                                        
                                             MenuModelController.shared.setMailsForFolder(mails: mails, folder: folderName)
                                             
                                             NotificationCenter.default.post(name: .mainViewControllerShouldRefreshData, object: nil)
@@ -233,16 +266,44 @@ class API: NSObject {
         }
     }
     
-    func getMailsInfo(text: String, folder: String, completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
+    func getMailsInfo(folder: String, completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
+        var searchString = ""
+        
+        if let syncingPeriod = SettingsModelController.shared.getValueFor(.syncPeriod) as? Double, syncingPeriod > 0.0 {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy.MM.dd"
+            
+            let date = Date(timeIntervalSinceNow: -syncingPeriod * 60.0)
+
+            searchString = "date:\(dateFormatter.string(from: date))/"
+        }
+
         let parameters = [
             "AccountID": currentUser.id,
             "Folder": folder,
-            "Search": text,
+            "Search": searchString,
+            "UseThreading": true,
             ] as [String : Any]
         
         createTask(module: "Mail", method: "GetMessagesInfo", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
-                completionHandler(result, nil)
+                var unthreaded: [[String: Any]] = []
+                
+                for var item in result {
+                    if let thread = item["thread"] as? [[String: Any]] {
+                        for var mail in thread {
+                            mail["threadUID"] = item["uid"]
+                            unthreaded.append(mail)
+                        }
+                        
+                        item["threadUID"] = item["uid"]
+                    }
+                    
+                    item.removeValue(forKey: "thread")
+                    unthreaded.append(item)
+                }
+                
+                completionHandler(unthreaded, nil)
             } else {
                 completionHandler(nil, error)
             }
@@ -328,6 +389,66 @@ class API: NSObject {
         }
     }
     
+    func getContactsInfo(completionHandler: @escaping ([APIContact]?, ContactsGroupDB?, Error?) -> Void) {
+        let group = ContactsGroupDB()
+        group.accountID = currentUser.id
+        group.name = "personal"
+        
+        let parameters = [
+            "Storage": group.name
+        ]
+        
+        createTask(module: "Contacts", method: "GetContactsInfo", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? [String: Any] {
+                if let cTag = result["CTag"] as? Int {
+                    group.cTag = cTag
+                }
+                
+                var contacts: [APIContact] = []
+                
+                if let info = result["Info"] as? [[String: Any]] {
+                    for item in info {
+                        contacts.append(APIContact(input: item))
+                    }
+                }
+                
+                completionHandler(contacts, group, nil)
+            } else {
+                completionHandler(nil, nil, error)
+            }
+        }
+    }
+    
+    func getContacts(contacts: [APIContact], completionHandler: @escaping ([APIContact]?, Error?) -> Void) {
+        var uids: [String] = []
+        
+        for contact in contacts {
+            if let uuid = contact.uuid {
+                uids.append(uuid)
+            }
+        }
+        
+        let parameters = [
+            "Storage": "personal",
+            "Uids": uids
+            ] as [String : Any]
+        
+        createTask(module: "Contacts", method: "GetContactsByUids", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? [[String: Any]] {
+                var contacts: [APIContact] = []
+                
+                for item in result {
+                    contacts.append(APIContact(input: item))
+                }
+                
+                completionHandler(contacts, nil)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    
     func sendMail(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
         let parameters = [
             "AccountID": currentUser.id,
@@ -396,28 +517,28 @@ class API: NSObject {
         }
     }
     
-    func deleteMessage(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
-        let parameters = [
-            "AccountID": currentUser.id,
-            "Folder": mail.folder ?? "",
-            "Uids": mail.uid ?? -1,
-            ] as [String : Any]
+    func moveMessage(mail: APIMail, toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        moveMessages(mails: [mail], toFolder: toFolder, completionHandler: completionHandler)
+    }
+
+    func moveMessages(mails: [APIMail], toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        if mails.count == 0 {
+            completionHandler(false, nil)
+        }
         
-        createTask(module: "Mail", method: "DeleteMessages", parameters: parameters) { (result, error) in
-            if let result = result["Result"] as? Bool {
-                completionHandler(result, error)
-            } else {
-                completionHandler(nil, error)
+        var uids: [String] = []
+        
+        for mail in mails {
+            if let uid = mail.uid {
+                uids.append(String(uid))
             }
         }
-    }
-    
-    func moveMessage(mail: APIMail, toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        
         let parameters = [
             "AccountID": currentUser.id,
-            "Folder": mail.folder ?? "",
+            "Folder": mails[0].folder ?? "",
             "ToFolder": toFolder,
-            "Uids": mail.uid ?? -1,
+            "Uids": uids.joined(separator: ", "),
             ] as [String : Any]
         
         createTask(module: "Mail", method: "MoveMessages", parameters: parameters) { (result, error) in
@@ -428,7 +549,7 @@ class API: NSObject {
             }
         }
     }
-
+    
     func setEmailSafety(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
         let parameters = [
             "AccountID": currentUser.id,
@@ -467,17 +588,80 @@ class API: NSObject {
             }.resume()
     }
     
+    func saveContact(contact: APIContact, edit: Bool, completionHandler: @escaping ([String: String]?, Error?) -> Void) {
+        let parameters = [
+            "Contact": contact.asJSON
+            ] as [String : Any]
+        
+        let method = edit ? "UpdateContact" : "CreateContact"
+        
+        createTask(module: "Contacts", method: method, parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? [String: String] {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    
+    func deleteMessage(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
+        deleteMessages(mails: [mail], completionHandler: completionHandler)
+    }
+    
+    func deleteMessages(mails: [APIMail], completionHandler: @escaping (Bool?, Error?) -> Void) {
+        if mails.count == 0 {
+            completionHandler(false, nil)
+        }
+        
+        var uids: [String] = []
+        
+        for mail in mails {
+            if let uid = mail.uid {
+                uids.append(String(uid))
+            }
+        }
+        
+        let parameters = [
+            "AccountID": currentUser.id,
+            "Folder": mails[0].folder ?? "",
+            "Uids": uids.joined(separator: ", "),
+            ] as [String : Any]
+        
+        createTask(module: "Mail", method: "DeleteMessages", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? Bool {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+
+    
+    func uploadAttachment(data: Data, fileName: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
+        let parameters = [
+            "AccountID": currentUser.id
+        ] as [String: Any]
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        let dataToUpload = createBody(parameters: [:], boundary: boundary, data: data, mimeType: "multipart/form-data", filename: fileName)
+        
+        createTask(module: "Mail", method: "UploadAttachment", parameters: parameters, dataToUpload: dataToUpload, boundary: boundary) { (result, error) in
+            completionHandler(result, error)
+        }
+    }
+    
     
     // MARK: - Helpers
     
-    func httpBodyFrom(dictionary: [String: String]) -> Data? {
+    func httpBodyFrom(dictionary: [String: String], dataToUpload: Data? = nil) -> Data? {
         var resultParts: [String] = []
         
         for key in dictionary.keys {
             resultParts.append(key + "=" + dictionary[key]!)
         }
         
-        for i in 0..<resultParts.count {
+        for i in 0 ..< resultParts.count {
             var part = resultParts[i]
             part = part.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             part = part.replacingOccurrences(of: "&", with: "%26")
@@ -487,7 +671,19 @@ class API: NSObject {
         }
         
         let result = resultParts.joined(separator: "&")
-        return result.data(using: .utf8)
+        
+        if let data = result.data(using: .utf8) {
+            let mutableData = NSMutableData(data: data)
+            
+            if dataToUpload != nil {
+                mutableData.appendString("&UploadData=")
+                mutableData.append(dataToUpload!)
+            }
+            
+            return mutableData as Data
+        } else {
+            return nil
+        }
     }
     
     func getServerURL() -> String {
@@ -517,16 +713,18 @@ class API: NSObject {
     }
     
     func removeCookies() {
-        guard let cookies = HTTPCookieStorage.shared.cookies(for: URL(string: "test.afterlogic.com")!) else {
+        guard let cookies = HTTPCookieStorage.shared.cookies else {
             return
         }
         
         for cookie in cookies {
-            HTTPCookieStorage.shared.deleteCookie(cookie)
+            if cookie.domain == "test.afterlogic.com" {
+                HTTPCookieStorage.shared.deleteCookie(cookie)
+            }
         }
     }
     
-    func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
+    func generateRequest(module: String, method: String, dataToUpload: Data? = nil, parameters: [String: Any]) -> URLRequest? {
         var request = URLRequest(url: URL(string: "\(getServerURL())?/Api/")!)
         
         request.httpMethod = "POST"
@@ -550,7 +748,7 @@ class API: NSObject {
             return nil
         }
         
-        if let bodyData = httpBodyFrom(dictionary: body) {
+        if let bodyData = httpBodyFrom(dictionary: body, dataToUpload: dataToUpload) {
             request.httpBody = bodyData
             return request
         }
@@ -558,13 +756,18 @@ class API: NSObject {
         return nil
     }
     
-    func createTask(module: String, method: String, parameters: [String: Any], completionHandler: @escaping ([String: Any], Error?) -> Void) {
+    func createTask(module: String, method: String, parameters: [String: Any], dataToUpload: Data? = nil, boundary: String? = nil, completionHandler: @escaping ([String: Any], Error?) -> Void) {
         
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
         
-        if let request = generateRequest(module: module, method: method, parameters: parameters) {
+        if var request = generateRequest(module: module, method: method, dataToUpload: dataToUpload, parameters: parameters) {
+            
+            if let boundary = boundary {
+                request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            }
+            
             URLSession.shared.dataTask(with: request) { (data, response, error) in
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -607,5 +810,34 @@ class API: NSObject {
             completionHandler([:], nil)
         }
         
+    }
+    
+    func createBody(parameters: [String: String], boundary: String, data: Data, mimeType: String, filename: String) -> Data {
+        let body = NSMutableData()
+        
+        let boundaryPrefix = "--\(boundary)\r\n"
+        
+        for (key, value) in parameters {
+            body.appendString(boundaryPrefix)
+            body.appendString("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+            body.appendString("\(value)\r\n")
+        }
+        
+        body.appendString(boundaryPrefix)
+        body.appendString("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n")
+        body.appendString("Content-Type: \(mimeType)\r\n\r\n")
+        body.append(data)
+        body.appendString("\r\n")
+        body.appendString("--".appending(boundary.appending("--")))
+        
+        return body as Data
+    }
+}
+
+
+extension NSMutableData {
+    func appendString(_ string: String) {
+        let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false)
+        append(data!)
     }
 }

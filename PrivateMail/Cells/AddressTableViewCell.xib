@@ -32,12 +32,6 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewLayout key="collectionViewLayout" id="ZZl-nc-8Ir" customClass="LeftAlignedCollectionViewFlowLayout" customModule="PrivateMail" customModuleProvider="target"/>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LCY-1T-JUa" userLabel="Selection button">
-                                <rect key="frame" x="40" y="0.0" width="234" height="50.5"/>
-                                <connections>
-                                    <action selector="plusButtonAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Uon-fL-gAn"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ha-yb-ccL" userLabel="Plus button">
                                 <rect key="frame" x="274" y="0.0" width="46" height="50.5"/>
                                 <constraints>
@@ -56,13 +50,9 @@
                             <constraint firstAttribute="bottom" secondItem="7ha-yb-ccL" secondAttribute="bottom" id="It9-ke-FGa"/>
                             <constraint firstItem="7ha-yb-ccL" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="QbC-C6-PvW"/>
                             <constraint firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="QbX-Ck-hlM"/>
-                            <constraint firstItem="LCY-1T-JUa" firstAttribute="trailing" secondItem="bDG-Tm-kr0" secondAttribute="trailing" id="Qrz-H0-4lJ"/>
-                            <constraint firstItem="LCY-1T-JUa" firstAttribute="top" secondItem="bDG-Tm-kr0" secondAttribute="top" id="aFb-MV-WgF"/>
                             <constraint firstItem="bDG-Tm-kr0" firstAttribute="leading" secondItem="2vO-bE-yCl" secondAttribute="leading" constant="40" id="doe-dC-sPL"/>
                             <constraint firstItem="h9Z-Ch-LuI" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="h7u-0z-RX8"/>
-                            <constraint firstItem="LCY-1T-JUa" firstAttribute="leading" secondItem="bDG-Tm-kr0" secondAttribute="leading" id="l9L-Q4-BVa"/>
                             <constraint firstItem="bDG-Tm-kr0" firstAttribute="top" secondItem="2vO-bE-yCl" secondAttribute="top" id="q2B-W7-9YM"/>
-                            <constraint firstItem="LCY-1T-JUa" firstAttribute="bottom" secondItem="bDG-Tm-kr0" secondAttribute="bottom" id="sXa-YY-fB5"/>
                             <constraint firstAttribute="height" constant="50" id="tRx-aZ-ZeP"/>
                             <constraint firstItem="h9Z-Ch-LuI" firstAttribute="leading" secondItem="2vO-bE-yCl" secondAttribute="leading" constant="15" id="uO7-UL-rm8"/>
                             <constraint firstAttribute="bottom" secondItem="h9Z-Ch-LuI" secondAttribute="bottom" id="w9H-jF-PRU"/>
@@ -79,7 +69,6 @@
             <connections>
                 <outlet property="collectionView" destination="bDG-Tm-kr0" id="ukV-AE-Omu"/>
                 <outlet property="heightConstraint" destination="tRx-aZ-ZeP" id="hWq-0v-WVK"/>
-                <outlet property="selectionButton" destination="LCY-1T-JUa" id="og4-qH-dGv"/>
                 <outlet property="titleLabel" destination="h9Z-Ch-LuI" id="dEZ-bm-EHd"/>
             </connections>
             <point key="canvasLocation" x="137.59999999999999" y="153.82308845577214"/>

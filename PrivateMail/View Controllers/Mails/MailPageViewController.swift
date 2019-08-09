@@ -355,6 +355,11 @@ extension MailPageViewController: UIPageViewControllerDataSource {
         let mailVC = storyboard?.instantiateViewController(withIdentifier: "MailVC") as! MailViewController
         let currentVC = viewController as! MailViewController
         
+        if currentVC.mail.threadUID != nil
+            && currentVC.mail.uid != currentVC.mail.threadUID {
+            return nil
+        }
+        
         let mails = MenuModelController.shared.mailsForCurrentFolder()
         let index = mails.firstIndex { (item) -> Bool in
             return item.uid == currentVC.mail.uid
@@ -374,6 +379,11 @@ extension MailPageViewController: UIPageViewControllerDataSource {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         let mailVC = storyboard?.instantiateViewController(withIdentifier: "MailVC") as! MailViewController
         let currentVC = viewController as! MailViewController
+        
+        if currentVC.mail.threadUID != nil
+            && currentVC.mail.uid != currentVC.mail.threadUID {
+            return nil
+        }
         
         let mails = MenuModelController.shared.mailsForCurrentFolder()
         let index = mails.firstIndex { (item) -> Bool in

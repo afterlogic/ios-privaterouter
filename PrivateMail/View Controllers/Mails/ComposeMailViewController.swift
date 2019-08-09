@@ -9,6 +9,7 @@
 import UIKit
 import ObjectivePGP
 import SVProgressHUD
+import QuickLook
 
 class ComposeMailViewController: UIViewController {
     
@@ -21,6 +22,8 @@ class ComposeMailViewController: UIViewController {
     @IBOutlet var encryptSwitch: UISwitch!
     @IBOutlet var passwordTextField: UITextField!
     @IBOutlet var eyeButton: UIButton!
+    
+    var attachementPreviewURL: URL?
     
     let editorBegin = """
             <style>
@@ -124,7 +127,15 @@ class ComposeMailViewController: UIViewController {
     }
     
     @IBAction func attachAction(_ sender: Any) {
-
+        let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.item"], in: .import)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .formSheet
+        
+        if #available(iOS 11.0, *) {
+            documentPicker.allowsMultipleSelection = false
+        }
+        
+        present(documentPicker, animated: true, completion: nil)
     }
     
     @IBAction func signEncryptButtonAction(_ sender: Any) {
@@ -199,7 +210,13 @@ class ComposeMailViewController: UIViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
+        if segue.identifier == "AddContact" {
+            if let vc = segue.destination as? ContactsViewController,
+                let style = (sender as? AddressTableViewCell)?.style {
+                vc.isSelection = true
+                vc.selectionStyle = style
+            }
+        }
     }
     
 }
@@ -207,7 +224,7 @@ class ComposeMailViewController: UIViewController {
 
 extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 4 + ComposeMailModelController.shared.mail.attachmentsToShow().count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -215,11 +232,13 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         
         var result = UITableViewCell()
         
+        print(self.tableView(tableView, numberOfRowsInSection: 0) )
+        
         switch indexPath.row {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
             cell.style = .to
-            cell.items = ComposeMailModelController.shared.mail.to ?? []
+            cell.setItems(ComposeMailModelController.shared.mail.to ?? [])
             cell.delegate = self
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
@@ -228,7 +247,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
             cell.style = .cc
-            cell.items = ComposeMailModelController.shared.mail.cc ?? []
+            cell.setItems(ComposeMailModelController.shared.mail.cc ?? [])
             cell.delegate = self
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
@@ -241,7 +260,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             result = cell
             break
             
-        default:
+        case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
             
             let html = editorBegin + ((mail.htmlBody ?? mail.plainBody) ?? "") + editorEnd
@@ -251,6 +270,36 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             cell.delegate = self
             
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+            result = cell
+            break
+            
+        default:
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
+            
+            cell.importKeyButton.isHidden = true
+            cell.importConstraint.isActive = false
+            
+            if let fileName = mail.attachmentsToShow()[indexPath.row - 1]["FileName"] as? String {
+                cell.titleLabel.text = fileName
+                
+                if (fileName as NSString).pathExtension == "asc" {
+                    cell.importKeyButton.isHidden = false
+                    cell.importConstraint.isActive = true
+                }
+                
+            } else {
+                cell.titleLabel.text = ""
+            }
+            
+            cell.downloadLink = nil
+            cell.delegate = self
+            
+            if let actions = mail.attachmentsToShow()[indexPath.row - 1]["Actions"] as? [String: [String: String]] {
+                if let downloadLink = actions["download"]?["url"] {
+                    cell.downloadLink = downloadLink
+                }
+            }
+            
             result = cell
             break
         }
@@ -286,5 +335,110 @@ extension ComposeMailViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return false
+    }
+}
+
+
+extension ComposeMailViewController: UIDocumentPickerDelegate {
+    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else {
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let filename = url.lastPathComponent
+            
+            ComposeMailModelController.shared.mail.attachments = [["FileName": filename, "IsInline": false]]
+            tableView.reloadData()
+            
+            API.shared.uploadAttachment(data: data, fileName: filename) { (result, error) in
+//                if let result = result["Result"] as? [String: Any] {
+//                } else {
+                    SVProgressHUD.showError(withStatus: "Can't upload the file")
+//                }
+            }
+        } catch {
+            presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("Can't open file", comment: ""), style: .alert, actions: [], addCancelButton: true)
+        }
+    }
+    
+    public func documentMenu(_ documentMenu:UIDocumentMenuViewController, didPickDocumentPicker documentPicker: UIDocumentPickerViewController) {
+        documentPicker.delegate = self
+        present(documentPicker, animated: true, completion: nil)
+    }
+    
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        dismiss(animated: true, completion: nil)
+    }
+}
+
+extension ComposeMailViewController: MailAttachmentTableViewCellDelegate {
+    func shouldOpenImportScreen(url: URL?, fileName: String) {
+        if let url = url {
+            SVProgressHUD.show()
+            
+            API.shared.downloadAttachementWith(url: url) { (data, error) in
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    } else if let data = data {
+                        let keys = String(data: data, encoding: .utf8)
+                        NotificationCenter.default.post(name: .shouldImportKey, object: keys)
+                    } else {
+                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                    }
+                }
+            }
+        } else {
+            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+        }
+    }
+    
+    func shouldPreviewAttachment(url: URL?, fileName: String) {
+        if let url = url {
+            SVProgressHUD.show()
+            
+            API.shared.downloadAttachementWith(url: url) { (data, error) in
+                SVProgressHUD.dismiss()
+                
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                } else if let data = data {
+                    if let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let fileURL = directory.appendingPathComponent(fileName)
+                        
+                        do {
+                            try data.write(to: fileURL)
+                            
+                            self.attachementPreviewURL = fileURL
+                            
+                            let previewController = QLPreviewController()
+                            previewController.dataSource = self
+                            self.present(previewController, animated: true)
+                        } catch {
+                            SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                        }
+                    }
+                } else {
+                    SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                }
+            }
+        } else {
+            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+        }
+    }
+}
+
+
+extension ComposeMailViewController: QLPreviewControllerDataSource {
+    func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
+        return 1
+    }
+    
+    func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
+        return attachementPreviewURL! as QLPreviewItem
     }
 }
