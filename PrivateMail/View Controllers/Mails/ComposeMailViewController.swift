@@ -45,7 +45,6 @@ class ComposeMailViewController: UIViewController {
         super.viewDidLoad()
         
         title = NSLocalizedString("Compose", comment: "")
-        navigationController?.isToolbarHidden = false
         
         passwordTextField.delegate = self
         dialogView.alpha = 0.0
@@ -60,8 +59,14 @@ class ComposeMailViewController: UIViewController {
         tableView.register(cellClass: MailSubjectTableViewCell())
         tableView.register(cellClass: MailBodyTableViewCell())
         tableView.register(cellClass: MailHTMLBodyTableViewCell())
+        tableView.register(cellClass: MailAttachmentTableViewCell())
         
         tableView.tableFooterView = UIView(frame: CGRect.zero)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isToolbarHidden = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -224,15 +229,13 @@ class ComposeMailViewController: UIViewController {
 
 extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4 + ComposeMailModelController.shared.mail.attachmentsToShow().count
+        return 4 + (ComposeMailModelController.shared.mail.attachmentsToSend?.keys.count ?? 0)
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let mail = ComposeMailModelController.shared.mail
         
         var result = UITableViewCell()
-        
-        print(self.tableView(tableView, numberOfRowsInSection: 0) )
         
         switch indexPath.row {
         case 0:
@@ -278,8 +281,22 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             
             cell.importKeyButton.isHidden = true
             cell.importConstraint.isActive = false
+
+            var tempNames: [String] = []
             
-            if let fileName = mail.attachmentsToShow()[indexPath.row - 1]["FileName"] as? String {
+            for key in mail.attachmentsToSend!.keys {
+                tempNames.append(key)
+            }
+            
+            tempNames.sort()
+            
+            let tempName = tempNames[indexPath.row - 3]
+            
+            if let attachment = mail.attachmentsToSend?[tempName] as? [String] {
+                let fileName = attachment[0]
+                
+                cell.downloadLink = tempName
+                cell.isComposer = true
                 cell.titleLabel.text = fileName
                 
                 if (fileName as NSString).pathExtension == "asc" {
@@ -291,14 +308,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
                 cell.titleLabel.text = ""
             }
             
-            cell.downloadLink = nil
             cell.delegate = self
-            
-            if let actions = mail.attachmentsToShow()[indexPath.row - 1]["Actions"] as? [String: [String: String]] {
-                if let downloadLink = actions["download"]?["url"] {
-                    cell.downloadLink = downloadLink
-                }
-            }
             
             result = cell
             break
@@ -341,25 +351,37 @@ extension ComposeMailViewController: UITextFieldDelegate {
 
 extension ComposeMailViewController: UIDocumentPickerDelegate {
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-        guard let url = urls.first else {
-            return
-        }
-        
-        do {
-            let data = try Data(contentsOf: url)
-            let filename = url.lastPathComponent
-            
-            ComposeMailModelController.shared.mail.attachments = [["FileName": filename, "IsInline": false]]
-            tableView.reloadData()
-            
-            API.shared.uploadAttachment(data: data, fileName: filename) { (result, error) in
-//                if let result = result["Result"] as? [String: Any] {
-//                } else {
-                    SVProgressHUD.showError(withStatus: "Can't upload the file")
-//                }
+        DispatchQueue.main.async {
+            guard let url = urls.first else {
+                return
             }
-        } catch {
-            presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("Can't open file", comment: ""), style: .alert, actions: [], addCancelButton: true)
+            
+            SVProgressHUD.show()
+            
+            API.shared.uploadAttachment(fileName: url.absoluteString) { (result, error) in
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
+                    if let result = result?["Result"] as? [String: Any] {
+                        if let attachmentInfo = result["Attachment"] as? [String: Any],
+                            let tempName = attachmentInfo["TempName"] as? String,
+                            let fileName = attachmentInfo["FileName"] as? String {
+                            let attachment = [fileName, "", "0", "0", ""]
+                            
+                            if ComposeMailModelController.shared.mail.attachmentsToSend == nil {
+                                ComposeMailModelController.shared.mail.attachmentsToSend = [:]
+                            }
+                            
+                            ComposeMailModelController.shared.mail.attachmentsToSend?[tempName] = attachment
+                            self.tableView.reloadData()
+                        } else {
+                            SVProgressHUD.showError(withStatus: "Can't upload the file")
+                        }
+                    } else {
+                        SVProgressHUD.showError(withStatus: "Can't upload the file")
+                    }
+                }
+            }
         }
     }
     
@@ -440,5 +462,11 @@ extension ComposeMailViewController: QLPreviewControllerDataSource {
     
     func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
         return attachementPreviewURL! as QLPreviewItem
+    }
+    
+    func reloadData() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
 }

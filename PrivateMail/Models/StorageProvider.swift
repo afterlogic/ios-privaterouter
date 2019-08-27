@@ -375,20 +375,23 @@ class StorageProvider: NSObject {
                     var found = false
                     let mail = mails[i]
                     
-                    if i < mailsDB.count {
-                        
+//                    if i < mailsDB.count {
+                    
                         if let first = mailsDB.first {
                             if mail.uid ?? -1 > first.uid ?? -1 {
                                 found = true
                             }
-                        }
+                        } else {
+                           found = true
+                    }
                         
                         if let last = mailsDB.last {
                             if mail.uid ?? -1 < last.uid ?? -1 {
                                 found = true
                             }
                         }
-                        
+                    
+                    if i < mailsDB.count {
                         for c in i ..< mailsDB.count {
                             if mail.uid ?? -1 == mailsDB[c].uid ?? -1 {
                                 break
@@ -399,10 +402,11 @@ class StorageProvider: NSObject {
                                 break
                             }
                         }
-                    } else {
-                        found = true
                     }
-                    
+//                    } else {
+//                        found = true
+//                    }
+                
                     if found {
                         uids.append(mail.uid ?? -1)
                         
@@ -811,60 +815,66 @@ class StorageProvider: NSObject {
     }
     
     func saveMails(mails: [APIMail], completionHandler: @escaping (Bool) -> Void) {
-        var mailsDB: [MailDB] = []
-        
         for mail in mails {
-            if API.shared.currentUser.id > 0,
-                let uid = mail.uid,
-                let input = mail.input,
-                let folder = mail.folder,
-                let subject = mail.subject,
-                let sender = mail.senders?.first,
-                let date = mail.date,
-                let isSeen = mail.isSeen,
-                let isFlagged = mail.isFlagged {
-                
-                let mailDB = MailDB()
-                mailDB.uid = uid
-                mailDB.folder = folder
-                mailDB.accountID = API.shared.currentUser.id
-                mailDB.body = mail.plainedBody(false)
-                mailDB.sender = sender
-                mailDB.subject = subject
-                mailDB.date = date
-                mailDB.isSeen = isSeen
-                mailDB.isFlagged = isFlagged
-                mailDB.threadUID = mail.threadUID ?? -1
-                mailDB.isAnswered = mail.isAnswered ?? false
-                mailDB.isForwarded = mail.isForwarded ?? false
-                mailDB.isDeleted = mail.isDeleted ?? false
-                mailDB.isDraft = mail.isDraft ?? false
-                mailDB.isRecent = mail.isRecent ?? false
-                
-                if let attachments = mail.attachments {
-                    var attachmentsNames = ""
-                    
-                    for attachment in attachments {
-                        if let name = attachment["FileName"] as? String {
-                            attachmentsNames += name
-                        }
-                    }
-                    
-                    mailDB.attachments = attachmentsNames
-                }
-                
-                let data = NSKeyedArchiver.archivedData(withRootObject: input)
-                mailDB.data = NSData(data: data)
-                mailsDB.append(mailDB)
-            }
+            saveMail(mail: mail)
         }
         
-        DispatchQueue.main.async {
-            try! self.realm.write {
-                self.realm.add(mailsDB)
-                completionHandler(true)
-            }
-        }
+        completionHandler(true)
+        
+//        var mailsDB: [MailDB] = []
+//
+//        for mail in mails {
+//            if API.shared.currentUser.id > 0,
+//                let uid = mail.uid,
+//                let input = mail.input,
+//                let folder = mail.folder,
+//                let subject = mail.subject,
+//                let sender = mail.senders?.first,
+//                let date = mail.date,
+//                let isSeen = mail.isSeen,
+//                let isFlagged = mail.isFlagged {
+//
+//                let mailDB = MailDB()
+//                mailDB.uid = uid
+//                mailDB.folder = folder
+//                mailDB.accountID = API.shared.currentUser.id
+//                mailDB.body = mail.plainedBody(false)
+//                mailDB.sender = sender
+//                mailDB.subject = subject
+//                mailDB.date = date
+//                mailDB.isSeen = isSeen
+//                mailDB.isFlagged = isFlagged
+//                mailDB.threadUID = mail.threadUID ?? -1
+//                mailDB.isAnswered = mail.isAnswered ?? false
+//                mailDB.isForwarded = mail.isForwarded ?? false
+//                mailDB.isDeleted = mail.isDeleted ?? false
+//                mailDB.isDraft = mail.isDraft ?? false
+//                mailDB.isRecent = mail.isRecent ?? false
+//
+//                if let attachments = mail.attachments {
+//                    var attachmentsNames = ""
+//
+//                    for attachment in attachments {
+//                        if let name = attachment["FileName"] as? String {
+//                            attachmentsNames += name
+//                        }
+//                    }
+//
+//                    mailDB.attachments = attachmentsNames
+//                }
+//
+//                let data = NSKeyedArchiver.archivedData(withRootObject: input)
+//                mailDB.data = NSData(data: data)
+//                mailsDB.append(mailDB)
+//            }
+//        }
+//
+//        DispatchQueue.main.async {
+//            try! self.realm.write {
+//                self.realm.add(mailsDB)
+//                completionHandler(true)
+//            }
+//        }
     }
     
     func saveCurrentUser(user: [String: Any]) {

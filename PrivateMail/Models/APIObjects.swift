@@ -59,6 +59,7 @@ struct APIMail {
     var isRecent: Bool?
     var hasAttachments: Bool?
     var attachments: [[String: Any]]?
+    var attachmentsToSend: [String: Any]?
     var to: [String]?
     var from: [String]?
     var cc: [String]?

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SVProgressHUD
 
 class ContactsViewController: UIViewController {
 
@@ -14,6 +15,8 @@ class ContactsViewController: UIViewController {
     
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var addButton: UIBarButtonItem!
+    @IBOutlet var menuButton: UIBarButtonItem!
+    @IBOutlet var sideMenuAction: UIBarButtonItem!
     
     var contacts: [APIContact] = [] {
         didSet {
@@ -31,8 +34,16 @@ class ContactsViewController: UIViewController {
     var isSelection: Bool = false
     var selectionStyle: AddressTableViewCellStyle? = nil
     
-    var selectedCells: [IndexPath] = [
-    ]
+    var selectedCells: [APIContact] = [
+        ] {
+        didSet {
+            if selectedCells.count > 0 {
+                title = NSLocalizedString("Selected: \(selectedCells.count)", comment: "")
+            } else if isSelection {
+                title = NSLocalizedString("Choose contacts", comment: "")
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +66,12 @@ class ContactsViewController: UIViewController {
         
         if isSelection {
             title = NSLocalizedString("Choose contacts", comment: "")
+            navigationItem.leftBarButtonItems = nil
+            navigationItem.rightBarButtonItems = [addButton, searchButton]
+        } else {
+            navigationItem.hidesBackButton = true
+            navigationItem.leftBarButtonItem = sideMenuAction
+            navigationItem.rightBarButtonItems = [menuButton, searchButton]
         }
         
         setupSearchBar()
@@ -149,8 +166,8 @@ class ContactsViewController: UIViewController {
             
             var emails: [String] = oldEmails ?? []
             
-            for indexPath in selectedCells {
-                if let email = contacts[indexPath.row].viewEmail {
+            for contact in selectedCells {
+                if let email = contact.viewEmail {
                     if !emails.contains(email) {
                         emails.append(email)
                     }
@@ -171,11 +188,55 @@ class ContactsViewController: UIViewController {
         }
     }
     
+    @IBAction func menuButtonAction(_ sender: Any) {
+        let actionSheet = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let addButton = UIAlertAction.init(title: NSLocalizedString("Add contact", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            self.performSegue(withIdentifier: "AddContactSegue", sender: nil)
+        }
+        
+        let mailButton = UIAlertAction.init(title: NSLocalizedString("Mails", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            self.dismiss(animated: false, completion: nil)
+            self.navigationController?.popViewController(animated: false)
+        }
+        
+        let settingsButton = UIAlertAction.init(title: NSLocalizedString("Settings", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            self.performSegue(withIdentifier: "SettingsSegue", sender: nil)
+        }
+        
+        let logOutButton = UIAlertAction.init(title: NSLocalizedString("Log Out", comment: ""), style: .default) { (alert: UIAlertAction!) in
+            SVProgressHUD.show()
+            
+            API.shared.logout(completionHandler: { (result, error) in
+                if let error = error {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                } else {
+                    SVProgressHUD.dismiss()
+                    NotificationCenter.default.post(name: .failedToLogin, object: nil)
+                }
+            })
+        }
+        
+        let cancelButton = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
+            
+        }
+        
+        actionSheet.addAction(addButton)
+        actionSheet.addAction(mailButton)
+        actionSheet.addAction(settingsButton)
+        actionSheet.addAction(logOutButton)
+        actionSheet.addAction(cancelButton)
+        
+        present(actionSheet, animated: true, completion: nil)
+    }
+    
     
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "AddContactSegue" {
+            ContactsModelController.shared.contact = APIContact()
+            
             let vc = segue.destination as! ContactDetailsViewController
             vc.isAdding = true
         }
@@ -193,17 +254,30 @@ extension ContactsViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: ContactTableViewCell.cellID(), for: indexPath) as! ContactTableViewCell
         cell.contact = contacts[indexPath.row]
         cell.switch.isHidden = !isSelection
-        cell.switch.isOn = selectedCells.contains(indexPath)
+        
+        let isSelected = selectedCells.contains { (item) -> Bool in
+            return cell.contact?.viewEmail == item.viewEmail
+        }
+        
+        cell.switch.isOn = isSelected
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isSelection {
-            if selectedCells.contains(indexPath) {
-                selectedCells.remove(at: selectedCells.firstIndex(of: indexPath)!)
+            let contact = contacts[indexPath.row]
+            
+            let isSelected = selectedCells.contains { (item) -> Bool in
+                return contact.viewEmail == item.viewEmail
+            }
+
+            if isSelected {
+                selectedCells.remove(at: selectedCells.firstIndex(where: { (item) -> Bool in
+                    return contact.viewEmail == item.viewEmail
+                })!)
             } else {
-                selectedCells.append(indexPath)
+                selectedCells.append(contact)
             }
             
             tableView.reloadData()
@@ -232,8 +306,17 @@ extension ContactsViewController: UISearchBarDelegate {
         
         UIView.transition(with: navigationController!.navigationBar, duration: 0.1, options: .transitionCrossDissolve, animations: {
             self.navigationItem.titleView = nil
-            self.navigationItem.rightBarButtonItems = [self.addButton, self.searchButton]
-            self.navigationItem.hidesBackButton = false
+            
+            if self.isSelection {
+                self.title = NSLocalizedString("Choose contacts", comment: "")
+                self.navigationItem.hidesBackButton = false
+                self.navigationItem.leftBarButtonItems = nil
+                self.navigationItem.rightBarButtonItems = [self.addButton, self.searchButton]
+            } else {
+                self.navigationItem.hidesBackButton = true
+                self.navigationItem.leftBarButtonItem = self.sideMenuAction
+                self.navigationItem.rightBarButtonItems = [self.menuButton, self.searchButton]
+            }
         }, completion: nil)
     }
     

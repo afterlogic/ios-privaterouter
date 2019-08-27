@@ -274,6 +274,9 @@ extension MailViewController: MailAttachmentTableViewCellDelegate {
             SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
         }
     }
+    
+    func reloadData() {
+    }
 }
 
 

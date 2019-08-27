@@ -28,6 +28,12 @@ class MainViewController: UIViewController {
     
     var mails: [APIMail] = [] {
         didSet {
+            let foldersWithoutThreading = ["Drafts", "Trash", "Spam"]
+            
+            if searchBar.text?.count ?? 0 > 0 || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "") {
+                return
+            }
+            
             var threadedList: [APIMail] = []
             
             for i in 0 ..< mails.count {
@@ -80,6 +86,10 @@ class MainViewController: UIViewController {
                     self.title = self.selectedFolder
                     self.navigationItem.rightBarButtonItems = [self.optionsButton, self.searchButton]
                     self.navigationItem.leftBarButtonItem = self.menuButton
+                    
+                    if self.searchBar.text?.count ?? 0 > 0 {
+                        self.searchButtonAction(self.searchButton as Any)
+                    }
                 } else {
                     guard let folder = MenuModelController.shared.currentFolder() else {
                         return

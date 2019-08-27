@@ -140,7 +140,7 @@
                         <outlet property="searchButton" destination="Dyf-Sy-Uh3" id="ifB-h3-q53"/>
                         <outlet property="tableView" destination="deA-tp-Mli" id="xPT-bI-f2a"/>
                         <segue destination="EOn-cB-asE" kind="show" identifier="ComposeSegue" id="drG-5J-rV3"/>
-                        <segue destination="KHX-tI-2PR" kind="show" identifier="ContactsSegue" id="R6G-FH-6Be"/>
+                        <segue destination="KHX-tI-2PR" kind="show" identifier="ContactsSegue" animates="NO" id="R6G-FH-6Be"/>
                         <segue destination="ChE-NV-zht" kind="show" identifier="MailSegue" id="7N5-Gf-ACW"/>
                         <segue destination="QVv-FJ-aya" kind="show" identifier="SettingsSegue" id="DhZ-du-u9t"/>
                     </connections>
@@ -158,18 +158,18 @@
                         <viewControllerLayoutGuide type="bottom" id="BGN-H8-3Bm"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="7hc-XX-gf5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="6A1-A0-G6B">
-                                <rect key="frame" x="0.0" y="44" width="375" height="768"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Xp-NJ-FIO">
-                                <rect key="frame" x="0.0" y="44" width="375" height="768"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <subviews>
                                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IDm-WY-dVn">
-                                        <rect key="frame" x="47.666666666666657" y="223.66666666666669" width="280" height="241"/>
+                                        <rect key="frame" x="47.666666666666657" y="201.66666666666669" width="280" height="241"/>
                                         <subviews>
                                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="n4y-Jw-tLm">
                                                 <rect key="frame" x="0.0" y="0.0" width="280" height="241"/>
@@ -340,27 +340,11 @@
                         <barButtonItem systemItem="flexibleSpace" id="R9E-kj-gdY"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Compose" id="YT9-Kq-G99">
-                        <rightBarButtonItems>
-                            <barButtonItem id="b1J-0b-HCs">
-                                <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="6sR-9w-A1V" userLabel="Icon">
-                                    <rect key="frame" x="337" y="0.0" width="22" height="44"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <state key="normal" image="side_menu"/>
-                                    <connections>
-                                        <action selector="menuButtonAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="rBv-Oz-Akv"/>
-                                    </connections>
-                                </button>
-                                <connections>
-                                    <action selector="optionsAction:" destination="EOn-cB-asE" id="g3W-t9-w6z"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem systemItem="action" id="AzL-uu-9un">
-                                <connections>
-                                    <action selector="sendAction:" destination="EOn-cB-asE" id="C9q-Qk-IuA"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="AzL-uu-9un">
+                            <connections>
+                                <action selector="sendAction:" destination="EOn-cB-asE" id="C9q-Qk-IuA"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -456,7 +440,19 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Contacts" id="Q8J-sq-BOF">
+                        <barButtonItem key="leftBarButtonItem" image="menu" id="GQf-5g-N7n"/>
                         <rightBarButtonItems>
+                            <barButtonItem id="oqb-fZ-KCl">
+                                <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="iJc-jZ-jdk" userLabel="Icon">
+                                    <rect key="frame" x="337" y="0.0" width="22" height="44"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <state key="normal" image="side_menu"/>
+                                    <connections>
+                                        <action selector="menuButtonAction:" destination="KHX-tI-2PR" eventType="touchUpInside" id="qM0-SJ-ZyR"/>
+                                    </connections>
+                                </button>
+                            </barButtonItem>
                             <barButtonItem systemItem="add" id="eNL-3p-B0E">
                                 <connections>
                                     <action selector="addButtonAction:" destination="KHX-tI-2PR" id="TBv-EP-az0"/>
@@ -470,12 +466,16 @@
                         </rightBarButtonItems>
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="addButton" destination="eNL-3p-B0E" id="Xk0-Y8-p5c"/>
+                        <outlet property="menuButton" destination="oqb-fZ-KCl" id="Ibb-Z8-DbE"/>
                         <outlet property="searchButton" destination="HMm-fv-vba" id="VMk-vJ-LWW"/>
+                        <outlet property="sideMenuAction" destination="GQf-5g-N7n" id="rlz-2P-Sq4"/>
                         <outlet property="tableView" destination="8na-we-pMI" id="zrG-iT-Axw"/>
                         <segue destination="ypO-gt-dUc" kind="show" identifier="ShowContactSegue" id="67v-HK-w7Z"/>
                         <segue destination="ypO-gt-dUc" kind="show" identifier="AddContactSegue" id="cAx-WG-7Li"/>
+                        <segue destination="QVv-FJ-aya" kind="show" identifier="SettingsSegue" id="wcd-hS-Cmg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fVW-1S-tBN" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -643,11 +643,11 @@
                         <viewControllerLayoutGuide type="bottom" id="Eog-Un-Prm"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="eZo-ST-Cq8">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="d1x-wR-3wc">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -680,11 +680,11 @@
                         <viewControllerLayoutGuide type="bottom" id="eWq-AE-fCo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="xEu-u0-rq5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="84M-AJ-ibn">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -715,17 +715,17 @@
                         <viewControllerLayoutGuide type="bottom" id="f2a-Wq-8oS"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="1AB-D6-Diw">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L5m-j3-Oh4">
-                                <rect key="frame" x="10" y="10" width="355" height="570"/>
+                                <rect key="frame" x="10" y="98" width="355" height="521"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5">
-                                <rect key="frame" x="10" y="590" width="355" height="40"/>
+                                <rect key="frame" x="10" y="629" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="h0r-0H-o0k"/>
@@ -739,7 +739,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ">
-                                <rect key="frame" x="10" y="640" width="355" height="40"/>
+                                <rect key="frame" x="10" y="679" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="bA1-od-46b"/>
@@ -787,11 +787,11 @@
                         <viewControllerLayoutGuide type="bottom" id="iyP-09-Bhw"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="jL4-xY-g6t">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="HpX-Fz-2uq">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -823,11 +823,11 @@
                         <viewControllerLayoutGuide type="bottom" id="jaW-Ba-99l"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="0Bb-Rl-4Px">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="NXp-8p-bTr">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -856,11 +856,11 @@
                         <viewControllerLayoutGuide type="bottom" id="G96-OO-uva"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ek7-gs-JXD">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="GUh-fM-xrX">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -1285,9 +1285,10 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="ZCy-BS-EsO"/>
+        <segue reference="wcd-hS-Cmg"/>
         <segue reference="gGo-gR-10m"/>
         <segue reference="DBZ-Gj-4Il"/>
         <segue reference="cAx-WG-7Li"/>
-        <segue reference="G4f-PZ-t7x"/>
+        <segue reference="drG-5J-rV3"/>
     </inferredMetricsTieBreakers>
 </document>

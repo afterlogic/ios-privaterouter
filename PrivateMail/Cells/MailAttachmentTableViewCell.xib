@@ -70,6 +70,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="downloadButton" destination="eq1-ad-6AM" id="yUO-OF-MTj"/>
                 <outlet property="importConstraint" destination="glD-N4-YJp" id="IVb-El-Rrs"/>
                 <outlet property="importKeyButton" destination="DfN-6X-eHb" id="IXy-VY-h5R"/>
                 <outlet property="titleLabel" destination="zbc-hT-nyA" id="bTJ-7G-BUR"/>

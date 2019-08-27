@@ -17,7 +17,6 @@ class MailSubjectTableViewCell: UITableViewCell {
         super.awakeFromNib()
         textField.delegate = self
         titleLabel.text = NSLocalizedString("Subject", comment: "")
-        textField.placeholder = NSLocalizedString("Subject", comment: "")
         textField.text = ComposeMailModelController.shared.mail.subject
     }
 

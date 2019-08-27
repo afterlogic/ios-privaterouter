@@ -277,12 +277,13 @@ class API: NSObject {
 
             searchString = "date:\(dateFormatter.string(from: date))/"
         }
-
+        
         let parameters = [
             "AccountID": currentUser.id,
             "Folder": folder,
             "Search": searchString,
             "UseThreading": true,
+//            "SortBy": "date"
             ] as [String : Any]
         
         createTask(module: "Mail", method: "GetMessagesInfo", parameters: parameters) { (result, error) in
@@ -311,6 +312,7 @@ class API: NSObject {
     }
     
     func getMailsList(text: String, folder: String, limit: Int, offset: Int, completionHandler: @escaping ([APIMail]?, Error?) -> Void) {
+ 
         let parameters = [
             "AccountID": currentUser.id,
             "Folder": folder,
@@ -464,7 +466,7 @@ class API: NSObject {
             "IsHtml": true,
             "Importance": 3,
             "SendReadingConfirmation": false,
-            "Attachments": mail.attachments ?? [],
+            "Attachments": mail.attachmentsToSend ?? [:],
             "InReplyTo": "",
             "References": "",
             "Sensitivity": 0,
@@ -638,23 +640,126 @@ class API: NSObject {
     }
 
     
-    func uploadAttachment(data: Data, fileName: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
+    func uploadAttachment(fileName: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
+        guard let token = keychain["AccessToken"] else {
+            completionHandler(nil, nil)
+            return
+        }
+        
+        let boundary = "----Boundary-\(UUID().uuidString)"
+        
         let parameters = [
-            "AccountID": currentUser.id
-        ] as [String: Any]
+            [
+                "name": "Module",
+                "value": "Mail"
+            ],
+            [
+                "name": "Method",
+                "value": "UploadAttachment"
+            ],
+            [
+                "name": "Parameters",
+                "value": "{\"AccountID\": \(currentUser.id)}"
+            ],
+            [
+                "name": "jua-uploader",
+                "fileName": fileName,
+                "content-type": "image/*"
+            ]
+        ]
         
-        let boundary = "Boundary-\(UUID().uuidString)"
-        let dataToUpload = createBody(parameters: [:], boundary: boundary, data: data, mimeType: "multipart/form-data", filename: fileName)
-        
-        createTask(module: "Mail", method: "UploadAttachment", parameters: parameters, dataToUpload: dataToUpload, boundary: boundary) { (result, error) in
-            completionHandler(result, error)
+        do {
+            let body = NSMutableData()
+            
+            for param in parameters {
+                let paramName = param["name"]!
+                body.appendString("--\(boundary)\r\n")
+                body.appendString("Content-Disposition:form-data; name=\"\(paramName)\"")
+                
+                if let filename = param["fileName"] {
+                    let contentType = param["content-type"]!
+                    
+                    let fileContent = try Data(contentsOf: URL(string: fileName)!)
+
+                    body.appendString("; filename=\"\(filename)\"\r\n")
+                    body.appendString("Content-Type: \(contentType)\r\n\r\n")
+                    body.append(fileContent)
+                    body.appendString("\r\n")
+                } else if let paramValue = param["value"] {
+                    body.appendString("\r\n\r\n\(paramValue)\r\n")
+                }
+            }
+            
+            body.appendString("--\(boundary)")
+            
+            let request = NSMutableURLRequest(url: URL(string: "\(getServerURL())?/Api/")!,
+                                              cachePolicy: .useProtocolCachePolicy,
+                                              timeoutInterval: 10.0)
+            
+            let headers = [
+                "Authorization": "Bearer \(token)",
+                "Accept": "*/*",
+                "Cache-Control": "no-cache",
+                "Accept-Encoding": "gzip, deflate",
+                "Content-Type": "multipart/form-data; boundary=\(boundary)",
+                "Content-Length": "\(body.length)",
+                "Connection": "keep-alive",
+                "cache-control": "no-cache"
+            ]
+            
+            
+            request.httpMethod = "POST"
+            request.allHTTPHeaderFields = headers
+            request.httpBody = body as Data
+            
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+            
+            let session = URLSession.shared
+            let dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
+                DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                }
+                
+                if let error = error {
+                    completionHandler([:], error)
+                    return
+                }
+                
+                if let data = data {
+                    do {
+                        let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: Any]
+                        
+                        if let result = json["ErrorCode"] {
+                            let res = result as! Int
+                            
+                            if res == 101 || res == 102 {
+                                keychain["AccessToken"] = nil
+                                NotificationCenter.default.post(name: .failedToLogin, object: nil)
+                            }
+                            
+                            completionHandler([:], nil)
+                            return
+                        }
+                        
+                        completionHandler(json, nil)
+                        
+                    } catch let error as NSError {
+                        completionHandler([:], error)
+                    }
+                }
+            })
+            
+            dataTask.resume()
+        } catch {
+            completionHandler(nil, nil)
+            return
         }
     }
     
     
     // MARK: - Helpers
     
-    func httpBodyFrom(dictionary: [String: String], dataToUpload: Data? = nil) -> Data? {
+    func httpBodyFrom(dictionary: [String: String]) -> Data? {
         var resultParts: [String] = []
         
         for key in dictionary.keys {
@@ -671,19 +776,7 @@ class API: NSObject {
         }
         
         let result = resultParts.joined(separator: "&")
-        
-        if let data = result.data(using: .utf8) {
-            let mutableData = NSMutableData(data: data)
-            
-            if dataToUpload != nil {
-                mutableData.appendString("&UploadData=")
-                mutableData.append(dataToUpload!)
-            }
-            
-            return mutableData as Data
-        } else {
-            return nil
-        }
+        return result.data(using: .utf8)
     }
     
     func getServerURL() -> String {
@@ -724,7 +817,7 @@ class API: NSObject {
         }
     }
     
-    func generateRequest(module: String, method: String, dataToUpload: Data? = nil, parameters: [String: Any]) -> URLRequest? {
+    func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
         var request = URLRequest(url: URL(string: "\(getServerURL())?/Api/")!)
         
         request.httpMethod = "POST"
@@ -748,7 +841,7 @@ class API: NSObject {
             return nil
         }
         
-        if let bodyData = httpBodyFrom(dictionary: body, dataToUpload: dataToUpload) {
+        if let bodyData = httpBodyFrom(dictionary: body) {
             request.httpBody = bodyData
             return request
         }
@@ -756,18 +849,13 @@ class API: NSObject {
         return nil
     }
     
-    func createTask(module: String, method: String, parameters: [String: Any], dataToUpload: Data? = nil, boundary: String? = nil, completionHandler: @escaping ([String: Any], Error?) -> Void) {
+    func createTask(module: String, method: String, parameters: [String: Any], completionHandler: @escaping ([String: Any], Error?) -> Void) {
         
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
         
-        if var request = generateRequest(module: module, method: method, dataToUpload: dataToUpload, parameters: parameters) {
-            
-            if let boundary = boundary {
-                request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-            }
-            
+        if let request = generateRequest(module: module, method: method, parameters: parameters) {
             URLSession.shared.dataTask(with: request) { (data, response, error) in
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -812,21 +900,16 @@ class API: NSObject {
         
     }
     
-    func createBody(parameters: [String: String], boundary: String, data: Data, mimeType: String, filename: String) -> Data {
+    func createBody(data: String, mimeType: String, filename: String) -> Data {
         let body = NSMutableData()
         
+        let boundary = "Boundary-\(UUID().uuidString)"
         let boundaryPrefix = "--\(boundary)\r\n"
-        
-        for (key, value) in parameters {
-            body.appendString(boundaryPrefix)
-            body.appendString("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
-            body.appendString("\(value)\r\n")
-        }
         
         body.appendString(boundaryPrefix)
         body.appendString("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n")
         body.appendString("Content-Type: \(mimeType)\r\n\r\n")
-        body.append(data)
+//        body.append(data)
         body.appendString("\r\n")
         body.appendString("--".appending(boundary.appending("--")))
         
