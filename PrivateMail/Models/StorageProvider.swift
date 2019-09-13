@@ -701,7 +701,7 @@ class StorageProvider: NSObject {
     }
     
     func getPGPKey(_ email: String?, isPrivate: Bool) -> PGPKey? {
-        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"\(email ?? "")\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"<\(email ?? "")>\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
         
         if let key = keys.first {
             let newKey = PGPKey()

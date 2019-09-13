@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,6 +12,8 @@
 		8251612B96DDB65962FF4437 /* Pods_PrivateMailUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */; };
 		E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50122662288981D00CC7477 /* MailPageViewController.swift */; };
 		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
+		E51C60362319A03600FEB411 /* ArialBlack.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E51C60352319A03600FEB411 /* ArialBlack.ttf */; };
+		E51C60382319A0EE00FEB411 /* Tahoma.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E51C60372319A0EE00FEB411 /* Tahoma.ttf */; };
 		E526714E2253E54900A1D180 /* APIObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E526714D2253E54900A1D180 /* APIObjects.swift */; };
 		E540988C22837B8600E2C588 /* MailHTMLBodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */; };
 		E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */; };
@@ -99,6 +101,8 @@
 		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
 		E50122662288981D00CC7477 /* MailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailPageViewController.swift; sourceTree = "<group>"; };
 		E5111F042242BA420036501F /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		E51C60352319A03600FEB411 /* ArialBlack.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ArialBlack.ttf; sourceTree = "<group>"; };
+		E51C60372319A0EE00FEB411 /* Tahoma.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Tahoma.ttf; sourceTree = "<group>"; };
 		E526714D2253E54900A1D180 /* APIObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIObjects.swift; sourceTree = "<group>"; };
 		E540988A22837B8500E2C588 /* MailHTMLBodyTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MailHTMLBodyTableViewCell.xib; sourceTree = "<group>"; };
 		E540988B22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailHTMLBodyTableViewCell.swift; sourceTree = "<group>"; };
@@ -217,6 +221,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E51C60342319A01000FEB411 /* Resourses */ = {
+			isa = PBXGroup;
+			children = (
+				E51C60352319A03600FEB411 /* ArialBlack.ttf */,
+				E51C60372319A0EE00FEB411 /* Tahoma.ttf */,
+			);
+			path = Resourses;
+			sourceTree = "<group>";
+		};
 		E544D2F722EA329300FA468F /* Contacts */ = {
 			isa = PBXGroup;
 			children = (
@@ -275,6 +288,7 @@
 				E5F28A9922384A33002721ED /* Models */,
 				E5F28A93223843E9002721ED /* View Controllers */,
 				E5F28A94223843FA002721ED /* Cells */,
+				E51C60342319A01000FEB411 /* Resourses */,
 				E567B4692236D51C00FA9945 /* Main.storyboard */,
 				E567B46C2236D51D00FA9945 /* Assets.xcassets */,
 				E567B46E2236D51D00FA9945 /* LaunchScreen.storyboard */,
@@ -514,7 +528,9 @@
 				E580A2DF22EBAA2200E90C89 /* KeyImportTableViewCell.xib in Resources */,
 				E567B4702236D51D00FA9945 /* LaunchScreen.storyboard in Resources */,
 				E567B46D2236D51D00FA9945 /* Assets.xcassets in Resources */,
+				E51C60362319A03600FEB411 /* ArialBlack.ttf in Resources */,
 				E5F1D7882242D3E4007071AA /* AddressTableViewCell.xib in Resources */,
+				E51C60382319A0EE00FEB411 /* Tahoma.ttf in Resources */,
 				E5F1D7902242E067007071AA /* MailSubjectTableViewCell.xib in Resources */,
 				E567B46B2236D51C00FA9945 /* Main.storyboard in Resources */,
 			);
@@ -578,31 +594,16 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/KeychainAccess/KeychainAccess.framework",
-				"${PODS_ROOT}/ObjectivePGP/Frameworks/ios/ObjectivePGP.framework",
-				"${PODS_ROOT}/ObjectivePGP/Frameworks/ios/ObjectivePGP.framework.dSYM",
-				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
-				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
-				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
-				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
-				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainAccess.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectivePGP.framework",
-				"${DWARF_DSYM_FOLDER_PATH}/ObjectivePGP.framework.dSYM",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PrivateMail/Pods-PrivateMail-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FBE52F11FCB28CB0AB115562 /* [CP] Check Pods Manifest.lock */ = {
@@ -856,6 +857,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 72664T4RU7;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
@@ -879,6 +881,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 72664T4RU7;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;

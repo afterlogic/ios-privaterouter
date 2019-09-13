@@ -146,28 +146,47 @@ class ComposeMailViewController: UIViewController {
     @IBAction func signEncryptButtonAction(_ sender: Any) {
         var mail = ComposeMailModelController.shared.mail
         
-        do {
-            if let publicKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: false)?.armoredKey {
-                #if !targetEnvironment(simulator)
-                if let body = mail.htmlBody, encryptSwitch.isOn {
-                    let data = body.data(using: .utf8)!
-                    let key = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
-                    
-                    let encrypted = try ObjectivePGP.encrypt(data, addSignature: signSwitch.isOn && false, using: key, passphraseForKey: { (key) -> String? in
-                        return passwordTextField.text
-                    })
-
-                    let armoredResult = Armor.armored(encrypted, as: .message).replacingOccurrences(of: "\n", with: "<br>")
-                    
-                    mail.htmlBody = armoredResult
-                    ComposeMailModelController.shared.mail = mail
-                    tableView.reloadData()
+        if let email = mail.to?.first {
+            do {
+                if let publicKey = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
+                    #if !targetEnvironment(simulator)
+                    if let body = mail.htmlBody, encryptSwitch.isOn {
+                        let data = body.data(using: .utf8)!
+                        var keys = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
+                        
+                        if let privateKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
+                            do {
+                               let privateKeys = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
+                                keys.append(contentsOf: privateKeys)
+                            } catch {
+                                
+                            }
+                        }
+                        
+                        if signSwitch.isOn && passwordTextField.text?.count ?? 0 == 0 {
+                            SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter password for signing", comment: ""))
+                            return
+                        }
+                        
+                        let encrypted = try ObjectivePGP.encrypt(data, addSignature: signSwitch.isOn, using: keys, passphraseForKey: { (key) -> String? in
+                            return passwordTextField.text
+                        })
+                        
+                        let armoredResult = Armor.armored(encrypted, as: .message).replacingOccurrences(of: "\n", with: "<br>")
+                        
+                        mail.htmlBody = armoredResult
+                        ComposeMailModelController.shared.mail = mail
+                        tableView.reloadData()
+                    }
+                    #endif
+                } else {
+                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
                 }
-                #endif
-            } else {
-                SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
+            } catch {
+                SVProgressHUD.showInfo(withStatus: error.localizedDescription)
             }
-        } catch {
+        } else {
+            SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please add mail recipient", comment: ""))
         }
         
         cancelButtonAction(sender)

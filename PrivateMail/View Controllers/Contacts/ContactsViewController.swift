@@ -253,7 +253,7 @@ extension ContactsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ContactTableViewCell.cellID(), for: indexPath) as! ContactTableViewCell
         cell.contact = contacts[indexPath.row]
-        cell.switch.isHidden = !isSelection
+        cell.switch.isHidden = !isSelection || !(cell.contact?.viewEmail?.count ?? 0 > 0)
         
         let isSelected = selectedCells.contains { (item) -> Bool in
             return cell.contact?.viewEmail == item.viewEmail
@@ -268,19 +268,21 @@ extension ContactsViewController: UITableViewDelegate, UITableViewDataSource {
         if isSelection {
             let contact = contacts[indexPath.row]
             
-            let isSelected = selectedCells.contains { (item) -> Bool in
-                return contact.viewEmail == item.viewEmail
-            }
-
-            if isSelected {
-                selectedCells.remove(at: selectedCells.firstIndex(where: { (item) -> Bool in
+            if (contact.viewEmail?.count ?? 0 > 0) {
+                let isSelected = selectedCells.contains { (item) -> Bool in
                     return contact.viewEmail == item.viewEmail
-                })!)
-            } else {
-                selectedCells.append(contact)
+                }
+                
+                if isSelected {
+                    selectedCells.remove(at: selectedCells.firstIndex(where: { (item) -> Bool in
+                        return contact.viewEmail == item.viewEmail
+                    })!)
+                } else {
+                    selectedCells.append(contact)
+                }
+                
+                tableView.reloadData()
             }
-            
-            tableView.reloadData()
         } else {
             ContactsModelController.shared.contact = contacts[indexPath.row]
             performSegue(withIdentifier: "ShowContactSegue", sender: nil)
@@ -308,7 +310,13 @@ extension ContactsViewController: UISearchBarDelegate {
             self.navigationItem.titleView = nil
             
             if self.isSelection {
-                self.title = NSLocalizedString("Choose contacts", comment: "")
+                
+                if self.selectedCells.count > 0 {
+                    self.title = NSLocalizedString("Selected: \(self.selectedCells.count)", comment: "")
+                } else {
+                    self.title = NSLocalizedString("Choose contacts", comment: "")
+                }
+                
                 self.navigationItem.hidesBackButton = false
                 self.navigationItem.leftBarButtonItems = nil
                 self.navigationItem.rightBarButtonItems = [self.addButton, self.searchButton]

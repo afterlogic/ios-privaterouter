@@ -91,8 +91,18 @@ class MailPageViewController: UIPageViewController {
                     if let privateKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
                         let body = mail.plainedBody(false)
                         let data = try Armor.readArmored(body)
-                        let key = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
-                        let decrypted = try ObjectivePGP.decrypt(data, andVerifySignature: false, using: key, passphraseForKey: { (key) -> String? in
+                        var keys = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
+                        
+                        if let publicKey = StorageProvider.shared.getPGPKey(mail.from?.first, isPrivate: false)?.armoredKey {
+                            do {
+                               let publicKeys = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
+                                keys.append(contentsOf: publicKeys)
+                            } catch {
+                                
+                            }
+                        }
+                        
+                        let decrypted = try ObjectivePGP.decrypt(data, andVerifySignature: true, using: keys, passphraseForKey: { (key) -> String? in
                             return password
                         })
                         
@@ -109,7 +119,7 @@ class MailPageViewController: UIPageViewController {
                     
                     SVProgressHUD.dismiss()
                 } catch {
-                    SVProgressHUD.showError(withStatus: NSLocalizedString("Can't decrypt message", comment: ""))
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
                 }
             }
         }))

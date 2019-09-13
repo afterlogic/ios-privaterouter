@@ -32,7 +32,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewLayout key="collectionViewLayout" id="ZZl-nc-8Ir" customClass="LeftAlignedCollectionViewFlowLayout" customModule="PrivateMail" customModuleProvider="target"/>
                             </collectionView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ha-yb-ccL" userLabel="Plus button">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7ha-yb-ccL" userLabel="Plus button">
                                 <rect key="frame" x="274" y="0.0" width="46" height="50.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="46" id="53Y-MT-qNC"/>
@@ -69,6 +69,7 @@
             <connections>
                 <outlet property="collectionView" destination="bDG-Tm-kr0" id="ukV-AE-Omu"/>
                 <outlet property="heightConstraint" destination="tRx-aZ-ZeP" id="hWq-0v-WVK"/>
+                <outlet property="plusButton" destination="7ha-yb-ccL" id="qww-XW-Utm"/>
                 <outlet property="titleLabel" destination="h9Z-Ch-LuI" id="dEZ-bm-EHd"/>
             </connections>
             <point key="canvasLocation" x="137.59999999999999" y="153.82308845577214"/>

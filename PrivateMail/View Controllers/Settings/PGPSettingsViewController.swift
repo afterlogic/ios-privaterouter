@@ -70,7 +70,9 @@ class PGPSettingsViewController: UIViewController {
                 #if !targetEnvironment(simulator)
                 self.view.isUserInteractionEnabled = false
                 
-                if let email = API.shared.currentUser.email {
+                if var email = API.shared.currentUser.email {
+                    email = "<\(email)>"
+                    
                     DispatchQueue.global(qos: .userInitiated).async {
                         let generator = KeyGenerator()
                         generator.keyBitsLength = 2048

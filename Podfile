@@ -13,7 +13,7 @@ target 'PrivateMail' do
   pod 'SVProgressHUD', '~> 2.2.5'
   pod 'SDWebImage', '~> 4.4.5'
   pod 'KeychainAccess', '~> 3.1.2'
-  pod 'RealmSwift', '~> 3.13.1'
+  pod 'RealmSwift', '~> 3.16.2'
   
   target 'PrivateMailTests' do
     inherit! :search_paths

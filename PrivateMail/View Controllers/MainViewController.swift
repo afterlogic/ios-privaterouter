@@ -680,6 +680,17 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
                 selectedMail = mails[indexPath.section]
             }
             
+            var mailsToUpdate = MenuModelController.shared.mailsForFolder(name: selectedFolder)
+            
+            for index in 0 ..< mailsToUpdate.count {
+                if mailsToUpdate[index].uid == selectedMail?.uid {
+                    mailsToUpdate[index].isSeen = true
+                    break
+                }
+            }
+            
+            MenuModelController.shared.setMailsForFolder(mails: mailsToUpdate, folder: selectedFolder)
+            
             performSegue(withIdentifier: "MailSegue", sender: nil)
         }
     }

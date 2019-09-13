@@ -9,6 +9,7 @@
 import UIKit
 import KeychainAccess
 import SVProgressHUD
+import ObjectivePGP
 
 let keychain = Keychain(service: "com.PrivateRouter.PrivateMail")
 
@@ -19,6 +20,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+//        do {
+//            let key = KeyGenerator().generate(for: "marcin@example.com", passphrase: "password")
+//            let publicKey = try key.export(keyType: .public)
+//            let secretKey = try key.export(keyType: .secret)
+//            
+//            var keys = try ObjectivePGP.readKeys(from: publicKey)
+//            keys.append(contentsOf: try ObjectivePGP.readKeys(from: secretKey))
+//
+//            let fileContent = "FUCK".data(using: .utf8)!
+//
+//            let encrypted = try ObjectivePGP.encrypt(fileContent, addSignature: true, using: keys, passphraseForKey: { (key) -> String? in
+//                return "password"
+//            })
+//
+//            keys = try ObjectivePGP.readKeys(from: secretKey)
+//            let decrypted = try ObjectivePGP.decrypt(encrypted, andVerifySignature: true, using: [key], passphraseForKey: { (key) -> String? in
+//                return "password"
+//            })
+//
+//            print("")
+//        } catch {
+//
+//        }
+            
         SVProgressHUD.setMaximumDismissTimeInterval(0.6)
         StorageProvider.migrateIfNeeded()
 //        StorageProvider.shared.deleteAllMails()

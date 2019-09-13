@@ -28,6 +28,7 @@ class AddressTableViewCell: UITableViewCell {
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var heightConstraint: NSLayoutConstraint!
+    @IBOutlet var plusButton: UIButton!
     
     weak open var delegate: UITableViewDelegateExtensionProtocol?
     
@@ -54,6 +55,7 @@ class AddressTableViewCell: UITableViewCell {
             }
             
             titleLabel.text = name
+            plusButton.isHidden = true
         }
     }
     
@@ -206,7 +208,13 @@ extension AddressTableViewCell: AddressCollectionViewCellProtocol {
 
 
 extension AddressTableViewCell: AddressFieldCollectionViewCellProtocol {
+    func addressTextFieldBeginEditing() {
+        plusButton.isHidden = false
+    }
+    
     func addAddress(email: String?) {
+        plusButton.isHidden = true
+        
         if let email = email?.replacingOccurrences(of: " ", with: ""), email.count > 0 {
             if email.isEmail {
                 let contacts = StorageProvider.shared.getContacts(nil, search: email)
