@@ -156,7 +156,7 @@ class API: NSObject {
                             
                             if oldHash != hash
                                 && (systemFolders.contains(folderName)
-                                    || folderName == currentFolder) {
+                                    || folderName == currentFolder) || (folderName == currentFolder && SettingsModelController.shared.currentSyncingPeriodMultiplier > 1.1) {
                                 
                                 if !StorageProvider.shared.syncingFolders.contains(folderName) {
                                     StorageProvider.shared.getMails(text: "", folder: folderName, limit: nil, additionalPredicate: nil, completionHandler: { (result) in
@@ -273,7 +273,7 @@ class API: NSObject {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy.MM.dd"
             
-            let date = Date(timeIntervalSinceNow: -syncingPeriod * 60.0)
+            let date = Date(timeIntervalSinceNow: -syncingPeriod * 60.0 * SettingsModelController.shared.currentSyncingPeriodMultiplier)
 
             searchString = "date:\(dateFormatter.string(from: date))/"
         }
@@ -391,19 +391,20 @@ class API: NSObject {
         }
     }
     
-    func getContactsInfo(completionHandler: @escaping ([APIContact]?, ContactsGroupDB?, Error?) -> Void) {
-        let group = ContactsGroupDB()
-        group.accountID = currentUser.id
-        group.name = "personal"
+    func getContactsInfo(group: String = "", completionHandler: @escaping ([APIContact]?, ContactsGroupDB?, Error?) -> Void) {
+        let groupDB = ContactsGroupDB()
+        groupDB.accountID = currentUser.id
+        groupDB.uuid = group
         
         let parameters = [
-            "Storage": group.name
+            "Storage": "Personal",
+            "GroupUUID": group
         ]
         
         createTask(module: "Contacts", method: "GetContactsInfo", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let cTag = result["CTag"] as? Int {
-                    group.cTag = cTag
+                    groupDB.cTag = cTag
                 }
                 
                 var contacts: [APIContact] = []
@@ -414,14 +415,14 @@ class API: NSObject {
                     }
                 }
                 
-                completionHandler(contacts, group, nil)
+                completionHandler(contacts, groupDB, nil)
             } else {
                 completionHandler(nil, nil, error)
             }
         }
     }
     
-    func getContacts(contacts: [APIContact], completionHandler: @escaping ([APIContact]?, Error?) -> Void) {
+    func getContacts(contacts: [APIContact], group: ContactsGroupDB, completionHandler: @escaping ([APIContact]?, Error?) -> Void) {
         var uids: [String] = []
         
         for contact in contacts {
@@ -431,8 +432,9 @@ class API: NSObject {
         }
         
         let parameters = [
-            "Storage": "personal",
-            "Uids": uids
+            "Storage": "Personal",
+            "Uids": uids,
+            "GroupUUID": group.uuid
             ] as [String : Any]
         
         createTask(module: "Contacts", method: "GetContactsByUids", parameters: parameters) { (result, error) in
@@ -450,8 +452,85 @@ class API: NSObject {
         }
     }
     
+    func getContactGroups(completionHandler: @escaping ([ContactsGroupDB]?, Error?) -> Void) {
+        createTask(module: "Contacts", method: "GetGroups", parameters: [:]) { (result, error) in
+            if let result = result["Result"] as? [[String: Any]] {
+                var groups: [ContactsGroupDB] = []
+                
+                for item in result {
+                    let group = ContactsGroupDB()
+                    
+                    if let value = item["UserID"] as? Int {
+                        group.userID = value
+                    }
+                    
+                    if let name = item["Name"] as? String {
+                        group.name = name
+                    }
+                    
+                    if let uuid = item["UUID"] as? String {
+                        group.uuid = uuid
+                    }
+                    
+                    if let uuid = item["ParentUUID"] as? String {
+                        group.parentUuid = uuid
+                    }
+                    
+                    if let isOrganization = item["IsOrganization"] as? Bool {
+                        group.isOrganization = isOrganization
+                    }
+                    
+                    if let value = item["Email"] as? String {
+                        group.email = value
+                    }
+                    
+                    if let value = item["Company"] as? String {
+                        group.company = value
+                    }
+                    
+                    if let value = item["Street"] as? String {
+                        group.street = value
+                    }
+                    
+                    if let value = item["City"] as? String {
+                        group.city = value
+                    }
+                    
+                    if let value = item["State"] as? String {
+                        group.state = value
+                    }
+                    
+                    if let value = item["Zip"] as? String {
+                        group.zip = value
+                    }
+                    
+                    if let value = item["Country"] as? String {
+                        group.county = value
+                    }
+                    
+                    if let value = item["Phone"] as? String {
+                        group.phone = value
+                    }
+                    
+                    if let value = item["Fax"] as? String {
+                        group.fax = value
+                    }
+
+                    if let value = item["Web"] as? String {
+                        group.web = value
+                    }
+                    
+                    groups.append(group)
+                }
+                
+                completionHandler(groups, error)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
     
-    func sendMail(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
+    func sendMail(mail: APIMail, isSaving: Bool = false, completionHandler: @escaping (Bool?, Error?) -> Void) {
         let parameters = [
             "AccountID": currentUser.id,
             "FetcherID": "",
@@ -476,7 +555,7 @@ class API: NSObject {
             "ConfirmUid": ""
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "SendMessage", parameters: parameters) { (result, error) in
+        createTask(module: "Mail", method: isSaving ? "SaveMessage" : "SendMessage", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, nil)
             } else {
@@ -606,6 +685,21 @@ class API: NSObject {
         }
     }
     
+    func saveGroup(group: ContactsGroupDB, edit: Bool, completionHandler: @escaping ([String: String]?, Error?) -> Void) {
+        let parameters = [
+            "Group": group.asJSON()
+            ] as [String : Any]
+        
+        let method = edit ? "UpdateGroup" : "CreateGroup"
+        
+        createTask(module: "Contacts", method: method, parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? [String: String] {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, nil)
+            }
+        }
+    }
     
     func deleteMessage(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
         deleteMessages(mails: [mail], completionHandler: completionHandler)
@@ -639,6 +733,19 @@ class API: NSObject {
         }
     }
 
+    func deleteGroup(group: ContactsGroupDB, completionHandler: @escaping ([String: String]?, Error?) -> Void) {
+        let parameters = [
+            "UUID": group.uuid
+            ] as [String : Any]
+                
+        createTask(module: "Contacts", method: "DeleteGroup", parameters: parameters) { (result, error) in
+            if let result = result["Result"] as? [String: String] {
+                completionHandler(result, error)
+            } else {
+                completionHandler(nil, nil)
+            }
+        }
+    }
     
     func uploadAttachment(fileName: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
         guard let token = keychain["AccessToken"] else {

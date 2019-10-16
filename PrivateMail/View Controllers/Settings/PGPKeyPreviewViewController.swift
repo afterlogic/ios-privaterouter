@@ -50,11 +50,11 @@ class PGPKeyPreviewViewController: UIViewController {
         navigationController?.isToolbarHidden = true
         
         if key?.accountID == -1 {
-            title = NSLocalizedString("All public keys", comment: "")
+            navigationItem.title = NSLocalizedString("All public keys", comment: "")
         } else if key?.isPrivate == true {
-            title = NSLocalizedString("Private key", comment: "")
+            navigationItem.title = NSLocalizedString("Private key", comment: "")
         } else {
-            title = NSLocalizedString("Public key", comment: "")
+            navigationItem.title = NSLocalizedString("Public key", comment: "")
         }
     }
     

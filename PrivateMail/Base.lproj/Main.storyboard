@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14865.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14819.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Mail-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController hidesBottomBarWhenPushed="YES" id="BYZ-38-t0r" customClass="MainViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" hidesBottomBarWhenPushed="YES" id="BYZ-38-t0r" customClass="MainViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Pqu-6D-GGt"/>
                         <viewControllerLayoutGuide type="bottom" id="RnA-sj-AiS"/>
@@ -22,6 +22,30 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="deA-tp-Mli">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
+                                                    <rect key="frame" x="15" y="11.000000000000002" width="345" height="21.666666666666671"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="aFs-3k-FiV" firstAttribute="leading" secondItem="FHg-XN-fdG" secondAttribute="leadingMargin" id="MMx-gL-MPY"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="aFs-3k-FiV" secondAttribute="trailing" id="QOI-Gy-ShV"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="aFs-3k-FiV" secondAttribute="bottom" id="UyX-dB-Xf2"/>
+                                                <constraint firstItem="aFs-3k-FiV" firstAttribute="top" secondItem="FHg-XN-fdG" secondAttribute="topMargin" id="ggi-LH-jqg"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No mails" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T2y-B3-uRe">
                                 <rect key="frame" x="139.66666666666666" y="347" width="96" height="30"/>
@@ -150,7 +174,7 @@
         <!--Compose-->
         <scene sceneID="DK5-7m-LSd">
             <objects>
-                <viewController id="EOn-cB-asE" customClass="ComposeMailViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="EOn-cB-asE" customClass="ComposeMailViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="2RX-Pj-9td"/>
                         <viewControllerLayoutGuide type="bottom" id="BGN-H8-3Bm"/>
@@ -284,7 +308,7 @@
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="280" id="6H8-0v-FG2"/>
                                                 </constraints>
-                                                <blurEffect style="extraLight"/>
+                                                <blurEffect style="regular"/>
                                             </visualEffectView>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -323,13 +347,13 @@
                     </view>
                     <toolbarItems>
                         <barButtonItem systemItem="flexibleSpace" id="E6b-0j-Zud"/>
-                        <barButtonItem title="Encrypt" id="sik-td-Jtk">
+                        <barButtonItem title="Encrypt" image="lock_closed" id="sik-td-Jtk">
                             <connections>
                                 <action selector="encryptAction:" destination="EOn-cB-asE" id="OOo-ei-3Kc"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem systemItem="flexibleSpace" id="vwf-Yu-n7k"/>
-                        <barButtonItem title="Attach" id="8k3-KN-xqM">
+                        <barButtonItem title="Attach" image="clip" id="8k3-KN-xqM">
                             <connections>
                                 <action selector="attachAction:" destination="EOn-cB-asE" id="LGp-g3-qM8"/>
                             </connections>
@@ -337,11 +361,20 @@
                         <barButtonItem systemItem="flexibleSpace" id="R9E-kj-gdY"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Compose" id="YT9-Kq-G99">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="AzL-uu-9un">
-                            <connections>
-                                <action selector="sendAction:" destination="EOn-cB-asE" id="C9q-Qk-IuA"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="action" id="AzL-uu-9un">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="sendAction:" destination="EOn-cB-asE" id="C9q-Qk-IuA"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="organize" id="zzr-8i-wXG">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="saveButtonAction:" destination="EOn-cB-asE" id="V5o-IM-gZw"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -359,20 +392,138 @@
             </objects>
             <point key="canvasLocation" x="2841" y="165"/>
         </scene>
+        <!--Groups-->
+        <scene sceneID="ijX-nD-5ab">
+            <objects>
+                <viewController storyboardIdentifier="GroupsViewController" title="Groups" modalPresentationStyle="fullScreen" id="oTK-WL-h3t" customClass="GroupsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="soX-E5-cb8"/>
+                        <viewControllerLayoutGuide type="bottom" id="KdG-Tb-FWW"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Jbe-cG-H5N">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fKB-V7-aaq">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="fKB-V7-aaq" firstAttribute="top" secondItem="Jbe-cG-H5N" secondAttribute="top" id="CEr-Zw-miC"/>
+                            <constraint firstAttribute="bottom" secondItem="fKB-V7-aaq" secondAttribute="bottom" id="MsC-yv-czu"/>
+                            <constraint firstItem="fKB-V7-aaq" firstAttribute="leading" secondItem="Jbe-cG-H5N" secondAttribute="leading" id="V6E-pS-SGn"/>
+                            <constraint firstAttribute="trailing" secondItem="fKB-V7-aaq" secondAttribute="trailing" id="YFu-R6-ldj"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Groups" id="j9m-lW-j3B">
+                        <barButtonItem key="leftBarButtonItem" enabled="NO" id="Dgd-4P-rRT">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="closeButtonAction:" destination="oTK-WL-h3t" id="8BL-o1-Fqo"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tableView" destination="fKB-V7-aaq" id="4uW-Cx-fd4"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oe0-qd-8H3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="960.79999999999995" y="1690.6403940886701"/>
+        </scene>
+        <!--Create group-->
+        <scene sceneID="LPa-bg-xDF">
+            <objects>
+                <viewController title="Create group" modalPresentationStyle="fullScreen" id="mNA-78-Dy2" customClass="GroupDetailsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="KvT-dE-i4C"/>
+                        <viewControllerLayoutGuide type="bottom" id="bjR-9T-PZJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Xio-eS-JTJ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Qab-nh-Ib2">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Qab-nh-Ib2" secondAttribute="trailing" id="K8X-3j-Z8p"/>
+                            <constraint firstItem="Qab-nh-Ib2" firstAttribute="leading" secondItem="Xio-eS-JTJ" secondAttribute="leading" id="PGo-7b-m6I"/>
+                            <constraint firstItem="Qab-nh-Ib2" firstAttribute="top" secondItem="KvT-dE-i4C" secondAttribute="bottom" id="dgd-qc-ci1"/>
+                            <constraint firstAttribute="bottom" secondItem="Qab-nh-Ib2" secondAttribute="bottom" id="zST-g1-peH"/>
+                        </constraints>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Create group" id="Rx4-17-lHw">
+                        <rightBarButtonItems>
+                            <barButtonItem image="side_menu" id="fnb-Rd-0Sr">
+                                <connections>
+                                    <action selector="menuButtonAction:" destination="mNA-78-Dy2" id="A4P-Q1-VcK"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="save" id="NbK-uT-dPn">
+                                <connections>
+                                    <action selector="saveButtonAction:" destination="mNA-78-Dy2" id="d8g-a3-WSq"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="compose" id="cg3-eL-W00">
+                                <connections>
+                                    <action selector="editButtonAction:" destination="mNA-78-Dy2" id="rpJ-tp-u4x"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="folder_trash" id="9vg-Tp-3Xz">
+                                <connections>
+                                    <action selector="deleteButtonAction:" destination="mNA-78-Dy2" id="gVg-qT-Ktz"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="folder_sent" id="4qC-tX-wb4">
+                                <connections>
+                                    <action selector="mailButtonAction:" destination="mNA-78-Dy2" id="Yn3-wy-1RW"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="editButton" destination="cg3-eL-W00" id="C9u-jw-PCZ"/>
+                        <outlet property="mailButton" destination="4qC-tX-wb4" id="Rgt-wn-ywg"/>
+                        <outlet property="menuButton" destination="fnb-Rd-0Sr" id="tyX-Ya-AIH"/>
+                        <outlet property="saveButton" destination="NbK-uT-dPn" id="pBW-Xh-3Fq"/>
+                        <outlet property="tableView" destination="Qab-nh-Ib2" id="XYg-Xr-e5R"/>
+                        <outlet property="trashButton" destination="9vg-Tp-3Xz" id="BeW-du-elV"/>
+                        <segue destination="EOn-cB-asE" kind="show" identifier="ComposeMessage" id="avA-Ht-FI2"/>
+                        <segue destination="QVv-FJ-aya" kind="show" identifier="SettingsSegue" id="tRM-st-5ox"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Lnx-wD-WpG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2841" y="1691"/>
+        </scene>
         <!--Contact-->
         <scene sceneID="Z6V-BB-vdW">
             <objects>
-                <viewController id="ypO-gt-dUc" customClass="ContactDetailsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="fullScreen" id="ypO-gt-dUc" customClass="ContactDetailsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="tbS-Qc-Kjd"/>
                         <viewControllerLayoutGuide type="bottom" id="hGE-mh-1Le"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="93F-26-bAe">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <textField hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Rtz-VG-1H9">
+                                <rect key="frame" x="139" y="389" width="97" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="UzB-FU-xRu">
-                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -387,23 +538,48 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Contact" id="TdY-CB-1lq">
                         <rightBarButtonItems>
-                            <barButtonItem title="Edit" id="zVZ-Ak-cw9">
+                            <barButtonItem image="side_menu" id="f5i-q5-vFy">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="menuButtonAction:" destination="ypO-gt-dUc" id="Llb-wX-gdU"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="compose" id="zVZ-Ak-cw9">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="editButtonAction:" destination="ypO-gt-dUc" id="Z6a-dS-cZX"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem systemItem="compose" id="FnI-pT-6N1">
+                            <barButtonItem image="folder_sent" id="FnI-pT-6N1">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="composeButtonAction:" destination="ypO-gt-dUc" id="EAa-AC-K3M"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="search" id="9rO-Z7-Q8f">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="searchButtonAction:" destination="ypO-gt-dUc" id="Yy3-Uz-5VT"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="clip" id="vJt-Nx-oKv">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="addToMailButtonAction:" destination="ypO-gt-dUc" id="hkB-a9-9VN"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="addToMailButton" destination="vJt-Nx-oKv" id="TOC-bY-h1k"/>
                         <outlet property="composeButton" destination="FnI-pT-6N1" id="r8m-be-Jow"/>
+                        <outlet property="datePickerField" destination="Rtz-VG-1H9" id="a3O-A8-NXa"/>
                         <outlet property="editButton" destination="zVZ-Ak-cw9" id="jMg-9t-y8B"/>
+                        <outlet property="menuButton" destination="f5i-q5-vFy" id="jtF-N3-1ra"/>
+                        <outlet property="searchButton" destination="9rO-Z7-Q8f" id="fkG-7K-ilv"/>
                         <outlet property="tableView" destination="UzB-FU-xRu" id="2wn-tN-RKG"/>
                         <segue destination="EOn-cB-asE" kind="show" identifier="ComposeSegue" id="G4f-PZ-t7x"/>
+                        <segue destination="QVv-FJ-aya" kind="show" identifier="SettingsSegue" id="Hy7-FJ-oH6"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zyZ-nD-gyw" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -413,35 +589,71 @@
         <!--Contacts-->
         <scene sceneID="xXC-U1-xEd">
             <objects>
-                <viewController title="Contacts" hidesBottomBarWhenPushed="YES" id="KHX-tI-2PR" customClass="ContactsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Contacts" modalPresentationStyle="fullScreen" hidesBottomBarWhenPushed="YES" id="KHX-tI-2PR" customClass="ContactsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="EjG-VN-vTY"/>
                         <viewControllerLayoutGuide type="bottom" id="fTI-XG-Zvc"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="TTQ-HI-v3t">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="8na-we-pMI">
-                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7BO-ey-jmS">
+                                <rect key="frame" x="295" y="540" width="60" height="60"/>
+                                <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="7BO-ey-jmS" secondAttribute="height" multiplier="1:1" id="v5R-ap-xjN"/>
+                                    <constraint firstAttribute="width" constant="60" id="xj5-F9-ven"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="add_person"/>
+                                <connections>
+                                    <action selector="addContactButtonAction:" destination="KHX-tI-2PR" eventType="touchUpInside" id="2hQ-VA-Op6"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kd6-DQ-VQx">
+                                <rect key="frame" x="295" y="610" width="60" height="60"/>
+                                <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="RLR-X8-cD1"/>
+                                    <constraint firstAttribute="width" secondItem="Kd6-DQ-VQx" secondAttribute="height" multiplier="1:1" id="oRx-K6-tCv"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="add_group"/>
+                                <connections>
+                                    <action selector="addGroupButtonAction:" destination="KHX-tI-2PR" eventType="touchUpInside" id="oTu-r2-43B"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="Kd6-DQ-VQx" firstAttribute="width" secondItem="Kd6-DQ-VQx" secondAttribute="height" multiplier="1:1" id="DKD-En-FWi"/>
+                            <constraint firstAttribute="trailing" secondItem="Kd6-DQ-VQx" secondAttribute="trailing" constant="20" id="Lyy-u6-cw3"/>
                             <constraint firstItem="8na-we-pMI" firstAttribute="top" secondItem="EjG-VN-vTY" secondAttribute="bottom" id="VTr-t2-tP0"/>
                             <constraint firstAttribute="trailing" secondItem="8na-we-pMI" secondAttribute="trailing" id="WZp-1D-o9C"/>
+                            <constraint firstItem="fTI-XG-Zvc" firstAttribute="top" secondItem="Kd6-DQ-VQx" secondAttribute="bottom" constant="20" id="YQL-Fh-OZ2"/>
+                            <constraint firstItem="Kd6-DQ-VQx" firstAttribute="top" secondItem="7BO-ey-jmS" secondAttribute="bottom" constant="10" id="b1l-D6-k3D"/>
                             <constraint firstAttribute="bottom" secondItem="8na-we-pMI" secondAttribute="bottom" id="bQb-NH-sxm"/>
+                            <constraint firstItem="7BO-ey-jmS" firstAttribute="trailing" secondItem="Kd6-DQ-VQx" secondAttribute="trailing" id="dKW-0I-BKO"/>
                             <constraint firstItem="8na-we-pMI" firstAttribute="leading" secondItem="TTQ-HI-v3t" secondAttribute="leading" id="lhu-em-M1Z"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Contacts" id="Q8J-sq-BOF">
-                        <barButtonItem key="leftBarButtonItem" image="menu" id="GQf-5g-N7n"/>
+                        <barButtonItem key="leftBarButtonItem" image="menu" id="GQf-5g-N7n">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="showGroupsButtonAction:" destination="KHX-tI-2PR" id="c7U-om-O5Y"/>
+                            </connections>
+                        </barButtonItem>
                         <rightBarButtonItems>
                             <barButtonItem id="oqb-fZ-KCl">
                                 <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="iJc-jZ-jdk" userLabel="Icon">
-                                    <rect key="frame" x="337" y="0.0" width="22" height="44"/>
+                                    <rect key="frame" x="319" y="0.0" width="40" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="side_menu"/>
@@ -451,28 +663,41 @@
                                 </button>
                             </barButtonItem>
                             <barButtonItem systemItem="add" id="eNL-3p-B0E">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="addButtonAction:" destination="KHX-tI-2PR" id="TBv-EP-az0"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="search" id="HMm-fv-vba">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <action selector="searchButtonAction:" destination="KHX-tI-2PR" id="D2T-T5-sjS"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem image="password_eye_opened" id="Y42-Tb-RPE">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="showGroupButtonAction:" destination="KHX-tI-2PR" id="Wei-q3-U3k"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="black" translucent="NO" prompted="NO"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="addButton" destination="eNL-3p-B0E" id="Xk0-Y8-p5c"/>
+                        <outlet property="addContactButton" destination="7BO-ey-jmS" id="1k2-bq-0pV"/>
+                        <outlet property="addGroupButton" destination="Kd6-DQ-VQx" id="Rj2-eA-B7L"/>
                         <outlet property="menuButton" destination="oqb-fZ-KCl" id="Ibb-Z8-DbE"/>
                         <outlet property="searchButton" destination="HMm-fv-vba" id="VMk-vJ-LWW"/>
+                        <outlet property="showGroupButton" destination="Y42-Tb-RPE" id="wA9-bW-iCI"/>
                         <outlet property="sideMenuAction" destination="GQf-5g-N7n" id="rlz-2P-Sq4"/>
                         <outlet property="tableView" destination="8na-we-pMI" id="zrG-iT-Axw"/>
                         <segue destination="ypO-gt-dUc" kind="show" identifier="ShowContactSegue" id="67v-HK-w7Z"/>
                         <segue destination="ypO-gt-dUc" kind="show" identifier="AddContactSegue" id="cAx-WG-7Li"/>
                         <segue destination="QVv-FJ-aya" kind="show" identifier="SettingsSegue" id="wcd-hS-Cmg"/>
+                        <segue destination="mNA-78-Dy2" kind="show" identifier="ShowGroup" id="Mf6-5H-tvn"/>
+                        <segue destination="mNA-78-Dy2" kind="show" identifier="EditGroup" id="D3c-MS-VaF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fVW-1S-tBN" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -482,7 +707,7 @@
         <!--Mail-->
         <scene sceneID="0Sw-wu-E7Y">
             <objects>
-                <viewController storyboardIdentifier="MailVC" title="Mail" id="4Rb-Vv-OGZ" customClass="MailViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MailVC" title="Mail" modalPresentationStyle="fullScreen" id="4Rb-Vv-OGZ" customClass="MailViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="PWp-5w-Dk8"/>
                         <viewControllerLayoutGuide type="bottom" id="lVq-hU-whm"/>
@@ -579,10 +804,10 @@
         <!--Mail-->
         <scene sceneID="btu-9v-dZI">
             <objects>
-                <pageViewController autoresizesArchivedViewToFullSize="NO" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="ChE-NV-zht" customClass="MailPageViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <pageViewController autoresizesArchivedViewToFullSize="NO" modalPresentationStyle="fullScreen" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="ChE-NV-zht" customClass="MailPageViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems>
                         <barButtonItem systemItem="flexibleSpace" id="OIT-Gq-5vK"/>
-                        <barButtonItem title="Decrypt" id="cxD-bS-Hvg">
+                        <barButtonItem title="Decrypt" image="lock_opened" id="cxD-bS-Hvg">
                             <connections>
                                 <action selector="decryptButtonAction:" destination="ChE-NV-zht" id="0zP-Jz-PIX"/>
                             </connections>
@@ -634,17 +859,17 @@
         <!--OpenPGP-->
         <scene sceneID="hgj-Qm-vYy">
             <objects>
-                <viewController title="OpenPGP" id="lCT-ta-ebB" customClass="PGPSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="OpenPGP" modalPresentationStyle="fullScreen" id="lCT-ta-ebB" customClass="PGPSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="cgh-TP-hEh"/>
                         <viewControllerLayoutGuide type="bottom" id="Eog-Un-Prm"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="eZo-ST-Cq8">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="d1x-wR-3wc">
-                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -656,6 +881,7 @@
                             <constraint firstAttribute="bottom" secondItem="d1x-wR-3wc" secondAttribute="bottom" id="on1-pp-6XS"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="CvJ-vg-x0t"/>
                     <connections>
                         <outlet property="tableView" destination="d1x-wR-3wc" id="kbb-V0-so7"/>
                         <segue destination="Vzz-Dm-XIh" kind="show" identifier="PreviewSegue" id="4lM-Os-CAf"/>
@@ -671,17 +897,17 @@
         <!--Public Key-->
         <scene sceneID="7ka-Wp-F81">
             <objects>
-                <viewController storyboardIdentifier="PGPPreview" title="Public Key" id="Vzz-Dm-XIh" customClass="PGPKeyPreviewViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PGPPreview" title="Public Key" modalPresentationStyle="fullScreen" id="Vzz-Dm-XIh" customClass="PGPKeyPreviewViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Hg9-VT-uoa"/>
                         <viewControllerLayoutGuide type="bottom" id="eWq-AE-fCo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="xEu-u0-rq5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="84M-AJ-ibn">
-                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -693,6 +919,7 @@
                             <constraint firstItem="84M-AJ-ibn" firstAttribute="leading" secondItem="xEu-u0-rq5" secondAttribute="leading" id="ypX-5n-r0l"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="PSK-w8-0cv"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="84M-AJ-ibn" id="8sB-dA-3iK"/>
@@ -706,23 +933,23 @@
         <!--Import keys-->
         <scene sceneID="7MG-Hg-I45">
             <objects>
-                <viewController title="Import keys" id="2t8-kH-sE8" customClass="ImportKeysFromTextViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Import keys" modalPresentationStyle="fullScreen" id="2t8-kH-sE8" customClass="ImportKeysFromTextViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="wPZ-Wz-Dqf"/>
                         <viewControllerLayoutGuide type="bottom" id="f2a-Wq-8oS"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="1AB-D6-Diw">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L5m-j3-Oh4">
-                                <rect key="frame" x="10" y="98" width="355" height="521"/>
+                                <rect key="frame" x="10" y="10" width="355" height="521"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5">
-                                <rect key="frame" x="10" y="629" width="355" height="40"/>
+                                <rect key="frame" x="10" y="541" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="h0r-0H-o0k"/>
@@ -736,7 +963,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ">
-                                <rect key="frame" x="10" y="679" width="355" height="40"/>
+                                <rect key="frame" x="10" y="591" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="bA1-od-46b"/>
@@ -764,6 +991,7 @@
                             <constraint firstItem="f2a-Wq-8oS" firstAttribute="top" secondItem="Iwb-ev-OXQ" secondAttribute="bottom" constant="10" id="o6T-cx-Yef"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="xyG-GX-OoG"/>
                     <connections>
                         <outlet property="checkButton" destination="rZS-Jp-5h5" id="71R-ka-N5u"/>
                         <outlet property="closeButton" destination="Iwb-ev-OXQ" id="Cdn-4z-Xb2"/>
@@ -773,22 +1001,22 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NZc-ZF-cKC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1909.5999999999999" y="1702.4630541871923"/>
+            <point key="canvasLocation" x="3761" y="938"/>
         </scene>
         <!--Settings-->
         <scene sceneID="7B5-UC-Ild">
             <objects>
-                <viewController title="Settings" id="QVv-FJ-aya" customClass="SettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Settings" modalPresentationStyle="fullScreen" id="QVv-FJ-aya" customClass="SettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="yw8-Q8-uKc"/>
                         <viewControllerLayoutGuide type="bottom" id="iyP-09-Bhw"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="jL4-xY-g6t">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="HpX-Fz-2uq">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -800,6 +1028,7 @@
                             <constraint firstItem="HpX-Fz-2uq" firstAttribute="top" secondItem="jL4-xY-g6t" secondAttribute="top" id="sVP-rQ-dRk"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="ffc-Vf-mmP"/>
                     <connections>
                         <outlet property="tableView" destination="HpX-Fz-2uq" id="bb5-f5-GQU"/>
                         <segue destination="lCT-ta-ebB" kind="show" identifier="PGPSegue" id="Srx-Zd-017"/>
@@ -814,17 +1043,17 @@
         <!--Common-->
         <scene sceneID="Boy-hj-Mnz">
             <objects>
-                <viewController title="Common" id="JaM-Z1-379" customClass="CommonSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Common" modalPresentationStyle="fullScreen" id="JaM-Z1-379" customClass="CommonSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="fyo-zV-KZY"/>
                         <viewControllerLayoutGuide type="bottom" id="jaW-Ba-99l"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="0Bb-Rl-4Px">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="NXp-8p-bTr">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -836,6 +1065,7 @@
                             <constraint firstAttribute="trailing" secondItem="NXp-8p-bTr" secondAttribute="trailing" id="kPk-y6-U8U"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="Gs9-18-WyM"/>
                     <connections>
                         <outlet property="tableView" destination="NXp-8p-bTr" id="Fqz-Rq-p7e"/>
                     </connections>
@@ -847,17 +1077,17 @@
         <!--Sync-->
         <scene sceneID="s0v-T6-bdO">
             <objects>
-                <viewController title="Sync" id="BOF-iv-NLH" customClass="SyncSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Sync" modalPresentationStyle="fullScreen" id="BOF-iv-NLH" customClass="SyncSettingsViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="f4T-Fa-zg3"/>
                         <viewControllerLayoutGuide type="bottom" id="G96-OO-uva"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ek7-gs-JXD">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="GUh-fM-xrX">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                         </subviews>
@@ -869,6 +1099,7 @@
                             <constraint firstItem="GUh-fM-xrX" firstAttribute="top" secondItem="ek7-gs-JXD" secondAttribute="top" id="e3Z-Hq-mds"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="ruI-0L-45K"/>
                     <connections>
                         <outlet property="tableView" destination="GUh-fM-xrX" id="Meg-gl-Z1h"/>
                     </connections>
@@ -880,7 +1111,7 @@
         <!--Login View Controller-->
         <scene sceneID="eoD-of-WBm">
             <objects>
-                <viewController storyboardIdentifier="LoginViewController" id="gM2-5w-oUs" customClass="LoginViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="LoginViewController" modalPresentationStyle="fullScreen" id="gM2-5w-oUs" customClass="LoginViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="kV2-5m-H1l"/>
                         <viewControllerLayoutGuide type="bottom" id="ZD4-Ly-qxP"/>
@@ -1040,7 +1271,7 @@
         <!--Side Menu View Controller-->
         <scene sceneID="wuv-WF-kce">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="wK1-LR-dxt" customClass="SideMenuViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SideMenuViewController" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="wK1-LR-dxt" customClass="SideMenuViewController" customModule="PrivateMail" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="BbK-oA-xUp"/>
                         <viewControllerLayoutGuide type="bottom" id="O7Q-Bu-wOf"/>
@@ -1161,7 +1392,7 @@
         <!--Navigation Controller-->
         <scene sceneID="hSY-VY-X3c">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="iPJ-Sr-XcC" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="iPJ-Sr-XcC" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="vKK-AP-sYd">
                         <rect key="frame" x="0.0" y="44" width="375" height="44"/>
@@ -1252,6 +1483,7 @@
                             <constraint firstItem="2n2-hX-I44" firstAttribute="top" secondItem="Ubd-WA-183" secondAttribute="bottom" constant="10" id="z1c-cc-Y8f"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="3UW-HD-DmZ"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="addSelectedButton" destination="2n2-hX-I44" id="oTV-un-NOT"/>
@@ -1262,28 +1494,86 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="F9z-V6-ScV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2840.8000000000002" y="1701.7241379310346"/>
+            <point key="canvasLocation" x="4684" y="938"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Cum-A0-oup">
+            <objects>
+                <navigationController storyboardIdentifier="GroupsNavViewController" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="zjQ-Ql-BuG" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="126-gl-X9X">
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="barTintColor" red="0.41568627450980389" green="0.047058823529411764" blue="0.25098039215686274" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="oTK-WL-h3t" kind="relationship" relationship="rootViewController" id="2nk-F0-DFe"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SQJ-5L-4ls" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2" y="1691"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="d9S-oJ-6Ak">
+            <objects>
+                <navigationController storyboardIdentifier="GroupDetailsNavController" automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="DO5-Qq-WB0" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="fUr-br-zr4">
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="barTintColor" red="0.41568627450000001" green="0.047058823530000002" blue="0.25098039220000001" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
+                        <textAttributes key="largeTitleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="mNA-78-Dy2" kind="relationship" relationship="rootViewController" id="t9I-0H-Dvj"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="piV-CP-bjE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1910" y="1691"/>
         </scene>
     </scenes>
     <resources>
+        <image name="add_group" width="30" height="30"/>
+        <image name="add_person" width="30" height="30"/>
         <image name="arrow" width="10" height="5"/>
         <image name="avatar_placeholder" width="50" height="50"/>
         <image name="background" width="320" height="569"/>
+        <image name="clip" width="25" height="25"/>
+        <image name="folder_sent" width="25" height="25"/>
+        <image name="folder_trash" width="25" height="25"/>
         <image name="letter" width="30" height="19.666666030883789"/>
+        <image name="lock_closed" width="25" height="25"/>
+        <image name="lock_opened" width="25" height="25"/>
         <image name="logo" width="320" height="65.666664123535156"/>
         <image name="menu" width="20" height="20"/>
         <image name="password_eye_closed" width="22" height="16.666666030883789"/>
+        <image name="password_eye_opened" width="22" height="14.333333015441895"/>
         <image name="settings" width="20" height="20"/>
         <image name="side_menu" width="20" height="40"/>
         <image name="spam" width="19.333333969116211" height="25"/>
         <image name="trash" width="20.333333969116211" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ZCy-BS-EsO"/>
+        <segue reference="ShJ-eP-Qpt"/>
         <segue reference="wcd-hS-Cmg"/>
         <segue reference="gGo-gR-10m"/>
-        <segue reference="DBZ-Gj-4Il"/>
+        <segue reference="R6G-FH-6Be"/>
         <segue reference="cAx-WG-7Li"/>
-        <segue reference="drG-5J-rV3"/>
+        <segue reference="Mf6-5H-tvn"/>
+        <segue reference="G4f-PZ-t7x"/>
     </inferredMetricsTieBreakers>
 </document>

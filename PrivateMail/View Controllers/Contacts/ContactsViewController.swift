@@ -8,6 +8,11 @@
 
 import UIKit
 import SVProgressHUD
+import SideMenu
+
+extension Notification.Name {
+    static let contactsViewShouldUpdate = Notification.Name(rawValue: "contactsViewShouldUpdate")
+}
 
 class ContactsViewController: UIViewController {
 
@@ -17,6 +22,9 @@ class ContactsViewController: UIViewController {
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
     @IBOutlet var sideMenuAction: UIBarButtonItem!
+    @IBOutlet var showGroupButton: UIBarButtonItem!
+    @IBOutlet var addGroupButton: UIButton!
+    @IBOutlet var addContactButton: UIButton!
     
     var contacts: [APIContact] = [] {
         didSet {
@@ -63,16 +71,13 @@ class ContactsViewController: UIViewController {
         } else {
             tableView.addSubview(refreshControl)
         }
+            
+        addContactButton.layer.cornerRadius = addContactButton.frame.width / 2.0
+        addGroupButton.layer.cornerRadius = addGroupButton.frame.width / 2.0
         
-        if isSelection {
-            title = NSLocalizedString("Choose contacts", comment: "")
-            navigationItem.leftBarButtonItems = nil
-            navigationItem.rightBarButtonItems = [addButton, searchButton]
-        } else {
-            navigationItem.hidesBackButton = true
-            navigationItem.leftBarButtonItem = sideMenuAction
-            navigationItem.rightBarButtonItems = [menuButton, searchButton]
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(shouldUpdateTitle), name: .contactsViewShouldUpdate, object: nil)
+        
+        shouldUpdateTitle()
         
         setupSearchBar()
         reloadData()
@@ -83,6 +88,76 @@ class ContactsViewController: UIViewController {
         navigationController?.isToolbarHidden = true
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let sideVC = (self.storyboard?.instantiateViewController(withIdentifier: "GroupsViewController"))!
+        SideMenuManager.default.menuLeftNavigationController = UISideMenuNavigationController(rootViewController: sideVC) 
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func shouldUpdateTitle() {
+        if isSelection {
+            title = NSLocalizedString("Choose contacts", comment: "")
+            navigationItem.leftBarButtonItems = nil
+            navigationItem.rightBarButtonItems = [addButton, searchButton]
+        } else {
+            navigationItem.titleView = setTitle(title: NSLocalizedString("Contacts", comment: ""), subtitle: GroupsModelController.shared.selectedItem.name)
+            
+            navigationItem.hidesBackButton = true
+            navigationItem.leftBarButtonItem = sideMenuAction
+            navigationItem.rightBarButtonItems = [menuButton, searchButton]
+            
+            NotificationCenter.default.addObserver(self, selector: #selector(didSelectFolder), name: .didSelectFolder, object: nil)
+            
+            if GroupsModelController.shared.selectedItem.uuid != "" {
+                navigationItem.rightBarButtonItems?.append(showGroupButton)
+            }
+        }
+        
+        addContactButton.isHidden = isSelection
+        addGroupButton.isHidden = isSelection
+        
+        reloadData()
+    }
+    
+    func setTitle(title:String, subtitle:String) -> UIView {
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: -2, width: 0, height: 0))
+        titleLabel.textColor = .white
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+        titleLabel.text = title
+        titleLabel.sizeToFit()
+
+        let subtitleLabel = UILabel(frame: CGRect(x: 0, y: 18, width: 0, height: 0))
+        subtitleLabel.textColor = .init(white: 1.0, alpha: 0.9)
+        subtitleLabel.font = UIFont.systemFont(ofSize: 12)
+        subtitleLabel.text = subtitle
+        subtitleLabel.sizeToFit()
+
+        let titleView = UIView(frame: CGRect(x: 0, y: 0, width: max(titleLabel.frame.size.width, subtitleLabel.frame.size.width), height: 30))
+        titleView.addSubview(titleLabel)
+        titleView.addSubview(subtitleLabel)
+
+        let widthDiff = subtitleLabel.frame.size.width - titleLabel.frame.size.width
+
+        if widthDiff < 0 {
+            let newX = widthDiff / 2
+            subtitleLabel.frame.origin.x = abs(newX)
+        } else {
+            let newX = widthDiff / 2
+            titleLabel.frame.origin.x = newX
+        }
+
+        return titleView
+    }
+    
+    @objc func didSelectFolder() {
+        navigationController?.popViewController(animated: false)
+    }
+    
     @objc func refreshControlAction() {
         if !tableView.isDragging {
             reloadData()
@@ -90,35 +165,39 @@ class ContactsViewController: UIViewController {
     }
     
     func reloadData() {
-        refreshControl.beginRefreshing(in: tableView)
-        
-        contacts = StorageProvider.shared.getContacts()
-        let oldCTag = StorageProvider.shared.getContactsGroup()?.cTag ?? -1
-        
-        API.shared.getContactsInfo { (result, group, error) in
-            if let contacts = result,
-                oldCTag != group?.cTag {
-                API.shared.getContacts(contacts: contacts, completionHandler: { (result, error) in
-                    if let contacts = result {
-                        DispatchQueue.main.async {
-                            StorageProvider.shared.deleteAllContacts()
-                            StorageProvider.shared.saveContacts(contacts: contacts)
-                            
-                            if let group = group {
-                                StorageProvider.shared.saveContactsGroup(group: group)
+        DispatchQueue.main.async {
+            self.refreshControl.beginRefreshing(in: self.tableView)
+            
+            let oldCTag = StorageProvider.shared.getContactsGroup()?.cTag ?? -1
+            
+            let selectedGroup = GroupsModelController.shared.selectedItem
+            self.contacts = StorageProvider.shared.getContacts(selectedGroup.uuid)
+            
+            API.shared.getContactsInfo(group: selectedGroup.uuid) { (result, group, error) in
+                if let contacts = result,
+                    oldCTag != group?.cTag {
+                    DispatchQueue.main.async {
+                        API.shared.getContacts(contacts: contacts, group: selectedGroup, completionHandler: { (result, error) in
+                            DispatchQueue.main.async {
+                                if let contacts = result {
+                                    StorageProvider.shared.deleteAllContacts()
+                                    StorageProvider.shared.saveContacts(contacts: contacts)
+                                    
+                                    //                            if let group = group {
+                                    //                                StorageProvider.shared.saveContactsGroups(groups: [group])
+                                    //                            }
+                                    
+                                    self.contacts = StorageProvider.shared.getContacts(selectedGroup.uuid)
+                                }
+                                
+                                self.refreshControl.endRefreshing()
                             }
-                            
-                            self.contacts = StorageProvider.shared.getContacts()
-                        }
+                        })
                     }
-                    
+                } else {
                     DispatchQueue.main.async {
                         self.refreshControl.endRefreshing()
                     }
-                })
-            } else {
-                DispatchQueue.main.async {
-                    self.refreshControl.endRefreshing()
                 }
             }
         }
@@ -162,6 +241,8 @@ class ContactsViewController: UIViewController {
             
             if selectionStyle == .to {
                 oldEmails = ComposeMailModelController.shared.mail.to
+            } else if selectionStyle == .bcc {
+                oldEmails = ComposeMailModelController.shared.mail.bcc
             }
             
             var emails: [String] = oldEmails ?? []
@@ -178,6 +259,8 @@ class ContactsViewController: UIViewController {
                 ComposeMailModelController.shared.mail.cc = emails
             } else if selectionStyle == .to {
                 ComposeMailModelController.shared.mail.to = emails
+            } else if selectionStyle == .bcc {
+                ComposeMailModelController.shared.mail.bcc = emails
             }
             
             navigationController?.popViewController(animated: true)
@@ -190,10 +273,6 @@ class ContactsViewController: UIViewController {
     
     @IBAction func menuButtonAction(_ sender: Any) {
         let actionSheet = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let addButton = UIAlertAction.init(title: NSLocalizedString("Add contact", comment: ""), style: .default) { (alert: UIAlertAction!) in
-            self.performSegue(withIdentifier: "AddContactSegue", sender: nil)
-        }
         
         let mailButton = UIAlertAction.init(title: NSLocalizedString("Mails", comment: ""), style: .default) { (alert: UIAlertAction!) in
             self.dismiss(animated: false, completion: nil)
@@ -221,13 +300,29 @@ class ContactsViewController: UIViewController {
             
         }
         
-        actionSheet.addAction(addButton)
         actionSheet.addAction(mailButton)
         actionSheet.addAction(settingsButton)
         actionSheet.addAction(logOutButton)
         actionSheet.addAction(cancelButton)
         
         present(actionSheet, animated: true, completion: nil)
+    }
+    
+    @IBAction func showGroupsButtonAction(_ sender: Any) {
+        present(SideMenuManager.default.menuLeftNavigationController!, animated: true, completion: nil)
+    }
+    
+    @IBAction func showGroupButtonAction(_ sender: Any) {
+        performSegue(withIdentifier: "ShowGroup", sender: nil)
+    }
+    
+    @IBAction func addContactButtonAction(_ sender: Any) {
+        self.performSegue(withIdentifier: "AddContactSegue", sender: nil)
+    }
+    
+    @IBAction func addGroupButtonAction(_ sender: Any) {
+        GroupsModelController.shared.group = ContactsGroupDB()
+        performSegue(withIdentifier: "EditGroup", sender: nil)
     }
     
     
@@ -239,6 +334,13 @@ class ContactsViewController: UIViewController {
             
             let vc = segue.destination as! ContactDetailsViewController
             vc.isAdding = true
+        }
+        
+        if segue.identifier == "ShowGroup" {
+            let vc = segue.destination as! GroupDetailsViewController
+            GroupsModelController.shared.group = GroupsModelController.shared.selectedItem
+            vc.inEditingMode = false
+            
         }
     }
 
@@ -324,7 +426,13 @@ extension ContactsViewController: UISearchBarDelegate {
                 self.navigationItem.hidesBackButton = true
                 self.navigationItem.leftBarButtonItem = self.sideMenuAction
                 self.navigationItem.rightBarButtonItems = [self.menuButton, self.searchButton]
+                
+                if GroupsModelController.shared.selectedItem.uuid != "" {
+                    self.navigationItem.rightBarButtonItems?.append(self.showGroupButton)
+                }
             }
+            
+            self.shouldUpdateTitle()
         }, completion: nil)
     }
     

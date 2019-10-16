@@ -37,6 +37,8 @@ class SideMenuViewController: UIViewController {
         
         avatarImageView.layer.cornerRadius = avatarImageView.frame.size.height / 2.0
         
+        navigationController?.isNavigationBarHidden = true
+        
         setupTableView()
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.reloadData), name: .didRecieveUser, object: nil)

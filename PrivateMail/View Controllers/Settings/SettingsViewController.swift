@@ -26,7 +26,7 @@ class SettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = NSLocalizedString("Settings", comment: "")
+        navigationItem.title = NSLocalizedString("Settings", comment: "")
         
         tableView.delegate = self
         tableView.dataSource = self

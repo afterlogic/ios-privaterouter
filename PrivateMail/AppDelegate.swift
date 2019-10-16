@@ -19,35 +19,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-//        do {
-//            let key = KeyGenerator().generate(for: "marcin@example.com", passphrase: "password")
-//            let publicKey = try key.export(keyType: .public)
-//            let secretKey = try key.export(keyType: .secret)
-//            
-//            var keys = try ObjectivePGP.readKeys(from: publicKey)
-//            keys.append(contentsOf: try ObjectivePGP.readKeys(from: secretKey))
-//
-//            let fileContent = "FUCK".data(using: .utf8)!
-//
-//            let encrypted = try ObjectivePGP.encrypt(fileContent, addSignature: true, using: keys, passphraseForKey: { (key) -> String? in
-//                return "password"
-//            })
-//
-//            keys = try ObjectivePGP.readKeys(from: secretKey)
-//            let decrypted = try ObjectivePGP.decrypt(encrypted, andVerifySignature: true, using: [key], passphraseForKey: { (key) -> String? in
-//                return "password"
-//            })
-//
-//            print("")
-//        } catch {
-//
-//        }
             
         SVProgressHUD.setMaximumDismissTimeInterval(0.6)
         StorageProvider.migrateIfNeeded()
-//        StorageProvider.shared.deleteAllMails()
-//        StorageProvider.shared.deleteAllContacts()
         
         NotificationCenter.default.addObserver(self, selector: #selector(presentLoginViewController(notification:)), name: .failedToLogin, object: nil)
         
@@ -91,13 +65,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     @objc func presentLoginViewController(notification: Notification) {
-        if let loginVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
-            DispatchQueue.main.async {
-                if let rootVC = self.window?.rootViewController as? UINavigationController {
-                    rootVC.popToRootViewController(animated: false)
-                    
-                    self.window?.makeKeyAndVisible()
-                    rootVC.present(loginVC, animated: notification.object == nil, completion: nil)
+        DispatchQueue.main.async {
+            if let loginVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController {
+                DispatchQueue.main.async {
+                    if let rootVC = self.window?.rootViewController as? UINavigationController {
+                        rootVC.popToRootViewController(animated: false)
+                        
+                        self.window?.makeKeyAndVisible()
+                        rootVC.present(loginVC, animated: notification.object == nil, completion: nil)
+                    }
                 }
             }
         }

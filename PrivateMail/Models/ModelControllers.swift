@@ -11,6 +11,7 @@ import UIKit
 class ComposeMailModelController: NSObject {
     static let shared = ComposeMailModelController()
     var mail: APIMail = APIMail()
+    var attachmentFileURL: URL?
 }
 
 class ContactsModelController: NSObject {
@@ -27,6 +28,8 @@ enum SettingsParameter {
 
 class SettingsModelController: NSObject {
     static let shared = SettingsModelController()
+    
+    var currentSyncingPeriodMultiplier = 1.0
     
     override init() {
         if UserDefaults.standard.object(forKey: "userSettings") as? [String: Any] == nil {

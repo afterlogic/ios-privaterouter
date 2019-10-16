@@ -417,14 +417,15 @@ struct APIFolder {
 
 struct APIContact {
     var uuid: String?
-    var group: String?
+    var storage: String?
     var fullName: String?
     var eTag: String?
     var viewEmail: String?
     var personalEmail: String?
-    var businessEmail: String?
     var otherEmail: String?
-    var primaryEmail: String?
+    var primaryEmail: Int?
+    var primaryPhone: Int?
+    var primaryAddress: Int?
     var skype: String?
     var facebook: String?
     var personalMobile: String?
@@ -433,35 +434,113 @@ struct APIContact {
     var lastName: String?
     var nickName: String?
     var personalPhone: String?
+    var groupUUIDs: [String]?
+    var city: String?
+    var state: String?
+    var zip: String?
+    var country: String?
+    var web: String?
+    var fax: String?
+    var birthDay: Int?
+    var birthMonth: Int?
+    var birthYear: Int?
+    
+    var businessEmail: String?
+    var businessCity: String?
+    var businessState: String?
+    var businessZip: String?
+    var businessCountry: String?
+    var businessWeb: String?
+    var businessFax: String?
+    var businessAddress: String?
+    var businessDepartment: String?
+    var businessOffice: String?
+    var businessCompany: String?
+    var businessJobTitle: String?
+    var businessPhone: String?
+    var notes: String?
     
     var input: [String: Any]?
     
+    var emails: [String] {
+        get {
+            var result: [String] = []
+            
+            if let email = viewEmail,
+                email.isEmail {
+                result.append(email)
+            }
+            
+            if let email = personalEmail, !result.contains(email),
+                email.isEmail {
+                result.append(email)
+            }
+            
+            if let email = businessEmail, !result.contains(email),
+                email.isEmail {
+                result.append(email)
+            }
+            
+            if let email = otherEmail, !result.contains(email),
+                email.isEmail {
+                result.append(email)
+            }
+            
+            for index in 0 ..< result.count {
+                result[index] = result[index].replacingOccurrences(of: " ", with: "")
+            }
+            
+            return result
+        }
+    }
+    
     var asJSON: [String: Any] {
         get {
-            if let input = input {
-                return input
-            } else {
-                let result: [String: Any] = [
-                    "UUID": (uuid ?? ""),
-                    "Storage": (group ?? "personal"),
-                    "FullName": (fullName ?? ""),
-                    "ETag": (eTag ?? ""),
-                    "ViewEmail": (viewEmail ?? ""),
-                    "PersonalEmail": (viewEmail ?? ""),
-                    "BusinessEmail": (businessEmail ?? ""),
-                    "OtherEmail": (primaryEmail ?? ""),
-                    "Skype": (skype ?? ""),
-                    "Facebook": (facebook ?? ""),
-                    "PersonalMobile": (personalMobile ?? ""),
-                    "PersonalAddress": (personalAddress ?? ""),
-                    "FirstName": (firstName ?? ""),
-                    "LastName": (lastName ?? ""),
-                    "NickName": (nickName ?? ""),
-                    "PersonalPhone": (personalPhone ?? ""),
-                ]
-                
-                return result
-            }
+            let result: [String: Any] = [
+                "UUID": (uuid ?? ""),
+                "Storage": (storage ?? "personal"),
+                "FullName": (fullName ?? ""),
+                "ETag": (eTag ?? ""),
+                "ViewEmail": (viewEmail ?? ""),
+                "OtherEmail": (otherEmail ?? ""),
+                "Skype": (skype ?? ""),
+                "Facebook": (facebook ?? ""),
+                "FirstName": (firstName ?? ""),
+                "LastName": (lastName ?? ""),
+                "NickName": (nickName ?? ""),
+                "GroupUUIDs": (groupUUIDs ?? []),
+                "PersonalPhone": (personalPhone ?? ""),
+                "PersonalCity" : (city ?? ""),
+                "PersonalState" : (state ?? ""),
+                "PersonalZip" : (zip ?? ""),
+                "PersonalCountry" : (country ?? ""),
+                "PersonalWeb" : (web ?? ""),
+                "PersonalFax" : (fax ?? ""),
+                "PersonalMobile": (personalMobile ?? ""),
+                "PersonalAddress": (personalAddress ?? ""),
+                "BusinessEmail" : (businessEmail ?? ""),
+                "BusinessCity" : (businessCity ?? ""),
+                "BusinessState" : (businessState ?? ""),
+                "BusinessZip" : (businessZip ?? ""),
+                "BusinessCountry" : (businessCountry ?? ""),
+                "BusinessWeb" : (businessWeb ?? ""),
+                "BusinessFax" : (businessFax ?? ""),
+                "BusinessAddress" : (businessAddress ?? ""),
+                "BusinessDepartment" : (businessDepartment ?? ""),
+                "BusinessOffice" : (businessOffice ?? ""),
+                "BusinessCompany" : (businessCompany ?? ""),
+                "BusinessJobTitle" : (businessJobTitle ?? ""),
+                "BusinessPhone" : (businessPhone ?? ""),
+                "PrimaryPhone": (primaryPhone ?? 0),
+                "PrimaryAddress": (primaryAddress ?? 0),
+                "PrimaryEmail": (primaryEmail ?? 0),
+                "BirthDay" : (birthDay ?? 0),
+                "BirthMonth" : (birthMonth ?? 0),
+                "BirthYear" : (birthYear ?? 0),
+                "Notes": (notes ?? "")
+            ]
+            
+            return result
         }
     }
     
@@ -476,12 +555,16 @@ struct APIContact {
             self.uuid = uuid
         }
         
-        if let group = input["Storage"] as? String {
-            self.group = group
+        if let storage = input["Storage"] as? String {
+            self.storage = storage
         }
         
         if let fullName = input["FullName"] as? String {
             self.fullName = fullName
+        }
+        
+        if let notes = input["Notes"] as? String {
+            self.notes = notes
         }
         
         if let eTag = input["ETag"] as? String {
@@ -500,8 +583,28 @@ struct APIContact {
             self.personalEmail = personalEmail
         }
         
-        if let primaryEmail = input["PrimaryEmail"] as? String {
+        if let primaryEmail = input["PrimaryEmail"] as? Int {
             self.primaryEmail = primaryEmail
+        }
+        
+        if let primaryPhone = input["PrimaryPhone"] as? Int {
+            self.primaryPhone = primaryPhone
+        }
+        
+        if let primaryAddress = input["PrimaryAddress"] as? Int {
+            self.primaryAddress = primaryAddress
+        }
+        
+        if let value = input["BirthDay"] as? Int {
+            self.birthDay = value
+        }
+        
+        if let value = input["BirthMonth"] as? Int {
+            self.birthMonth = value
+        }
+        
+        if let value = input["BirthYear"] as? Int {
+            self.birthYear = value
         }
         
         if let skype = input["Skype"] as? String {
@@ -536,25 +639,98 @@ struct APIContact {
             self.personalPhone = phone
         }
 
+        if let groups = input["GroupUUIDs"] as? [String] {
+            self.groupUUIDs = groups
+        }
+        
+        if let value = input["PersonalZip"] as? String {
+            self.zip = value
+        }
+        
+        if let value = input["PersonalCity"] as? String {
+            self.city = value
+        }
+        
+        if let value = input["PersonalCountry"] as? String {
+            self.country = value
+        }
+        
+        if let value = input["PersonalWeb"] as? String {
+            self.web = value
+        }
+        
+        if let value = input["PersonalState"] as? String {
+            self.state = value
+        }
+        
+        if let value = input["BusinessEmail"] as? String {
+            self.businessEmail = value
+        }
+        
+        if let value = input["BusinessDepartment"] as? String {
+            self.businessDepartment = value
+        }
+        
+        if let value = input["BusinessState"] as? String {
+            self.businessState = value
+        }
+        
+        if let value = input["BusinessAddress"] as? String {
+            self.businessAddress = value
+        }
+        
+        if let value = input["BusinessWeb"] as? String {
+            self.businessWeb = value
+        }
+        
+        if let value = input["BusinessCity"] as? String {
+            self.businessCity = value
+        }
+        
+        if let value = input["BusinessOffice"] as? String {
+            self.businessOffice = value
+        }
+        
+        if let value = input["BusinessFax"] as? String {
+            self.businessFax = value
+        }
+        
+        if let value = input["BusinessZip"] as? String {
+            self.businessZip = value
+        }
+        
+        if let value = input["BusinessCountry"] as? String {
+            self.businessCountry = value
+        }
+        
+        if let value = input["BusinessCompany"] as? String {
+            self.businessCompany = value
+        }
+        
+        if let value = input["BusinessJobTitle"] as? String {
+            self.businessJobTitle = value
+        }
+        
+        if let value = input["BusinessPhone"] as? String {
+            self.businessPhone = value
+        }
+        
+        if let value = input["PersonalFax"] as? String {
+            self.fax = value
+        }
     }
     
     init(_ contact: ContactDB) {
-        self.uuid = contact.uuid
-        self.group = contact.group
-        self.fullName = contact.fullName
-        self.eTag = contact.eTag
-        self.viewEmail = contact.viewEmail
-        self.personalEmail = contact.primaryEmail
-        self.businessEmail = contact.businessEmail
-        self.otherEmail = contact.otherEmail
-        self.primaryEmail = contact.primaryEmail
-        self.skype = contact.skype
-        self.facebook = contact.facebook
-        self.personalMobile = contact.personalMobile
-        self.personalAddress = contact.personalAddress
-        self.firstName = contact.firstName
-        self.lastName = contact.lastName
-        self.nickName = contact.nickName
-        self.personalPhone = contact.personalPhone
+        self.init(data: contact.data)
+    }
+    
+    init(data: NSData) {
+        let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: data))
+        
+        if let input = input as? [String : Any] {
+            self = APIContact(input: input)
+        } else {
+            self = APIContact()
+        }
     }
 }

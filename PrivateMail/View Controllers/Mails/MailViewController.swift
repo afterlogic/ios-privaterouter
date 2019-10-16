@@ -246,28 +246,30 @@ extension MailViewController: MailAttachmentTableViewCellDelegate {
             SVProgressHUD.show()
             
             API.shared.downloadAttachementWith(url: url) { (data, error) in
-                SVProgressHUD.dismiss()
-                
-                if let error = error {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
-                } else if let data = data {
-                    if let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-                        let fileURL = directory.appendingPathComponent(fileName)
-                        
-                        do {
-                            try data.write(to: fileURL)
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    } else if let data = data {
+                        if let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                            let fileURL = directory.appendingPathComponent(fileName)
                             
-                            self.attachementPreviewURL = fileURL
-                            
-                            let previewController = QLPreviewController()
-                            previewController.dataSource = self
-                            self.present(previewController, animated: true)
-                        } catch {
-                            SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                            do {
+                                try data.write(to: fileURL)
+                                
+                                self.attachementPreviewURL = fileURL
+                                
+                                let previewController = QLPreviewController()
+                                previewController.dataSource = self
+                                self.present(previewController, animated: true)
+                            } catch {
+                                SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                            }
                         }
+                    } else {
+                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
                     }
-                } else {
-                    SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
                 }
             }
         } else {

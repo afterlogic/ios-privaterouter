@@ -1,5 +1,5 @@
 //
-//  KeyImportTableViewCell.swift
+//  GroupTableViewCell.swift
 //  PrivateMail
 //
 //  Created by Артём Абрамов
@@ -8,28 +8,33 @@
 
 import UIKit
 
-class KeyImportTableViewCell: UITableViewCell {
+class GroupTableViewCell: UITableViewCell {
 
-    @IBOutlet var emailLabel: UILabel!
-    @IBOutlet var descriptionLabel: UILabel!
-    @IBOutlet var `switch`: UISwitch!
+    @IBOutlet var titleLabel: UILabel!
+    @IBOutlet var selectionView: UIView!
     
+    override var isSelected: Bool {
+        didSet {
+            selectionView.isHidden = !isSelected
+        }
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        selectionView.layer.cornerRadius = 4.0
         selectionStyle = .none
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
     }
     
 }
 
 
-extension KeyImportTableViewCell: UITableViewCellExtensionProtocol {
+extension GroupTableViewCell: UITableViewCellExtensionProtocol {
     static func cellID() -> String {
-        return "KeyImportTableViewCell"
+        return "GroupTableViewCell"
     }
+
 }

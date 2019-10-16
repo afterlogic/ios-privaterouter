@@ -18,7 +18,7 @@ class CommonSettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = NSLocalizedString("Common", comment: "")
+        navigationItem.title = NSLocalizedString("Common", comment: "")
         
         tableView.delegate = self
         tableView.dataSource = self

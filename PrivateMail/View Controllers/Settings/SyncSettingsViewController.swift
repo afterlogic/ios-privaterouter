@@ -38,7 +38,7 @@ class SyncSettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = NSLocalizedString("Sync", comment: "")
+        navigationItem.title = NSLocalizedString("Sync", comment: "")
         
         tableView.delegate = self
         tableView.dataSource = self

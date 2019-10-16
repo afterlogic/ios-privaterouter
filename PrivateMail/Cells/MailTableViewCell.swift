@@ -42,6 +42,8 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     var delegate: MailTableViewCellDelegate?
     
+    var showThreading = true
+    
     var isFlagged: Bool = false {
         didSet {
             flagButton.isHidden = !isFlagged
@@ -126,7 +128,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
             unfoldButton.isHidden = true
             unfoldLayoutConstraint.isActive = false
             
-            if let threadUID = mail?.threadUID {
+            if let threadUID = mail?.threadUID, showThreading {
                 if threadUID != mail?.uid {
                     threadConstraint.isActive = true
                     threadBackground.isHidden = false
@@ -160,13 +162,15 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
         isFlagged = !isFlagged
         
         if var mail = mail {
-            StorageProvider.shared.containsMail(mail: mail, completionHandler: { (mailDB) in
-                if mailDB != nil {
-                    mail.isFlagged = self.isFlagged
-                    StorageProvider.shared.saveMail(mail: mail)
-                    self.delegate?.updateFlagsInMail(mail: mail)
-                }
-            })
+            DispatchQueue.main.async {
+                StorageProvider.shared.containsMail(mail: mail, completionHandler: { (mailDB) in
+                    if mailDB != nil {
+                        mail.isFlagged = self.isFlagged
+                        StorageProvider.shared.saveMail(mail: mail)
+                        self.delegate?.updateFlagsInMail(mail: mail)
+                    }
+                })
+            }
         }
         
         API.shared.setMailFlagged(mail: mail ?? APIMail(), flagged: isFlagged) { (result, error) in

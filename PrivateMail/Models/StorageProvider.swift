@@ -61,6 +61,41 @@ class ContactsGroupDB: Object {
     @objc dynamic var accountID = -1
     @objc dynamic var name = ""
     @objc dynamic var cTag = -1
+    @objc dynamic var uuid = ""
+    @objc dynamic var parentUuid = ""
+    @objc dynamic var userID = -1
+    @objc dynamic var isOrganization = false
+    @objc dynamic var email = ""
+    @objc dynamic var company = ""
+    @objc dynamic var street = ""
+    @objc dynamic var city = ""
+    @objc dynamic var state = ""
+    @objc dynamic var zip = ""
+    @objc dynamic var county = ""
+    @objc dynamic var phone = ""
+    @objc dynamic var fax = ""
+    @objc dynamic var web = ""
+    
+    func asJSON() -> [String: Any] {
+        let result: [String: Any] = [
+            "UUID": uuid,
+            "Name": name,
+            "IsOrganization": isOrganization ? "1" : "0",
+            "Email": email,
+            "Country": county,
+            "City": city,
+            "Company": company,
+            "Fax": fax,
+            "Phone": phone,
+            "State": state,
+            "Street": street,
+            "Web": web,
+            "Zip": zip,
+            "Contacts": [],
+        ]
+        
+        return result
+    }
 }
 
 class ContactDB: Object {
@@ -71,9 +106,10 @@ class ContactDB: Object {
     @objc dynamic var eTag = ""
     @objc dynamic var viewEmail = ""
     @objc dynamic var personalEmail = ""
-    @objc dynamic var businessEmail = ""
     @objc dynamic var otherEmail = ""
-    @objc dynamic var primaryEmail = ""
+    @objc dynamic var primaryEmail = 0
+    @objc dynamic var primaryPhone = 0
+    @objc dynamic var primaryAddress = 0
     @objc dynamic var skype = ""
     @objc dynamic var facebook = ""
     @objc dynamic var personalMobile = ""
@@ -82,12 +118,32 @@ class ContactDB: Object {
     @objc dynamic var lastName = ""
     @objc dynamic var nickName = ""
     @objc dynamic var personalPhone = ""
+    @objc dynamic var data = NSData()
+    @objc dynamic var businessEmail = ""
+    @objc dynamic var businessStreet = ""
+    @objc dynamic var businessCity = ""
+    @objc dynamic var businessState = ""
+    @objc dynamic var businessZip = ""
+    @objc dynamic var businessCountry = ""
+    @objc dynamic var businessWeb = ""
+    @objc dynamic var businessFax = ""
+    @objc dynamic var businessAddress = ""
+    @objc dynamic var businessDepartment = ""
+    @objc dynamic var businessOffice = ""
+    @objc dynamic var businessCompany = ""
+    @objc dynamic var businessJobTitle = ""
+    @objc dynamic var businessPhone = ""
+    @objc dynamic var birthDay = 0
+    @objc dynamic var birthMonth = 0
+    @objc dynamic var birthYear = 0
+    @objc dynamic var notes = ""
 }
 
 extension Realm {
     func writeAsync<T : ThreadConfined>(obj: T, errorHandler: @escaping ((_ error : Swift.Error) -> Void) = { _ in return }, block: @escaping ((Realm, T?) -> Void)) {
         let wrappedObj = ThreadSafeReference(to: obj)
         let config = self.configuration
+        
         DispatchQueue(label: "background").async {
             autoreleasepool {
                 do {
@@ -340,87 +396,36 @@ class StorageProvider: NSObject {
                 self.delegate?.updateTableView(mails: newMails, folder: folder)
                 
                 var parts: [[Int]] = []
+
+                var oldUIDS: [Int] = []
+                
+                for mail in mailsDB {
+                    oldUIDS.append(mail.uid ?? -1)
+                }
+                
+                var newUIDS: [Int] = []
+
+                for mail in mails {
+                    newUIDS.append(mail.uid ?? -1)
+                }
+                
+                let setA = Set(oldUIDS)
+                let setB = Set(newUIDS)
+                let uidsToDownload = setB.subtracting(setA).sorted { (a, b) -> Bool in
+                    return a > b
+                }
+                
                 var uids: [Int] = []
                 
-//                for mail in mails {
-//                    var found = false
-//
-//                    if mailsDB.count > 0 {
-//                        if let first = mailsDB.first {
-//                            if mail.uid ?? -1 > first.uid ?? -1 {
-//                                found = true
-//                            }
-//                        }
-//
-//                        if let last = mailsDB.last {
-//                            if mail.uid ?? -1 < last.uid ?? -1 {
-//                                found = true
-//                            }
-//                        }
-//                    } else {
-//                        found = true
-//                    }
-//
-//                    if found {
-//                        uids.append(mail.uid ?? -1)
-//
-//                        if uids.count == 50 {
-//                            parts.append(uids)
-//                            uids = []
-//                        }
-//                    }
-//                }
-                
-                for i in 0 ..< mails.count {
-                    var found = false
-                    let mail = mails[i]
+                for uid in uidsToDownload {
+                    uids.append(uid)
                     
-//                    if i < mailsDB.count {
-                    
-                        if let first = mailsDB.first {
-                            if mail.uid ?? -1 > first.uid ?? -1 {
-                                found = true
-                            }
-                        } else {
-                           found = true
-                    }
-                        
-                        if let last = mailsDB.last {
-                            if mail.uid ?? -1 < last.uid ?? -1 {
-                                found = true
-                            }
-                        }
-                    
-                    if i < mailsDB.count {
-                        for c in i ..< mailsDB.count {
-                            if mail.uid ?? -1 == mailsDB[c].uid ?? -1 {
-                                break
-                            }
-                            
-                            if mail.uid ?? -1 < mailsDB[c].uid ?? -1 {
-                                found = true
-                                break
-                            }
-                        }
-                    }
-//                    } else {
-//                        found = true
-//                    }
-                
-                    if found {
-                        uids.append(mail.uid ?? -1)
-                        
-                        if uids.count == 50 {
-                            parts.append(uids)
-                            uids = []
-                        }
+                    if uids.count == 50 || uid == uidsToDownload.last {
+                        parts.append(uids)
+                        uids = []
                     }
                 }
-                
-                if uids.count > 0 {
-                    parts.append(uids)
-                }
-                
+                                
                 DispatchQueue.global(qos: .default).async {
                     var progress: String?
                     var totalCount = mailsDB.count
@@ -581,9 +586,9 @@ class StorageProvider: NSObject {
     // MARK: - Fetching
     
     func getMails(text: String, folder: String, limit: Int?, additionalPredicate: String?, completionHandler: @escaping ([APIMail]) -> Void) {
-        let referenceDate = Date()
-        let fetchID = fetchingID
-        fetchingID += 1
+//        let referenceDate = Date()
+//        let fetchID = fetchingID
+//        fetchingID += 1
         
 //        print("Fetching began: ID\(fetchID)")
         
@@ -598,7 +603,19 @@ class StorageProvider: NSObject {
             )
             """
             
-            if text.count > 0 {
+            let groups = text.groups(for: "email:\\s*((([^\\s]+)\\s*)+)")
+            
+            if groups.count > 0 {
+                let combinedEmails = groups[0][1]
+                let emailGroups = combinedEmails.groups(for: "[^,\\s]+")
+                var predicateParts: [String] = []
+                
+                for email in emailGroups {
+                    predicateParts.append("sender CONTAINS[cd] \"\(email[0])\"")
+                }
+                
+                predicate += " AND (\(predicateParts.joined(separator: " OR ")))"
+            } else if text.count > 0 {
                 predicate += """
                 AND (subject CONTAINS[cd] \"\(text)\"
                 OR body CONTAINS[cd] \"\(text)\"
@@ -664,17 +681,15 @@ class StorageProvider: NSObject {
     }
     
     func containsMail(mail: APIMail, completionHandler: @escaping (MailDB?) -> Void) {
-        DispatchQueue.main.async {
-            if let uid = mail.uid, let folder = mail.folder {
-                let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
-                if result.count > 0 {
-                    completionHandler(result.first)
-                } else {
-                    completionHandler(nil)
-                }
+        if let uid = mail.uid, let folder = mail.folder {
+            let result = self.realm.objects(MailDB.self).filter("uid = \(uid) AND folder = \"\(folder)\" AND accountID = \(API.shared.currentUser.id)")
+            if result.count > 0 {
+                completionHandler(result.first)
             } else {
                 completionHandler(nil)
             }
+        } else {
+            completionHandler(nil)
         }
     }
     
@@ -721,14 +736,25 @@ class StorageProvider: NSObject {
         return nil
     }
     
+    func getContactGroups() -> [ContactsGroupDB] {
+        let results = realm.objects(ContactsGroupDB.self)//.filter("accountID = \(API.shared.currentUser.id)")
+        var groups: [ContactsGroupDB] = []
+        
+        for group in results {
+            groups.append(group)
+        }
+        
+        return groups
+    }
+    
     func getContactsGroup(_ name: String? = nil) -> ContactsGroupDB? {
-        let groups = self.realm.objects(ContactsGroupDB.self).filter("name = \"\(name ?? "personal")\" AND accountID = \(API.shared.currentUser.id)")
+        let groups = realm.objects(ContactsGroupDB.self).filter("name = \"\(name ?? "personal")\" AND accountID = \(API.shared.currentUser.id)")
         return groups.first
     }
     
     func getContacts(_ group: String? = nil, search: String? = nil) -> [APIContact] {
-        var predicate = "(group = \"\(group ?? "personal")\" AND accountID = \(API.shared.currentUser.id)) "
-        
+        var predicate = "(accountID = \(API.shared.currentUser.id)) "
+                
         if let search = search, search.count > 0 {
             predicate += """
             AND (fullName CONTAINS[cd] \"\(search)\"
@@ -742,7 +768,14 @@ class StorageProvider: NSObject {
         
         for item in result {
             let contact = APIContact(item)
-            contacts.append(contact)
+            
+            if let group = group, group != "" {
+                if contact.groupUUIDs?.contains(group) ?? false {
+                    contacts.append(contact)
+                }
+            } else {
+                contacts.append(contact)
+            }
         }
         
         return contacts
@@ -758,7 +791,7 @@ class StorageProvider: NSObject {
             let folder = mail.folder,
             let subject = mail.subject,
             let sender = mail.senders?.first,
-//            let body = mail.plainBody,
+            //            let body = mail.plainBody,
             let date = mail.date,
             let isSeen = mail.isSeen,
             let isFlagged = mail.isFlagged {
@@ -820,61 +853,6 @@ class StorageProvider: NSObject {
         }
         
         completionHandler(true)
-        
-//        var mailsDB: [MailDB] = []
-//
-//        for mail in mails {
-//            if API.shared.currentUser.id > 0,
-//                let uid = mail.uid,
-//                let input = mail.input,
-//                let folder = mail.folder,
-//                let subject = mail.subject,
-//                let sender = mail.senders?.first,
-//                let date = mail.date,
-//                let isSeen = mail.isSeen,
-//                let isFlagged = mail.isFlagged {
-//
-//                let mailDB = MailDB()
-//                mailDB.uid = uid
-//                mailDB.folder = folder
-//                mailDB.accountID = API.shared.currentUser.id
-//                mailDB.body = mail.plainedBody(false)
-//                mailDB.sender = sender
-//                mailDB.subject = subject
-//                mailDB.date = date
-//                mailDB.isSeen = isSeen
-//                mailDB.isFlagged = isFlagged
-//                mailDB.threadUID = mail.threadUID ?? -1
-//                mailDB.isAnswered = mail.isAnswered ?? false
-//                mailDB.isForwarded = mail.isForwarded ?? false
-//                mailDB.isDeleted = mail.isDeleted ?? false
-//                mailDB.isDraft = mail.isDraft ?? false
-//                mailDB.isRecent = mail.isRecent ?? false
-//
-//                if let attachments = mail.attachments {
-//                    var attachmentsNames = ""
-//
-//                    for attachment in attachments {
-//                        if let name = attachment["FileName"] as? String {
-//                            attachmentsNames += name
-//                        }
-//                    }
-//
-//                    mailDB.attachments = attachmentsNames
-//                }
-//
-//                let data = NSKeyedArchiver.archivedData(withRootObject: input)
-//                mailDB.data = NSData(data: data)
-//                mailsDB.append(mailDB)
-//            }
-//        }
-//
-//        DispatchQueue.main.async {
-//            try! self.realm.write {
-//                self.realm.add(mailsDB)
-//                completionHandler(true)
-//            }
-//        }
     }
     
     func saveCurrentUser(user: [String: Any]) {
@@ -985,9 +963,9 @@ class StorageProvider: NSObject {
         }
     }
     
-    func saveContactsGroup(group: ContactsGroupDB) {
+    func saveContactsGroups(groups: [ContactsGroupDB]) {
         try! self.realm.write {
-            self.realm.add(group)
+            self.realm.add(groups)
         }
     }
     
@@ -999,14 +977,16 @@ class StorageProvider: NSObject {
             
             contactDB.accountID = API.shared.currentUser.id
             contactDB.uuid = contact.uuid ?? ""
-            contactDB.group = contact.group ?? ""
+            contactDB.group = contact.storage ?? ""
             contactDB.fullName = contact.fullName ?? ""
             contactDB.eTag = contact.eTag ?? ""
             contactDB.viewEmail = contact.viewEmail ?? ""
-            contactDB.personalEmail = contact.primaryEmail ?? ""
             contactDB.businessEmail = contact.businessEmail ?? ""
             contactDB.otherEmail = contact.otherEmail ?? ""
-            contactDB.primaryEmail = contact.primaryEmail ?? ""
+            contactDB.personalEmail = contact.personalEmail ?? ""
+            contactDB.primaryAddress = contact.primaryAddress ?? 0
+            contactDB.primaryEmail = contact.primaryEmail ?? 0
+            contactDB.primaryPhone = contact.primaryPhone ?? 0
             contactDB.skype = contact.skype ?? ""
             contactDB.facebook = contact.facebook ?? ""
             contactDB.personalMobile = contact.personalMobile ?? ""
@@ -1015,7 +995,29 @@ class StorageProvider: NSObject {
             contactDB.lastName = contact.lastName ?? ""
             contactDB.nickName = contact.nickName ?? ""
             contactDB.personalPhone = contact.personalPhone ?? ""
+            contactDB.businessEmail = contact.businessEmail ?? ""
+            contactDB.businessCity = contact.businessCity ?? ""
+            contactDB.businessState = contact.businessState ?? ""
+            contactDB.businessZip = contact.businessZip ?? ""
+            contactDB.businessCountry = contact.businessCountry ?? ""
+            contactDB.businessWeb = contact.businessWeb ?? ""
+            contactDB.businessFax = contact.businessFax ?? ""
+            contactDB.businessAddress = contact.businessAddress ?? ""
+            contactDB.businessDepartment = contact.businessDepartment ?? ""
+            contactDB.businessOffice = contact.businessOffice ?? ""
+            contactDB.businessCompany = contact.businessCompany ?? ""
+            contactDB.businessJobTitle = contact.businessJobTitle ?? ""
+            contactDB.businessPhone = contact.businessPhone ?? ""
+            contactDB.birthDay = contact.birthDay ?? 0
+            contactDB.birthMonth = contact.birthMonth ?? 0
+            contactDB.birthYear = contact.birthYear ?? 0
+            contactDB.notes = contact.notes ?? ""
             
+            if let input = contact.input {
+                let data = NSKeyedArchiver.archivedData(withRootObject: input)
+                contactDB.data = NSData(data: data)
+            }
+                
             contactsDB.append(contactDB)
         }
         
@@ -1073,11 +1075,11 @@ class StorageProvider: NSObject {
     
     func deleteAllContacts() {
         let contacts = self.realm.objects(ContactDB.self)
-        let groups = self.realm.objects(ContactsGroupDB.self)
+//        let groups = self.realm.objects(ContactsGroupDB.self)
         
         try! self.realm.write {
             self.realm.delete(contacts)
-            self.realm.delete(groups)
+//            self.realm.delete(groups)
         }
     }
     
@@ -1119,6 +1121,14 @@ class StorageProvider: NSObject {
         }
     }
     
+    func deleteGroups() {
+        let groups = self.realm.objects(ContactsGroupDB.self)
+        
+        try! self.realm.write {
+            self.realm.delete(groups)
+        }
+    }
+    
     func deleteGroup(group: ContactsGroupDB) {
         let result = self.realm.objects(ContactsGroupDB.self).filter("name = \"\(group.name)\" AND accountID = \(API.shared.currentUser.id)")
         
@@ -1128,9 +1138,8 @@ class StorageProvider: NSObject {
     }
     
     func deleteContact(contact: APIContact) {
-        if let uuid = contact.uuid,
-            let group = contact.group {
-            let result = self.realm.objects(ContactDB.self).filter("uuid = \"\(uuid)\" AND group = \"\(group)\" AND accountID = \(API.shared.currentUser.id)")
+        if let uuid = contact.uuid {
+            let result = self.realm.objects(ContactDB.self).filter("uuid = \"\(uuid)\" AND accountID = \(API.shared.currentUser.id)")
             
             try! self.realm.write {
                 self.realm.delete(result)
@@ -1153,32 +1162,25 @@ class StorageProvider: NSObject {
         
         let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
         
-        var deletedUids: [Int] = []
-        var lastIndex = 0
+//        var deletedUids: [Int] = []
+//        var lastIndex = 0
         
-        for i in 0 ..< mails.count {
-            let uid = mails[i].uid ?? -1
+        var oldUIDS: [Int] = []
+        
+        for mail in result {
+            oldUIDS.append(mail.uid)
+        }
+        
+        var newUIDS: [Int] = []
 
-            while lastIndex < result.count {
-                let resultUid = result[lastIndex].uid
-                
-                if resultUid >= uid {
-                    if resultUid > uid {
-                        deletedUids.append(resultUid)
-                    }
-                    
-                    lastIndex += 1
-                } else {
-                    break
-                }
-            }
-            
-            if (i == mails.count - 1) && (lastIndex < result.count) {
-                while lastIndex < result.count {
-                    deletedUids.append(result[lastIndex].uid)
-                    lastIndex += 1
-                }
-            }
+        for mail in mails {
+            newUIDS.append(mail.uid ?? -1)
+        }
+        
+        let setA = Set(newUIDS)
+        let setB = Set(oldUIDS)
+        let deletedUids = setB.subtracting(setA).sorted { (a, b) -> Bool in
+            return a > b
         }
         
         predicate = """

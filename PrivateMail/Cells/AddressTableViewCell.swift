@@ -210,10 +210,28 @@ extension AddressTableViewCell: AddressCollectionViewCellProtocol {
 extension AddressTableViewCell: AddressFieldCollectionViewCellProtocol {
     func addressTextFieldBeginEditing() {
         plusButton.isHidden = false
+        
+        if style == .cc {
+            if let vc = delegate as? ComposeMailViewController {
+                if !vc.shouldShowBcc {
+                    vc.shouldShowBcc = true
+                    vc.tableView.insertRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
+                }
+            }
+        }
     }
     
     func addAddress(email: String?) {
         plusButton.isHidden = true
+        
+        if style == .cc {
+            if let vc = delegate as? ComposeMailViewController {
+                if !vc.shouldShowBcc {
+                    vc.shouldShowBcc = true
+                    vc.tableView.reloadData()
+                }
+            }
+        }
         
         if let email = email?.replacingOccurrences(of: " ", with: ""), email.count > 0 {
             if email.isEmail {

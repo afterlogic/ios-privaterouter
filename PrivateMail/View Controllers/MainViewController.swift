@@ -14,6 +14,7 @@ import RealmSwift
 extension Notification.Name {
     static let mainViewControllerShouldRefreshData = Notification.Name("mainViewControllerShouldRefreshData")
     static let mainViewControllerShouldGoToSelectionMode = Notification.Name("mainViewControllerShouldGoToSelectionMode")
+    static let mainViewControllerShouldMakeSearch = Notification.Name("mainViewControllerShouldMakeSearch")
 }
 
 class MainViewController: UIViewController {
@@ -26,11 +27,32 @@ class MainViewController: UIViewController {
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
     
+    var shouldShowMoreButton = true {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+    
+    var showThreads = true
+    
     var mails: [APIMail] = [] {
         didSet {
             let foldersWithoutThreading = ["Drafts", "Trash", "Spam"]
+            showThreads = true
             
+            var shouldShowButton = false
+            
+            if let syncingPeriod = SettingsModelController.shared.getValueFor(.syncPeriod) as? Double, syncingPeriod > 0.0
+                && (searchBar.text?.count ?? 0 == 0) {
+                if let totalCount = MenuModelController.shared.currentFolder()?.messagesCount,
+                    totalCount > mails.count {
+                    shouldShowButton = true
+                }
+            }
+                
             if searchBar.text?.count ?? 0 > 0 || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "") {
+                shouldShowMoreButton = shouldShowButton
+                showThreads = false
                 return
             }
             
@@ -63,6 +85,7 @@ class MainViewController: UIViewController {
             }
             
             self.mails = threadedList
+            shouldShowMoreButton = shouldShowButton
         }
     }
     
@@ -156,6 +179,12 @@ class MainViewController: UIViewController {
             self.isSelection = true
         }
         
+        NotificationCenter.default.addObserver(forName: .mainViewControllerShouldMakeSearch, object: nil, queue: .main) { (notification) in
+            self.searchButtonAction(self)
+            self.searchBar.text = notification.object as? String
+            self.searchBarSearchButtonClicked(self.searchBar)
+        }
+        
         StorageProvider.shared.delegate = self
         
         setupSideMenu()
@@ -170,12 +199,16 @@ class MainViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
         
+        SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
         mails = MenuModelController.shared.mailsForFolder(name: selectedFolder)
         tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        let sideVC = (storyboard?.instantiateViewController(withIdentifier: "SideMenuViewController"))!
+        SideMenuManager.default.menuLeftNavigationController = UISideMenuNavigationController(rootViewController: sideVC)
     }
     
     
@@ -202,17 +235,21 @@ class MainViewController: UIViewController {
     
     @objc func refreshControlAction() {
         if !tableView.isDragging {
+            SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
+            MenuModelController.shared.updateFolder(folder: selectedFolder, hash: "")
             reloadData(withSyncing: true, completionHandler: {})
         }
     }
     
-    func reloadData(withSyncing: Bool, completionHandler: @escaping () -> Void) {
+    func reloadData(withSyncing: Bool, showRefreshControl: Bool = true, completionHandler: @escaping () -> Void) {
         if isSelection {
             refreshControl.endRefreshing()
             return
         }
         
-        refreshControl.beginRefreshing(in: tableView)
+        if showRefreshControl {
+            refreshControl.beginRefreshing(in: tableView)
+        }
         
         lastPage = false
         
@@ -271,6 +308,7 @@ class MainViewController: UIViewController {
     
     @objc func didSelectFolder() {
         isSelection = false
+        SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
         
         if selectedFolder != MenuModelController.shared.selectedFolder {
             title = MenuModelController.shared.selectedFolder
@@ -629,11 +667,13 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             emptyLabel.isHidden = false
         }
         
-        return mails.count;
+        return mails.count + (shouldShowMoreButton ? 1 : 0);
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if unfoldedThreads.contains(mails[section].threadUID ?? -1) || unfoldedThreads.contains(-999) {
+        if section == tableView.numberOfSections - 1 && shouldShowMoreButton {
+            return 1
+        } else if unfoldedThreads.contains(mails[section].threadUID ?? -1) || unfoldedThreads.contains(-999) {
             return mails[section].thread.count + 1;
         } else {
             return 1
@@ -641,10 +681,19 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80.0
+        if indexPath.section == tableView.numberOfSections - 1 && shouldShowMoreButton {
+            return 44.0
+        } else {
+            return 80.0
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.section == tableView.numberOfSections - 1 && shouldShowMoreButton {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "MoreMessagesCell")!
+            return cell
+        }
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: MailTableViewCell.cellID(), for: indexPath) as! MailTableViewCell
         
         var mail = mails[indexPath.section]
@@ -653,6 +702,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             mail = mail.thread[indexPath.row - 1]
         }
         
+        cell.showThreading = showThreads
         cell.mail = mail
         cell.delegate = self
         cell.isSelection = isSelection
@@ -665,6 +715,12 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == tableView.numberOfSections - 1 && shouldShowMoreButton {
+            SettingsModelController.shared.currentSyncingPeriodMultiplier += 1.0
+            reloadData(withSyncing: true, showRefreshControl: false, completionHandler: {})
+            return
+        }
+        
         if isSelection {
             if selectedCells.contains(indexPath) {
                 selectedCells.remove(at: selectedCells.firstIndex(of: indexPath)!)

@@ -29,7 +29,7 @@ class PGPSettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = NSLocalizedString("OpenPGP", comment: "")
+        navigationItem.title = NSLocalizedString("OpenPGP", comment: "")
    
         tableView.delegate = self
         tableView.dataSource = self

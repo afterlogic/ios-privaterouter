@@ -2,7 +2,7 @@
 //  AddressFieldCollectionViewCell.swift
 //  PrivateMail
 //
-//  Created by Артём Абрамов on 09/08/2019.
+//  Created by Артём Абрамов
 //  Copyright © 2019 PrivateRouter. All rights reserved.
 //
 
