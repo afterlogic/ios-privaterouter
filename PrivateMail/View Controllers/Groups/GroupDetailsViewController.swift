@@ -189,6 +189,8 @@ class GroupDetailsViewController: UIViewController {
                 if error == nil {
                     SVProgressHUD.dismiss()
                     self.closeButtonAction(sender)
+                    GroupsModelController.shared.selectedItem = ContactsGroupDB()
+                    NotificationCenter.default.post(name: .contactsViewShouldUpdate, object: nil)
                 } else {
                     SVProgressHUD.showError(withStatus: error?.localizedDescription)
                 }

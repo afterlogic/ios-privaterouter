@@ -33,7 +33,8 @@ class MailViewController: UIViewController {
         
         title = NSLocalizedString("Mail", comment: "")
         navigationController?.isToolbarHidden = false
-
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        
         warningLabel.text = NSLocalizedString("Pictures in this message have been blocked for your safety", comment: "")
         showPicturesButton.setTitle("Show pictures", for: .normal)
         alwaysShowPicturesButton.setTitle("Always show pictures", for: .normal)
@@ -111,6 +112,12 @@ class MailViewController: UIViewController {
                 self.tableView.reloadData()
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        
     }
     
     

@@ -150,6 +150,7 @@ class ContactDetailsViewController: UIViewController {
         }
         
         hidesBottomBarWhenPushed = true
+        navigationController?.setNavigationBarHidden(true, animated: false)
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -174,11 +175,21 @@ class ContactDetailsViewController: UIViewController {
                 self.reloadData()
             }
         }
+        
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(
+        self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     @objc func refreshControlAction() {
@@ -551,5 +562,25 @@ extension ContactDetailsViewController {
     
     @objc func cancelDatePicker(){
         datePickerField.resignFirstResponder()
+    }
+}
+
+
+extension ContactDetailsViewController {
+    @objc func keyboardWillShow(_ notification: Notification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            
+            UIView.animate(withDuration: 0.25) {
+                self.tableView.contentInset.bottom = keyboardHeight
+            }
+        }
+    }
+    
+    @objc func keyboardWillHide(_ notification: Notification) {
+        UIView.animate(withDuration: 0.25) {
+            self.tableView.contentInset.bottom = 0.0
+        }
     }
 }
