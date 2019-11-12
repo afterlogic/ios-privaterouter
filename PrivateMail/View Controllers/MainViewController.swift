@@ -747,7 +747,18 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             
             MenuModelController.shared.setMailsForFolder(mails: mailsToUpdate, folder: selectedFolder)
             
+            var shouldReturnSearchBar = false
+            
+            if navigationItem.titleView != nil {
+                shouldReturnSearchBar = true
+                navigationItem.titleView = nil
+            }
+            
             performSegue(withIdentifier: "MailSegue", sender: nil)
+            
+            if shouldReturnSearchBar {
+                navigationItem.titleView = searchBar
+            }
         }
     }
     

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15509"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -33,7 +33,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
                                                     <rect key="frame" x="15" y="11.000000000000002" width="345" height="21.666666666666671"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -631,9 +631,9 @@
                         </subviews>
                         <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="8na-we-pMI" firstAttribute="top" secondItem="TTQ-HI-v3t" secondAttribute="top" id="5yv-9W-hij"/>
                             <constraint firstItem="Kd6-DQ-VQx" firstAttribute="width" secondItem="Kd6-DQ-VQx" secondAttribute="height" multiplier="1:1" id="DKD-En-FWi"/>
                             <constraint firstAttribute="trailing" secondItem="Kd6-DQ-VQx" secondAttribute="trailing" constant="20" id="Lyy-u6-cw3"/>
-                            <constraint firstItem="8na-we-pMI" firstAttribute="top" secondItem="EjG-VN-vTY" secondAttribute="bottom" id="VTr-t2-tP0"/>
                             <constraint firstAttribute="trailing" secondItem="8na-we-pMI" secondAttribute="trailing" id="WZp-1D-o9C"/>
                             <constraint firstItem="fTI-XG-Zvc" firstAttribute="top" secondItem="Kd6-DQ-VQx" secondAttribute="bottom" constant="20" id="YQL-Fh-OZ2"/>
                             <constraint firstItem="Kd6-DQ-VQx" firstAttribute="top" secondItem="7BO-ey-jmS" secondAttribute="bottom" constant="10" id="b1l-D6-k3D"/>
@@ -702,7 +702,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fVW-1S-tBN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="961" y="165"/>
+            <point key="canvasLocation" x="960.79999999999995" y="164.77832512315271"/>
         </scene>
         <!--Mail-->
         <scene sceneID="0Sw-wu-E7Y">

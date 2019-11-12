@@ -92,7 +92,10 @@ class ContactsViewController: UIViewController {
         super.viewWillAppear(animated)
         
         let sideVC = (self.storyboard?.instantiateViewController(withIdentifier: "GroupsViewController"))!
-        SideMenuManager.default.menuLeftNavigationController = UISideMenuNavigationController(rootViewController: sideVC) 
+        SideMenuManager.default.menuLeftNavigationController = UISideMenuNavigationController(rootViewController: sideVC)
+        
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     deinit {
@@ -387,7 +390,19 @@ extension ContactsViewController: UITableViewDelegate, UITableViewDataSource {
             }
         } else {
             ContactsModelController.shared.contact = contacts[indexPath.row]
+            
+            var shouldReturnSearchBar = false
+            
+            if navigationItem.titleView != nil {
+                shouldReturnSearchBar = true
+                navigationItem.titleView = nil
+            }
+            
             performSegue(withIdentifier: "ShowContactSegue", sender: nil)
+            
+            if shouldReturnSearchBar {
+                navigationItem.titleView = searchBar
+            }
         }
     }
     
