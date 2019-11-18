@@ -22,3 +22,5 @@ PrivateMail/.DS_Store
 
 #CocoaPods
 Pods/
+
+.idea/
