@@ -387,7 +387,7 @@ struct APIFolder {
         if let name = input["Name"] as? String {
             self.name = name
         }
-
+    
         if let fullName = input["FullName"] as? String {
             self.fullName = fullName
         }

@@ -27,6 +27,25 @@ class MenuModelController: NSObject {
         return result
     }
     
+    func menuItems() -> [MenuItem] {
+        var folders = foldersToShow()
+    
+        guard folders.isNotEmpty else {
+            return []
+        }
+    
+        var menuItems = [MenuItem]()
+        
+        if let inboxIndex = folders.firstIndex(where: { $0.fullName == "INBOX" }) {
+            menuItems.append(.folder(folders.remove(at: inboxIndex)))
+            menuItems.append(.custom(.starred))
+        }
+        let recentFolderItems = folders.map(MenuItem.folder)
+        menuItems.append(contentsOf: recentFolderItems)
+    
+        return menuItems
+    }
+    
     func expandedFolders(folders: [APIFolder]) -> [APIFolder] {
         var result: [APIFolder] = []
         
@@ -216,5 +235,14 @@ class MenuModelController: NSObject {
         }
         
         self.folders = compressedFolders(folders: folders)
+    }
+}
+
+enum MenuItem {
+    case custom(Custom)
+    case folder(APIFolder)
+    
+    enum Custom {
+        case starred
     }
 }
