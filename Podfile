@@ -25,4 +25,27 @@ target 'PrivateMail' do
     # Pods for testing
   end
 
+  post_install do |installer|
+
+    #region: MARK: - Pods swift version
+    
+    DEFAULT_SWIFT_VERSION = '5.1'
+    POD_SWIFT_VERSION_MAP = {
+        'SideMenu' => '4.0'
+    }
+
+    installer.pods_project.targets.each do |target|
+
+      swift_version = POD_SWIFT_VERSION_MAP[target.name] || DEFAULT_SWIFT_VERSION
+
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = swift_version
+      end
+
+    end
+
+    #endregion
+
+  end
+
 end
