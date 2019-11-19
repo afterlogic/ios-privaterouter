@@ -11,11 +11,54 @@ import UIKit
 class MenuModelController: NSObject {
     static let shared = MenuModelController()
     
-    var folders: [APIFolder] = []
+    var folders: [APIFolder] = [] {
+        didSet {
+            expandedFoldersMap = expandedFolders(folders: folders).associate {
+                (key: $0.fullName ?? "", value: $0)
+            }
+        }
+    }
+    private var expandedFoldersMap: [String: APIFolder] = [:]
     
-    var selectedFolder: String = "INBOX"
+    var selectedMenuItem: MenuItem = .folder(fullName: "INBOX")
     
-    func foldersToShow() -> [APIFolder] {
+    var selectedFolder: String {
+        switch selectedMenuItem {
+        case .custom(.starred):
+            return "INBOX"
+        case .folder(let fullName):
+            return fullName
+        }
+    }
+    
+    func folder(byFullName fullName: String) -> APIFolder? {
+        expandedFoldersMap[fullName]
+    }
+    
+    func menuItems() -> [MenuItem] {
+        var folders = foldersToShow()
+    
+        guard folders.isNotEmpty else {
+            return []
+        }
+    
+        var menuItems = [MenuItem]()
+        
+        if let inboxIndex = folders.firstIndex(where: { $0.fullName == "INBOX" }) {
+            folders.remove(at: inboxIndex)
+            menuItems.append(.folder(fullName: "INBOX"))
+            menuItems.append(.custom(.starred))
+        }
+        
+        let recentFolderItems = folders
+            .map { $0.fullName ?? "" }
+            .map(MenuItem.folder)
+        menuItems.append(contentsOf: recentFolderItems)
+    
+        return menuItems
+    }
+    
+    private func foldersToShow() -> [APIFolder] {
         var result: [APIFolder] = []
         
         for folder in expandedFolders(folders: folders) {
@@ -103,24 +146,25 @@ class MenuModelController: NSObject {
     
     func updateFolders(newFolders: [APIFolder]) {
         var newFolders = expandedFolders(folders: newFolders)
-        let expandedFolders = self.expandedFolders(folders: folders)
+        let expandedFoldersMap = expandedFolders(folders: folders)
+            .filter { $0.fullName != nil }
+            .associate(mapper: { (key: $0.fullName!, value: $0) })
         
-        for i in 0 ..< newFolders.count {
-            for folder in expandedFolders {
-                if folder.fullName == newFolders[i].fullName {
-                    newFolders[i].mails = folder.mails
-                    newFolders[i].hash = folder.hash
-                    
-                    if newFolders[i].unreadCount == nil {
-                        newFolders[i].unreadCount = folder.unreadCount
-                    }
-                    
-                    if newFolders[i].messagesCount == nil {
-                        newFolders[i].messagesCount = folder.messagesCount
-                    }
-                    
-                    break
-                }
+        newFolders.mutatingForEach { newFolder in
+            guard
+                let fullName = newFolder.fullName,
+                let folder = expandedFoldersMap[fullName]
+                else { return }
+    
+            newFolder.mails = folder.mails
+            newFolder.hash = folder.hash
+    
+            if newFolder.unreadCount == nil {
+                newFolder.unreadCount = folder.unreadCount
+            }
+    
+            if newFolder.messagesCount == nil {
+                newFolder.messagesCount = folder.messagesCount
             }
         }
         
@@ -216,5 +260,14 @@ class MenuModelController: NSObject {
         }
         
         self.folders = compressedFolders(folders: folders)
+    }
+}
+
+enum MenuItem: Equatable {
+    case custom(Custom)
+    case folder(fullName: String)
+    
+    enum Custom: Equatable {
+        case starred
     }
 }

@@ -174,24 +174,24 @@ class SideMenuViewController: UIViewController {
     }
     
     func selectCurrentFolder(withAction: Bool) {
-        let folders = MenuModelController.shared.foldersToShow()
-        if folders.count > 0 {
-            var index = 0
-            for i in 0 ..< folders.count {
-                if let name = folders[i].name {
-                    if name == MenuModelController.shared.selectedFolder {
-                        index = i
-                        break
-                    }
-                }
-            }
-            
-            self.tableView.selectRow(at: IndexPath(row: index, section: 0), animated: true, scrollPosition: .top)
-
-            if withAction {
-                self.tableView(tableView, didSelectRowAt: IndexPath(row: index, section: 0))
-            }
+        guard
+            let selectedIndex = getSelectedItemIndex()
+            else { return }
+        
+        let indexPath = IndexPath(row: selectedIndex, section: 0)
+    
+        self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+    
+        if withAction {
+            self.tableView(tableView, didSelectRowAt: indexPath)
         }
+    }
+    
+    private func getSelectedItemIndex() -> Int? {
+        MenuModelController.shared.menuItems()
+            .firstIndex(where: {
+                $0 == MenuModelController.shared.selectedMenuItem
+            })
     }
     
     
@@ -207,7 +207,7 @@ class SideMenuViewController: UIViewController {
 extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return MenuModelController.shared.foldersToShow().count
+        return MenuModelController.shared.menuItems().count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -218,66 +218,90 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: FolderTableViewCell.cellID(), for: indexPath) as! FolderTableViewCell
         
         cell.titleLabel.text = ""
+        cell.selectionStyle = .none
         
-        let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
+        let item = MenuModelController.shared.menuItems()[indexPath.row]
         
-        if folder.fullName == MenuModelController.shared.selectedFolder {
+        if item == MenuModelController.shared.selectedMenuItem {
             cell.setSelected(true)
         } else {
             cell.setSelected(false)
         }
         
-        cell.folder = folder
-        
-        if folder.type == 3 {
-            cell.unreadCount = folder.messagesCount ?? 0
-        } else {
-            cell.unreadCount = folder.unreadCount ?? 0
+        switch item {
+        case .custom(.starred):
+            cell.subFoldersCount = 0
+            cell.unreadCount = 0
+            cell.sideConstraint.constant = 15.0
+            cell.titleLabel.text = Strings.starred
+            cell.iconImageView.image = nil
+            cell.iconImageView.image = UIImage(named: "folder_starred")?.withRenderingMode(.alwaysTemplate)
+            cell.iconImageView.tintColor = UIColor(red: 222, green: 191, blue: 64)
+            return cell
+            
+        case .folder(let folderName):
+            guard let folder = MenuModelController.shared.folder(byFullName: folderName) else {
+                return cell
+            }
+    
+            cell.folder = folder
+    
+            if folder.type == 3 {
+                cell.unreadCount = folder.messagesCount ?? 0
+            } else {
+                cell.unreadCount = folder.unreadCount ?? 0
+            }
+    
+            cell.subFoldersCount = 0 //folder.subFoldersCount ?? 0
+            cell.titleLabel.text = folder.name
+    
+            cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
+    
+            cell.iconImageView.tintColor = .black
+            switch folder.type {
+            case 1:
+                cell.iconImageView.image = UIImage(named: "folder_inbox")
+    
+            case 2:
+                cell.iconImageView.image = UIImage(named: "folder_sent")
+    
+            case 3:
+                cell.iconImageView.image = UIImage(named: "folder_drafts")
+    
+            case 4:
+                cell.iconImageView.image = UIImage(named: "folder_spam")
+    
+            case 5:
+                cell.iconImageView.image = UIImage(named: "folder_trash")
+    
+            default:
+                cell.iconImageView.image = nil //UIImage(named: "folder_default")
+            }
+    
+            return cell
         }
-        
-        cell.subFoldersCount = 0 //folder.subFoldersCount ?? 0
-        cell.titleLabel.text = folder.name
-        
-        cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
-        
-        switch folder.type {
-        case 1:
-            cell.iconImageView.image = UIImage(named: "folder_inbox")
-            
-        case 2:
-            cell.iconImageView.image = UIImage(named: "folder_sent")
-            
-        case 3:
-            cell.iconImageView.image = UIImage(named: "folder_drafts")
-            
-        case 4:
-            cell.iconImageView.image = UIImage(named: "folder_spam")
-            
-        case 5:
-            cell.iconImageView.image = UIImage(named: "folder_trash")
-            
-        default:
-            cell.iconImageView.image = nil //UIImage(named: "folder_default")
-        }
-        
-        cell.selectionStyle = .none
-        
-        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let folder = MenuModelController.shared.foldersToShow()[indexPath.row]
+        let item = MenuModelController.shared.menuItems()[indexPath.row]
+    
+        MenuModelController.shared.selectedMenuItem = item
         
-        if folder.isSelectable ?? true {
-            let systemFolders = ["INBOX", "Sent", "Drafts"]
-            
-            if !systemFolders.contains(MenuModelController.shared.selectedFolder) {
-                StorageProvider.shared.stopSyncingFolder(MenuModelController.shared.selectedFolder)
+        switch item {
+        case .folder(let folderName):
+            if let folder = MenuModelController.shared.folder(byFullName: folderName),
+               folder.isSelectable ?? true {
+                
+                let systemFolders = ["INBOX", "Sent", "Drafts"]
+        
+                if !systemFolders.contains(MenuModelController.shared.selectedFolder) {
+                    StorageProvider.shared.stopSyncingFolder(MenuModelController.shared.selectedFolder)
+                }
             }
             
-            MenuModelController.shared.selectedFolder = folder.fullName ?? "INBOX"
+        default: break
         }
-        
+    
         NotificationCenter.default.post(name: .didSelectFolder, object: nil)
         tableView.reloadData()
         dismiss(animated: true, completion: nil)
@@ -288,4 +312,5 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             reloadData()
         }
     }
+    
 }
