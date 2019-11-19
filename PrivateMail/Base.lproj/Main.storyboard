@@ -23,15 +23,40 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NoMessagesCell" id="SlR-oV-lbn">
+                                        <rect key="frame" x="0.0" y="28" width="375" height="43.333332061767578"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SlR-oV-lbn" id="UEA-61-tFI">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.333332061767578"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" text="No messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bku-4o-qyE">
+                                                    <rect key="frame" x="15" y="10.999999999999998" width="345" height="21.333333333333329"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                    <userDefinedRuntimeAttributes>
+                                                        <userDefinedRuntimeAttribute type="string" keyPath="localizedText" value="noMessages"/>
+                                                    </userDefinedRuntimeAttributes>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="bku-4o-qyE" secondAttribute="trailing" id="2O4-xE-TL4"/>
+                                                <constraint firstItem="bku-4o-qyE" firstAttribute="leading" secondItem="UEA-61-tFI" secondAttribute="leadingMargin" id="4K8-5e-kaW"/>
+                                                <constraint firstItem="bku-4o-qyE" firstAttribute="top" secondItem="UEA-61-tFI" secondAttribute="topMargin" id="7p0-fc-iCk"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="bku-4o-qyE" secondAttribute="bottom" id="baD-4T-TqT"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="43.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="71.333332061767578" width="375" height="43"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
-                                                    <rect key="frame" x="15" y="11.000000000000002" width="345" height="21.666666666666671"/>
+                                                    <rect key="frame" x="15" y="11" width="345" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -47,12 +72,6 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No mails" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T2y-B3-uRe">
-                                <rect key="frame" x="139.66666666666666" y="347" width="96" height="30"/>
-                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="25"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rDm-N1-kMN">
                                 <rect key="frame" x="295" y="610" width="60" height="60"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -114,9 +133,7 @@
                         <color key="backgroundColor" white="0.94999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="deA-tp-Mli" firstAttribute="top" secondItem="VhP-98-coM" secondAttribute="bottom" id="4YP-Ae-NOh"/>
-                            <constraint firstItem="T2y-B3-uRe" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Uvl-jc-NyR"/>
                             <constraint firstItem="deA-tp-Mli" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="XMb-cW-ut9"/>
-                            <constraint firstItem="T2y-B3-uRe" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="dD3-IL-sIP"/>
                             <constraint firstItem="VhP-98-coM" firstAttribute="top" secondItem="Pqu-6D-GGt" secondAttribute="bottom" constant="-40" id="feb-as-oVw"/>
                             <constraint firstItem="RnA-sj-AiS" firstAttribute="top" secondItem="rDm-N1-kMN" secondAttribute="bottom" constant="20" id="hXJ-9Z-fyr"/>
                             <constraint firstItem="VhP-98-coM" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="ibz-Mc-fAz"/>
@@ -153,7 +170,6 @@
                     </navigationItem>
                     <connections>
                         <outlet property="composeMailButton" destination="rDm-N1-kMN" id="dKC-2D-iwf"/>
-                        <outlet property="emptyLabel" destination="T2y-B3-uRe" id="Uo7-sv-5h8"/>
                         <outlet property="menuButton" destination="qTk-xu-g5x" id="P7b-a6-A3G"/>
                         <outlet property="optionsButton" destination="Ush-HH-5pY" id="xw9-qM-2UZ"/>
                         <outlet property="progressConstraint" destination="feb-as-oVw" id="hZY-In-nY1"/>
@@ -943,13 +959,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L5m-j3-Oh4">
-                                <rect key="frame" x="10" y="10" width="355" height="521"/>
+                                <rect key="frame" x="10" y="10" width="355" height="570"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5">
-                                <rect key="frame" x="10" y="541" width="355" height="40"/>
+                                <rect key="frame" x="10" y="590" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="h0r-0H-o0k"/>
@@ -963,7 +979,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ">
-                                <rect key="frame" x="10" y="591" width="355" height="40"/>
+                                <rect key="frame" x="10" y="640" width="355" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="bA1-od-46b"/>
@@ -1568,12 +1584,12 @@
         <image name="trash" width="20.333333969116211" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ShJ-eP-Qpt"/>
-        <segue reference="wcd-hS-Cmg"/>
+        <segue reference="ZCy-BS-EsO"/>
+        <segue reference="DhZ-du-u9t"/>
         <segue reference="gGo-gR-10m"/>
         <segue reference="R6G-FH-6Be"/>
         <segue reference="cAx-WG-7Li"/>
         <segue reference="Mf6-5H-tvn"/>
-        <segue reference="G4f-PZ-t7x"/>
+        <segue reference="drG-5J-rV3"/>
     </inferredMetricsTieBreakers>
 </document>
