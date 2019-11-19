@@ -20,7 +20,6 @@ extension Notification.Name {
 class MainViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
-    @IBOutlet var emptyLabel: UILabel!
     @IBOutlet var composeMailButton: UIButton!
     
     @IBOutlet var optionsButton: UIBarButtonItem!
@@ -41,6 +40,9 @@ class MainViewController: UIViewController {
             showThreads = true
             
             var shouldShowButton = false
+            defer {
+                shouldShowMoreButton = shouldShowButton
+            }
             
             if let syncingPeriod = SettingsModelController.shared.getValueFor(.syncPeriod) as? Double, syncingPeriod > 0.0
                 && (searchBar.text?.count ?? 0 == 0) {
@@ -51,7 +53,6 @@ class MainViewController: UIViewController {
             }
                 
             if searchBar.text?.count ?? 0 > 0 || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "") {
-                shouldShowMoreButton = shouldShowButton
                 showThreads = false
                 return
             }
@@ -90,8 +91,6 @@ class MainViewController: UIViewController {
             } else {
                 self.mails = threadedList
             }
-            
-            shouldShowMoreButton = shouldShowButton
         }
     }
     
@@ -314,7 +313,6 @@ class MainViewController: UIViewController {
     
     @objc func didSelectFolder() {
         isSelection = false
-        SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
         
         let selectedMenuItem = MenuModelController.shared.selectedMenuItem
         
@@ -331,6 +329,7 @@ class MainViewController: UIViewController {
         }
         
         if selectedFolder != MenuModelController.shared.selectedFolder {
+            SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
             
             selectedFolder = MenuModelController.shared.selectedFolder
             
@@ -617,8 +616,6 @@ class MainViewController: UIViewController {
         } else {
             tableView.addSubview(refreshControl)
         }
-        
-        emptyLabel.text = NSLocalizedString("No mails", comment: "")
     }
     
     func setupSideMenu() {
@@ -681,17 +678,11 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        if mails.count > 0 {
-            emptyLabel.isHidden = true
-        } else {
-            emptyLabel.isHidden = false
-        }
-        
-        return mails.count + (shouldShowMoreButton ? 1 : 0);
+        (mails.isEmpty ? 1 : mails.count) + (shouldShowMoreButton ? 1 : 0);
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == tableView.numberOfSections - 1 && shouldShowMoreButton {
+        if section == 0 && mails.isEmpty || section == tableView.numberOfSections - 1 && shouldShowMoreButton {
             return 1
         } else if unfoldedThreads.contains(mails[section].threadUID ?? -1) || unfoldedThreads.contains(-999) {
             return mails[section].thread.count + 1;
@@ -709,6 +700,11 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.section == 0 && mails.isEmpty {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "NoMessagesCell")!
+            return cell
+        }
+        
         if indexPath.section == tableView.numberOfSections - 1 && shouldShowMoreButton {
             let cell = tableView.dequeueReusableCell(withIdentifier: "MoreMessagesCell")!
             return cell
