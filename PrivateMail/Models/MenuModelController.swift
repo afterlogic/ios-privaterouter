@@ -11,20 +11,28 @@ import UIKit
 class MenuModelController: NSObject {
     static let shared = MenuModelController()
     
-    var folders: [APIFolder] = []
-    
-    var selectedFolder: String = "INBOX"
-    
-    func foldersToShow() -> [APIFolder] {
-        var result: [APIFolder] = []
-        
-        for folder in expandedFolders(folders: folders) {
-            if folder.isSubscribed ?? true {
-                result.append(folder)
+    var folders: [APIFolder] = [] {
+        didSet {
+            expandedFoldersMap = expandedFolders(folders: folders).associate {
+                (key: $0.fullName ?? "", value: $0)
             }
         }
-        
-        return result
+    }
+    private var expandedFoldersMap: [String: APIFolder] = [:]
+    
+    var selectedMenuItem: MenuItem = .folder(fullName: "INBOX")
+    
+    var selectedFolder: String {
+        switch selectedMenuItem {
+        case .custom(.starred):
+            return "INBOX"
+        case .folder(let fullName):
+            return fullName
+        }
+    }
+    
+    func folder(byFullName fullName: String) -> APIFolder? {
+        expandedFoldersMap[fullName]
     }
     
     func menuItems() -> [MenuItem] {
@@ -37,13 +45,29 @@ class MenuModelController: NSObject {
         var menuItems = [MenuItem]()
         
         if let inboxIndex = folders.firstIndex(where: { $0.fullName == "INBOX" }) {
-            menuItems.append(.folder(folders.remove(at: inboxIndex)))
+            folders.remove(at: inboxIndex)
+            menuItems.append(.folder(fullName: "INBOX"))
             menuItems.append(.custom(.starred))
         }
-        let recentFolderItems = folders.map(MenuItem.folder)
+        
+        let recentFolderItems = folders
+            .map { $0.fullName ?? "" }
+            .map(MenuItem.folder)
         menuItems.append(contentsOf: recentFolderItems)
     
         return menuItems
+    }
+    
+    private func foldersToShow() -> [APIFolder] {
+        var result: [APIFolder] = []
+        
+        for folder in expandedFolders(folders: folders) {
+            if folder.isSubscribed ?? true {
+                result.append(folder)
+            }
+        }
+        
+        return result
     }
     
     func expandedFolders(folders: [APIFolder]) -> [APIFolder] {
@@ -239,11 +263,11 @@ class MenuModelController: NSObject {
     }
 }
 
-enum MenuItem {
+enum MenuItem: Equatable {
     case custom(Custom)
-    case folder(APIFolder)
+    case folder(fullName: String)
     
-    enum Custom {
+    enum Custom: Equatable {
         case starred
     }
 }

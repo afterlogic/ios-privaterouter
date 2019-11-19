@@ -83,14 +83,21 @@ class MainViewController: UIViewController {
             threadedList.sort { (a, b) -> Bool in
                 return a.date?.timeIntervalSince1970 ?? 0.0 > b.date?.timeIntervalSince1970 ?? 0.0
             }
+    
+            if case .custom(.starred) = MenuModelController.shared.selectedMenuItem {
+                self.mails = threadedList
+                    .filter { $0.isFlagged ?? false }
+            } else {
+                self.mails = threadedList
+            }
             
-            self.mails = threadedList
             shouldShowMoreButton = shouldShowButton
         }
     }
     
     var selectedMail: APIMail?
     var selectedFolder = "Mail"
+    var lastSelectedMenuItem: MenuItem?
     
     var unfoldedThreads: [Int] = []
     
@@ -254,7 +261,6 @@ class MainViewController: UIViewController {
         lastPage = false
         
         let folder = selectedFolder
-        
         mails = MenuModelController.shared.mailsForFolder(name: folder)
         
         if searchBar.text?.count == 0 {
@@ -310,8 +316,22 @@ class MainViewController: UIViewController {
         isSelection = false
         SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
         
+        let selectedMenuItem = MenuModelController.shared.selectedMenuItem
+        
+        guard lastSelectedMenuItem != selectedMenuItem else {
+            return
+        }
+        lastSelectedMenuItem = selectedMenuItem
+        
+        switch selectedMenuItem {
+        case .custom(.starred):
+            title = Strings.starred
+        case .folder(let fullName):
+            title = fullName
+        }
+        
         if selectedFolder != MenuModelController.shared.selectedFolder {
-            title = MenuModelController.shared.selectedFolder
+            
             selectedFolder = MenuModelController.shared.selectedFolder
             
             mails = MenuModelController.shared.mailsForCurrentFolder()

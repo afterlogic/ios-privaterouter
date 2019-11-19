@@ -190,11 +190,7 @@ class SideMenuViewController: UIViewController {
     private func getSelectedItemIndex() -> Int? {
         MenuModelController.shared.menuItems()
             .firstIndex(where: {
-                if case .folder(let folder) = $0 {
-                    return folder.name == MenuModelController.shared.selectedFolder
-                } else {
-                    return false
-                }
+                $0 == MenuModelController.shared.selectedMenuItem
             })
     }
     
@@ -226,6 +222,12 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         let item = MenuModelController.shared.menuItems()[indexPath.row]
         
+        if item == MenuModelController.shared.selectedMenuItem {
+            cell.setSelected(true)
+        } else {
+            cell.setSelected(false)
+        }
+        
         switch item {
         case .custom(.starred):
             cell.subFoldersCount = 0
@@ -233,13 +235,13 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             cell.sideConstraint.constant = 15.0
             cell.titleLabel.text = Strings.starred
             cell.iconImageView.image = nil
+            cell.iconImageView.image = UIImage(named: "folder_starred")?.withRenderingMode(.alwaysTemplate)
+            cell.iconImageView.tintColor = UIColor(red: 222, green: 191, blue: 64)
             return cell
             
-        case .folder(let folder):
-            if folder.fullName == MenuModelController.shared.selectedFolder {
-                cell.setSelected(true)
-            } else {
-                cell.setSelected(false)
+        case .folder(let folderName):
+            guard let folder = MenuModelController.shared.folder(byFullName: folderName) else {
+                return cell
             }
     
             cell.folder = folder
@@ -255,6 +257,7 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     
             cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
     
+            cell.iconImageView.tintColor = .black
             switch folder.type {
             case 1:
                 cell.iconImageView.image = UIImage(named: "folder_inbox")
@@ -281,28 +284,27 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = MenuModelController.shared.menuItems()[indexPath.row]
+    
+        MenuModelController.shared.selectedMenuItem = item
         
         switch item {
-        case .custom(.starred):
-            NotificationCenter.default.post(name: .didSelectFolder, object: nil)
-            tableView.reloadData()
-            dismiss(animated: true, completion: nil)
-            
-        case .folder(let folder):
-            if folder.isSelectable ?? true {
+        case .folder(let folderName):
+            if let folder = MenuModelController.shared.folder(byFullName: folderName),
+               folder.isSelectable ?? true {
+                
                 let systemFolders = ["INBOX", "Sent", "Drafts"]
         
                 if !systemFolders.contains(MenuModelController.shared.selectedFolder) {
                     StorageProvider.shared.stopSyncingFolder(MenuModelController.shared.selectedFolder)
                 }
-        
-                MenuModelController.shared.selectedFolder = folder.fullName ?? "INBOX"
             }
-    
-            NotificationCenter.default.post(name: .didSelectFolder, object: nil)
-            tableView.reloadData()
-            dismiss(animated: true, completion: nil)
+            
+        default: break
         }
+    
+        NotificationCenter.default.post(name: .didSelectFolder, object: nil)
+        tableView.reloadData()
+        dismiss(animated: true, completion: nil)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
