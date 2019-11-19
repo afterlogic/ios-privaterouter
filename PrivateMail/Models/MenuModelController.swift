@@ -122,24 +122,25 @@ class MenuModelController: NSObject {
     
     func updateFolders(newFolders: [APIFolder]) {
         var newFolders = expandedFolders(folders: newFolders)
-        let expandedFolders = self.expandedFolders(folders: folders)
+        let expandedFoldersMap = expandedFolders(folders: folders)
+            .filter { $0.fullName != nil }
+            .associate(mapper: { (key: $0.fullName!, value: $0) })
         
-        for i in 0 ..< newFolders.count {
-            for folder in expandedFolders {
-                if folder.fullName == newFolders[i].fullName {
-                    newFolders[i].mails = folder.mails
-                    newFolders[i].hash = folder.hash
-                    
-                    if newFolders[i].unreadCount == nil {
-                        newFolders[i].unreadCount = folder.unreadCount
-                    }
-                    
-                    if newFolders[i].messagesCount == nil {
-                        newFolders[i].messagesCount = folder.messagesCount
-                    }
-                    
-                    break
-                }
+        newFolders.mutatingForEach { newFolder in
+            guard
+                let fullName = newFolder.fullName,
+                let folder = expandedFoldersMap[fullName]
+                else { return }
+    
+            newFolder.mails = folder.mails
+            newFolder.hash = folder.hash
+    
+            if newFolder.unreadCount == nil {
+                newFolder.unreadCount = folder.unreadCount
+            }
+    
+            if newFolder.messagesCount == nil {
+                newFolder.messagesCount = folder.messagesCount
             }
         }
         
