@@ -799,7 +799,7 @@ class API: NSObject {
             
             body.appendString("--\(boundary)")
             
-            let request = NSMutableURLRequest(url: URL(string: "\(getServerURL())?/Api/")!,
+            let request = NSMutableURLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!,
                                               cachePolicy: .useProtocolCachePolicy,
                                               timeoutInterval: 10.0)
             
@@ -886,25 +886,9 @@ class API: NSObject {
         return result.data(using: .utf8)
     }
     
-    func getServerURL() -> String {
-        "https://\(getDomain())/"
-    }
-    
-    func getDomain() -> String {
-        var server = "webmail"
-    
-        //        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-        //            if test {
-        server = "test"
-        //            }
-        //        }
-    
-        return "\(server).afterlogic.com"
-    }
-    
     func setCookie(key: String, value: AnyObject) {
         let cookieProps = [
-            .domain: getDomain(),
+            .domain: Urls.domain,
             .path: "/",
             .name: key,
             .value: value,
@@ -922,14 +906,14 @@ class API: NSObject {
         }
         
         for cookie in cookies {
-            if cookie.domain == "test.afterlogic.com" {
+            if cookie.domain == Urls.domain {
                 HTTPCookieStorage.shared.deleteCookie(cookie)
             }
         }
     }
     
     func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
-        var request = URLRequest(url: URL(string: "\(getServerURL())?/Api/")!)
+        var request = URLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!)
         
         request.httpMethod = "POST"
         

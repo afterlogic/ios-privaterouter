@@ -271,7 +271,7 @@ struct APIMail {
                         let url = actions["view"]?["url"] {
                         
                         if isInline {
-                            body = body.replacingOccurrences(of: "data-x-src-cid=\"\(cid)\"", with: "width=\"100%\" src=\"\(API.shared.getServerURL())\(url)\"")
+                            body = body.replacingOccurrences(of: "data-x-src-cid=\"\(cid)\"", with: "width=\"100%\" src=\"\(Urls.baseURL)\(url)\"")
                         }
                     }
                 }
