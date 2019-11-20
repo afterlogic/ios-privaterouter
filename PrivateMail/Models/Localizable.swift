@@ -12,6 +12,12 @@ struct Strings {
     static var noMessages: String { .localized("noMessages") }
     
     static var showMoreMessages: String { .localized("showMoreMessages") }
+
+    static var userLimitsDescription: String { .localized("userLimitsDescription") }
+    
+    static var upgradeNow: String { .localized("upgradeNow") }
+    
+    static var backToLogin: String { .localized("backToLogin") }
     
 }
 

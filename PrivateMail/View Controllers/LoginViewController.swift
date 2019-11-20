@@ -61,39 +61,49 @@ class LoginViewController: UIViewController {
             if login.count > 0 {
                 if let password = passwordTextField.text {
                     if password.count > 0 {
-                        SVProgressHUD.show()
                         view.isUserInteractionEnabled = false
-                        
-                        API.shared.login(login: login, password: password) { (success, error) in
-                            if let error = error {
-                                SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            } else {
-                                if success {
-                                    DispatchQueue.main.async {
-                                        self.dismiss(animated: true, completion: nil)
-                                    }
-                                }
-                                
-                                API.shared.getAccounts{(result, error) in
-                                    if let error = error {
-                                        SVProgressHUD.showError(withStatus: error.localizedDescription)
-                                        return
-                                    }
-                                }
-                                
-                                SVProgressHUD.dismiss()
-                            }
-                            
-                            DispatchQueue.main.async {
-                                self.view.isUserInteractionEnabled = true
-                            }
-                        }
+                        proceedLogin(login: login, password: password)
                     } else {
                         SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter password", comment: ""))
                     }
                 }
             } else {
                 SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter email", comment: ""))
+            }
+        }
+    }
+    
+    private func proceedLogin(login: String, password: String) {
+        SVProgressHUD.show()
+        
+        API.shared.login(login: login, password: password) { (success, error) in
+            SVProgressHUD.dismiss()
+            
+            if let error = error {
+                if let apiError = error as? APIError, apiError.code == 108 {
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "showUserLimits", sender: nil)
+                    }
+                } else {
+                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                }
+            } else {
+                if success {
+                    DispatchQueue.main.async {
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }
+            
+                API.shared.getAccounts{(result, error) in
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                        return
+                    }
+                }
+            }
+        
+            DispatchQueue.main.async {
+                self.view.isUserInteractionEnabled = true
             }
         }
     }

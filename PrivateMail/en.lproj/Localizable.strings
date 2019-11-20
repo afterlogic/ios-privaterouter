@@ -9,3 +9,7 @@
 "starred" = "Starred";
 "noMessages" = "No messages";
 "showMoreMessages" = "Show more messages";
+
+"userLimitsDescription" = "Mobile apps are not allowed in your billing plan.\nPlease upgrade plan.";
+"upgradeNow" = "UPGRADE NOW";
+"backToLogin" = "BACK TO LOGIN";

@@ -887,20 +887,24 @@ class API: NSObject {
     }
     
     func getServerURL() -> String {
+        "https://\(getDomain())/"
+    }
+    
+    func getDomain() -> String {
         var server = "webmail"
-        
+    
         //        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
         //            if test {
         server = "test"
         //            }
         //        }
-        
-        return "https://\(server).afterlogic.com/"
+    
+        return "\(server).afterlogic.com"
     }
     
     func setCookie(key: String, value: AnyObject) {
         let cookieProps = [
-            .domain: "test.afterlogic.com",
+            .domain: getDomain(),
             .path: "/",
             .name: key,
             .value: value,
@@ -957,7 +961,6 @@ class API: NSObject {
     }
     
     func createTask(module: String, method: String, parameters: [String: Any], completionHandler: @escaping ([String: Any], Error?) -> Void) {
-        
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -973,30 +976,47 @@ class API: NSObject {
                     return
                 }
                 
-                if let data = data {
-                    do {
-                        let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: Any]
-                        
-                        if let result = json["ErrorCode"] {
-                            let res = result as! Int
-                            
-                            if res == 101 || res == 102 {
-                                keychain["AccessToken"] = nil
-                                NotificationCenter.default.post(name: .failedToLogin, object: nil)
-                            }
-                            
-                            completionHandler([:], nil)
-                            return
+                guard var data = data else { return }
+                
+                #if DEBUG
+                if let dataString = String(data: data, encoding: .utf8),
+                   let jsonOpenIndex = dataString.range(of: "{\"")?.lowerBound {
+                    
+                    var jsonString = dataString[jsonOpenIndex...]
+                    data = jsonString.data(using: .utf8)!
+                }
+                #endif
+                
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: Any]
+        
+                    if let errorCode = json["ErrorCode"] as? Int {
+            
+                        if errorCode == 101 || errorCode == 102 {
+                            keychain["AccessToken"] = nil
+                            NotificationCenter.default.post(name: .failedToLogin, object: nil)
                         }
                         
-                        completionHandler(json, nil)
+                        let errorMessage = json["ErrorMessage"] as? String
                         
-                    } catch let error as NSError {
+                        let error = APIError(code: errorCode, message: errorMessage)
+                        
                         completionHandler([:], error)
+                        return
+                    } else {
+                        completionHandler(json, nil)
                     }
+        
+                } catch let error as NSError {
+                    #if DEBUG
+                    if let rawDataString = String(data: data, encoding: .utf8) {
+                        print("Response parsing failed. Response:\n\(rawDataString)")
+                    }
+                    #endif
+                    completionHandler([:], error)
                 }
                 
-                }.resume()
+            }.resume()
         } else {
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -1030,4 +1050,15 @@ extension NSMutableData {
         let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false)
         append(data!)
     }
+}
+
+struct APIError: Error {
+    
+    let code: Int
+    let message: String?
+    
+    var localizedDescription: String {
+        message ?? "\(code) Error has occurred."
+    }
+    
 }
