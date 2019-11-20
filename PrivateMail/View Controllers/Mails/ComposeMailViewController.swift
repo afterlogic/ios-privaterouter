@@ -544,12 +544,12 @@ extension ComposeMailViewController: MailAttachmentTableViewCellDelegate {
                         let keys = String(data: data, encoding: .utf8)
                         NotificationCenter.default.post(name: .shouldImportKey, object: keys)
                     } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                        SVProgressHUD.showError(withStatus: Strings.failedToDownloadFile)
                     }
                 }
             }
         } else {
-            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+            SVProgressHUD.showError(withStatus: Strings.wrongUrl)
         }
     }
     
@@ -576,16 +576,16 @@ extension ComposeMailViewController: MailAttachmentTableViewCellDelegate {
                                 previewController.dataSource = self
                                 self.present(previewController, animated: true)
                             } catch {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.somethingGoesWrong)
                             }
                         }
                     } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                        SVProgressHUD.showError(withStatus: Strings.failedToDownloadFile)
                     }
                 }
             }
         } else {
-            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+            SVProgressHUD.showError(withStatus: Strings.wrongUrl)
         }
     }
 }

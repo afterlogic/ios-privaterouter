@@ -51,7 +51,7 @@ class MailAttachmentTableViewCell: UITableViewCell {
                 ComposeMailModelController.shared.mail.attachmentsToSend?[downloadLink] = nil
                 delegate?.reloadData()
             } else {
-                let url = URL(string: "\(API.shared.getServerURL())\(downloadLink)")
+                let url = URL(string: "\(Urls.baseURL)\(downloadLink)")
                 delegate?.shouldPreviewAttachment(url: url, fileName: titleLabel.text ?? "file.txt")
             }
         }
@@ -59,7 +59,7 @@ class MailAttachmentTableViewCell: UITableViewCell {
     
     @IBAction func importKeyButtonAction(_ sender: Any) {
         if let downloadLink = downloadLink {
-            let url = URL(string: "\(API.shared.getServerURL())\(downloadLink)")
+            let url = URL(string: "\(Urls.baseURL)\(downloadLink)")
             delegate?.shouldOpenImportScreen(url: url, fileName: titleLabel.text ?? "file.txt")
         }
     }

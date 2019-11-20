@@ -140,21 +140,19 @@ class MailPageViewController: UIPageViewController {
             if moveToTrash {
                 API.shared.moveMessage(mail: self.mail, toFolder: "Trash") { (result, error) in
                     DispatchQueue.main.async {
+                        SVProgressHUD.dismiss()
+                        
                         if let success = result {
                             if success {
                                 StorageProvider.shared.deleteMail(mail: self.mail)
                                 MenuModelController.shared.removeMail(mail: self.mail)
                                 self.navigationController?.popViewController(animated: true)
                             } else {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.cantCompleteAction)
                             }
-                            
-                            SVProgressHUD.dismiss()
                         } else {
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            } else {
-                                SVProgressHUD.dismiss()
                             }
                         }
                     }
@@ -162,21 +160,19 @@ class MailPageViewController: UIPageViewController {
             } else {
                 API.shared.deleteMessage(mail: self.mail) { (result, error) in
                     DispatchQueue.main.async {
+                        SVProgressHUD.dismiss()
+                        
                         if let success = result {
                             if success {
                                 StorageProvider.shared.deleteMail(mail: self.mail)
                                 MenuModelController.shared.removeMail(mail: self.mail)
                                 self.navigationController?.popViewController(animated: true)
                             } else {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't delete message", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.cantDeleteMessage)
                             }
-                            
-                            SVProgressHUD.dismiss()
                         } else {
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            } else {
-                                SVProgressHUD.dismiss()
                             }
                         }
                     }
@@ -203,21 +199,19 @@ class MailPageViewController: UIPageViewController {
             
             API.shared.moveMessage(mail: self.mail, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
                 DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
                     if let success = result {
                         if success {
                             StorageProvider.shared.deleteMail(mail: self.mail)
                             MenuModelController.shared.removeMail(mail: self.mail)
                             self.navigationController?.popViewController(animated: true)
                         } else {
-                            SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                            SVProgressHUD.showError(withStatus: Strings.cantCompleteAction)
                         }
-                        
-                        SVProgressHUD.dismiss()
                     } else {
                         if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
-                        } else {
-                            SVProgressHUD.dismiss()
                         }
                     }
                 }

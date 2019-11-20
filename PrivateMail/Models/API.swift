@@ -799,7 +799,7 @@ class API: NSObject {
             
             body.appendString("--\(boundary)")
             
-            let request = NSMutableURLRequest(url: URL(string: "\(getServerURL())?/Api/")!,
+            let request = NSMutableURLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!,
                                               cachePolicy: .useProtocolCachePolicy,
                                               timeoutInterval: 10.0)
             
@@ -886,21 +886,9 @@ class API: NSObject {
         return result.data(using: .utf8)
     }
     
-    func getServerURL() -> String {
-        var server = "webmail"
-        
-        //        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-        //            if test {
-        server = "test"
-        //            }
-        //        }
-        
-        return "https://\(server).afterlogic.com/"
-    }
-    
     func setCookie(key: String, value: AnyObject) {
         let cookieProps = [
-            .domain: "test.afterlogic.com",
+            .domain: Urls.domain,
             .path: "/",
             .name: key,
             .value: value,
@@ -918,14 +906,14 @@ class API: NSObject {
         }
         
         for cookie in cookies {
-            if cookie.domain == "test.afterlogic.com" {
+            if cookie.domain == Urls.domain {
                 HTTPCookieStorage.shared.deleteCookie(cookie)
             }
         }
     }
     
     func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
-        var request = URLRequest(url: URL(string: "\(getServerURL())?/Api/")!)
+        var request = URLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!)
         
         request.httpMethod = "POST"
         
@@ -957,7 +945,6 @@ class API: NSObject {
     }
     
     func createTask(module: String, method: String, parameters: [String: Any], completionHandler: @escaping ([String: Any], Error?) -> Void) {
-        
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -973,30 +960,51 @@ class API: NSObject {
                     return
                 }
                 
-                if let data = data {
-                    do {
-                        let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String: Any]
-                        
-                        if let result = json["ErrorCode"] {
-                            let res = result as! Int
-                            
-                            if res == 101 || res == 102 {
-                                keychain["AccessToken"] = nil
-                                NotificationCenter.default.post(name: .failedToLogin, object: nil)
-                            }
-                            
-                            completionHandler([:], nil)
-                            return
+                guard var data = data else { return }
+                
+                #if DEBUG
+                if let dataString = String(data: data, encoding: .utf8),
+                   let jsonOpenIndex = dataString.range(of: "{\"")?.lowerBound {
+                    
+                    var jsonString = dataString[jsonOpenIndex...]
+                    data = jsonString.data(using: .utf8)!
+                    //data = try! JSONSerialization.data(withJSONObject: [
+                    //    "ErrorCode": 108,
+                    //    "ErrorMessage": "Mobile apps are not allowed in your billing plan."
+                    //])
+                }
+                #endif
+                
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: Any]
+        
+                    if let errorCode = json["ErrorCode"] as? Int {
+            
+                        if errorCode == 101 || errorCode == 102 {
+                            keychain["AccessToken"] = nil
+                            NotificationCenter.default.post(name: .failedToLogin, object: nil)
                         }
                         
-                        completionHandler(json, nil)
+                        let errorMessage = json["ErrorMessage"] as? String
                         
-                    } catch let error as NSError {
+                        let error = APIError(code: errorCode, message: errorMessage)
+                        
                         completionHandler([:], error)
+                        return
+                    } else {
+                        completionHandler(json, nil)
                     }
+        
+                } catch let error as NSError {
+                    #if DEBUG
+                    if let rawDataString = String(data: data, encoding: .utf8) {
+                        print("Response parsing failed. Response:\n\(rawDataString)")
+                    }
+                    #endif
+                    completionHandler([:], error)
                 }
                 
-                }.resume()
+            }.resume()
         } else {
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -1030,4 +1038,15 @@ extension NSMutableData {
         let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false)
         append(data!)
     }
+}
+
+struct APIError: Error, LocalizedError {
+    
+    let code: Int
+    let message: String?
+    
+    var errorDescription: String? {
+        message ?? "\(code) Error has occurred."
+    }
+    
 }

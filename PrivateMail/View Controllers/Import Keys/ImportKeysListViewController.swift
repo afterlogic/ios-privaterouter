@@ -101,7 +101,7 @@ class ImportKeysListViewController: UIViewController {
                 self.cancelButtonAction(action)
             }
             
-            presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("No keys found", comment: ""), style: .alert, actions: [cancel])
+            presentAlertView(Strings.error, message: NSLocalizedString("No keys found", comment: ""), style: .alert, actions: [cancel])
         }
     }
     

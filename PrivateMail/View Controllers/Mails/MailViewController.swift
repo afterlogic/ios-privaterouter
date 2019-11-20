@@ -179,7 +179,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
             
-            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: URL(string: API.shared.getServerURL()))
+            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: Urls.baseURL)
             cell.delegate = self
             
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
@@ -239,12 +239,12 @@ extension MailViewController: MailAttachmentTableViewCellDelegate {
                         let keys = String(data: data, encoding: .utf8)
                         NotificationCenter.default.post(name: .shouldImportKey, object: keys)
                     } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                        SVProgressHUD.showError(withStatus: Strings.failedToDownloadFile)
                     }
                 }
             }
         } else {
-            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+            SVProgressHUD.showError(withStatus: Strings.wrongUrl)
         }
     }
     
@@ -271,16 +271,16 @@ extension MailViewController: MailAttachmentTableViewCellDelegate {
                                 previewController.dataSource = self
                                 self.present(previewController, animated: true)
                             } catch {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Something goes wrong", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.somethingGoesWrong)
                             }
                         }
                     } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to download file", comment: ""))
+                        SVProgressHUD.showError(withStatus: Strings.failedToDownloadFile)
                     }
                 }
             }
         } else {
-            SVProgressHUD.showError(withStatus: NSLocalizedString("Wrong url", comment: ""))
+            SVProgressHUD.showError(withStatus: Strings.wrongUrl)
         }
     }
     

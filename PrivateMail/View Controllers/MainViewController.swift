@@ -268,13 +268,20 @@ class MainViewController: UIViewController {
         
         if withSyncing {
             API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
-                if let folders = result {
-                    MenuModelController.shared.updateFolders(newFolders: folders)
-                    NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
-                }
-                
                 DispatchQueue.main.async {
-                    self.refreshControl.endRefreshing()
+                    if showRefreshControl {
+                        self.refreshControl.endRefreshing()
+                    }
+                    
+                    if let error = error {
+                        SVProgressHUD.showError(withStatus: error.localizedDescription)
+                        return
+                    }
+    
+                    if let folders = result {
+                        MenuModelController.shared.updateFolders(newFolders: folders)
+                        NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
+                    }
                 }
             })
         } else {
@@ -282,8 +289,10 @@ class MainViewController: UIViewController {
                 completionHandler()
             })
             
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
+            if showRefreshControl {
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
+                }
             }
         }
     }
@@ -394,10 +403,11 @@ class MainViewController: UIViewController {
             SVProgressHUD.show()
             
             API.shared.logout(completionHandler: { (result, error) in
+                SVProgressHUD.dismiss()
+                
                 if let error = error {
                     SVProgressHUD.showError(withStatus: error.localizedDescription)
                 } else {
-                    SVProgressHUD.dismiss()
                     NotificationCenter.default.post(name: .failedToLogin, object: nil)
                 }
             })
@@ -469,6 +479,8 @@ class MainViewController: UIViewController {
             if moveToTrash {
                 API.shared.moveMessages(mails: mails, toFolder: "Trash") { (result, error) in
                     DispatchQueue.main.async {
+                        SVProgressHUD.dismiss()
+                        
                         if let success = result {
                             if success {
                                 for mail in mails {
@@ -479,15 +491,11 @@ class MainViewController: UIViewController {
                                 self.mails = MenuModelController.shared.mailsForCurrentFolder()
                                 self.isSelection = false
                             } else {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.cantCompleteAction)
                             }
-                            
-                            SVProgressHUD.dismiss()
                         } else {
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            } else {
-                                SVProgressHUD.dismiss()
                             }
                         }
                         
@@ -498,6 +506,8 @@ class MainViewController: UIViewController {
             } else {
                 API.shared.deleteMessages(mails: mails) { (result, error) in
                     DispatchQueue.main.async {
+                        SVProgressHUD.dismiss()
+                        
                         if let success = result {
                             if success {
                                 for mail in mails {
@@ -508,15 +518,12 @@ class MainViewController: UIViewController {
                                 self.mails = MenuModelController.shared.mailsForCurrentFolder()
                                 self.isSelection = false
                             } else {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't delete message", comment: ""))
+                                SVProgressHUD.showError(withStatus: Strings.cantDeleteMessage)
                             }
                             
-                            SVProgressHUD.dismiss()
                         } else {
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
-                            } else {
-                                SVProgressHUD.dismiss()
                             }
                         }
                     }
@@ -562,6 +569,8 @@ class MainViewController: UIViewController {
             
             API.shared.moveMessages(mails: mails, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
                 DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
                     if let success = result {
                         if success {
                             for mail in mails {
@@ -572,15 +581,11 @@ class MainViewController: UIViewController {
                             self.mails = MenuModelController.shared.mailsForCurrentFolder()
                             self.isSelection = false
                         } else {
-                            SVProgressHUD.showError(withStatus: NSLocalizedString("Can't complete action", comment: ""))
+                            SVProgressHUD.showError(withStatus: Strings.cantCompleteAction)
                         }
-                        
-                        SVProgressHUD.dismiss()
                     } else {
                         if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
-                        } else {
-                            SVProgressHUD.dismiss()
                         }
                     }
                     
