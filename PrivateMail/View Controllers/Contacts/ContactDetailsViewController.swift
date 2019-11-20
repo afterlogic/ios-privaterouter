@@ -282,7 +282,7 @@ class ContactDetailsViewController: UIViewController {
                         } else if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
                         } else {
-                            SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to edit contact", comment: ""))
+                            SVProgressHUD.showError(withStatus: Strings.failedToEditContact)
                         }
                     }
                 }
@@ -302,7 +302,7 @@ class ContactDetailsViewController: UIViewController {
                     } else if let error = error {
                         SVProgressHUD.showError(withStatus: error.localizedDescription)
                     } else {
-                        SVProgressHUD.showError(withStatus: NSLocalizedString("Failed to save contact", comment: ""))
+                        SVProgressHUD.showError(withStatus: Strings.failedToSaveContact)
                     }
                 }
             }

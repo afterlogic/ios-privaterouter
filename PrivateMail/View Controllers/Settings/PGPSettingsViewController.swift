@@ -49,7 +49,7 @@ class PGPSettingsViewController: UIViewController {
     func generateKeys() {
         for key in publicKeys + privateKeys {
             if key.email == API.shared.currentUser.email {
-                presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("Already have keys for this email", comment: ""), style: .alert, actions: [], addCancelButton: true)
+                presentAlertView(Strings.error, message: NSLocalizedString("Already have keys for this email", comment: ""), style: .alert, actions: [], addCancelButton: true)
                 return
             }
         }
@@ -230,7 +230,7 @@ extension PGPSettingsViewController: UIDocumentPickerDelegate {
             let keys = String(data: data, encoding: .utf8)
             performSegue(withIdentifier: "ImportFromFileSegue", sender: keys)
         } catch {
-            presentAlertView(NSLocalizedString("Error", comment: ""), message: NSLocalizedString("Can't open file", comment: ""), style: .alert, actions: [], addCancelButton: true)
+            presentAlertView(Strings.error, message: NSLocalizedString("Can't open file", comment: ""), style: .alert, actions: [], addCancelButton: true)
         }
     }
     

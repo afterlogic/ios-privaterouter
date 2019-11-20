@@ -13,3 +13,12 @@
 "userLimitsDescription" = "Mobile apps are not allowed in your billing plan.\nPlease upgrade plan.";
 "upgradeNow" = "UPGRADE NOW";
 "backToLogin" = "BACK TO LOGIN";
+
+"cantCompleteAction" = "Can't complete action";
+"failedToEditContact" = "Failed to edit contact";
+"failedToSaveContact" = "Failed to save contact";
+"somethingGoesWrong" = "Something goes wrong";
+"failedToDownloadFile" = "Failed to download file";
+"wrongUrl" = "Wrong url";
+"cantDeleteMessage" = "Can't delete message";
+"error" = "Error";

@@ -968,6 +968,10 @@ class API: NSObject {
                     
                     var jsonString = dataString[jsonOpenIndex...]
                     data = jsonString.data(using: .utf8)!
+                    //data = try! JSONSerialization.data(withJSONObject: [
+                    //    "ErrorCode": 108,
+                    //    "ErrorMessage": "Mobile apps are not allowed in your billing plan."
+                    //])
                 }
                 #endif
                 
@@ -1036,12 +1040,12 @@ extension NSMutableData {
     }
 }
 
-struct APIError: Error {
+struct APIError: Error, LocalizedError {
     
     let code: Int
     let message: String?
     
-    var localizedDescription: String {
+    var errorDescription: String? {
         message ?? "\(code) Error has occurred."
     }
     

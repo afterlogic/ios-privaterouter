@@ -19,6 +19,22 @@ struct Strings {
     
     static var backToLogin: String { .localized("backToLogin") }
     
+    static var cantCompleteAction: String { .localized("cantCompleteAction") }
+    
+    static var failedToEditContact: String { .localized("failedToEditContact") }
+    
+    static var failedToSaveContact: String { .localized("failedToSaveContact") }
+    
+    static var somethingGoesWrong: String { .localized("somethingGoesWrong") }
+    
+    static var failedToDownloadFile: String { .localized("failedToDownloadFile") }
+    
+    static var wrongUrl: String { .localized("wrongUrl") }
+    
+    static var cantDeleteMessage: String { .localized("cantDeleteMessage") }
+    
+    static var error: String { .localized("error") }
+    
 }
 
 extension String {
