@@ -26,6 +26,7 @@ class AddressFieldCollectionViewCell: UICollectionViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        textField.theme_textColor = .onSurfaceMajorText
         
         textField.delegate = self
     }

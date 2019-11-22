@@ -7,6 +7,14 @@ import Foundation
 import UIKit
 import SwiftTheme
 
+extension Notification.Name {
+    
+    static var themeUpdate: Notification.Name {
+        Notification.Name(rawValue: ThemeUpdateNotification)
+    }
+    
+}
+
 extension ThemeColorPicker {
     
     static var surface: ThemeColorPicker {

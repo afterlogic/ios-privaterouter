@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         nextTheme()
         #endif
         
-        applyThemeToRoot()
+        applyTheme()
             
         SVProgressHUD.setMaximumDismissTimeInterval(1)
         StorageProvider.migrateIfNeeded()
@@ -51,14 +51,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
-    private func applyThemeToRoot() {
-        guard let root = self.window?.rootViewController as? UINavigationController else {
-            return
-        }
+    private func applyTheme() {
+        
+        UITabBar.appearance().theme_backgroundColor = .secondarySurface
+        UITabBar.appearance().theme_barTintColor = .secondarySurface
+        UITabBar.appearance().theme_tintColor = .accent
+        
+        UIToolbar.appearance().theme_backgroundColor = .secondarySurface
+        UIToolbar.appearance().theme_barTintColor = .secondarySurface
+        UIToolbar.appearance().theme_tintColor = .accent
+        
+        UINavigationBar.appearance().theme_backgroundColor = .primary
+        UINavigationBar.appearance().theme_barTintColor = .primary
+        UINavigationBar.appearance().theme_tintColor = .onPrimary
+        
+        UILabel.appearance().theme_textColor = .onSurfaceMajorText
     
-        root.navigationBar.theme_backgroundColor = .primary
-        root.navigationBar.theme_barTintColor = .primary
-        root.navigationBar.theme_tintColor = .onPrimary
+        UIButton.appearance().theme_tintColor = .accent
+        
+        UISwitch.appearance().theme_onTintColor = .accent
+        
+        if #available(iOS 9.0, *) {
+            UIButton.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_tintColor = .onPrimary
+            UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).theme_textColor = nil
+            UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black
+        }
     }
     
     #if DEBUG

@@ -18,6 +18,7 @@ protocol MailAttachmentTableViewCellDelegate: NSObjectProtocol {
 
 class MailAttachmentTableViewCell: UITableViewCell {
 
+    @IBOutlet var iconImage: UIImageView!
     @IBOutlet var importKeyButton: UIButton!
     @IBOutlet var titleLabel: UILabel!
     @IBOutlet var importConstraint: NSLayoutConstraint!
@@ -28,16 +29,18 @@ class MailAttachmentTableViewCell: UITableViewCell {
     
     var isComposer = false {
         didSet {
-            if isComposer {
-                downloadButton.setImage(UIImage(named: "cross"), for: .normal)
-            } else {
-                downloadButton.setImage(UIImage(named: "download"), for: .normal)
-            }
+            let imageName = isComposer ? "cross" : "download"
+            downloadButton.setImage(UIImage(named: imageName)?.withRenderingMode(.alwaysTemplate), for: .normal)
         }
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        theme_backgroundColor = .surface
+        iconImage.theme_tintColor = .onSurfaceMinorText
+        titleLabel.theme_textColor = .onSurfaceMajorText
+        importKeyButton.theme_tintColor = .onSurfaceMinorText
+        downloadButton.theme_tintColor = .onSurfaceMinorText
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
