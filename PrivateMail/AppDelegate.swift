@@ -10,6 +10,7 @@ import UIKit
 import KeychainAccess
 import SVProgressHUD
 import ObjectivePGP
+import SwiftTheme
 
 let keychain = Keychain(service: "com.PrivateRouter.PrivateMail")
 
@@ -19,6 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        #if DEBUG
+        nextTheme()
+        #endif
+        
+        applyThemeToRoot()
             
         SVProgressHUD.setMaximumDismissTimeInterval(1)
         StorageProvider.migrateIfNeeded()
@@ -43,6 +50,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
+    private func applyThemeToRoot() {
+        guard let root = self.window?.rootViewController as? UINavigationController else {
+            return
+        }
+    
+        root.navigationBar.theme_backgroundColor = .primary
+        root.navigationBar.theme_barTintColor = .primary
+        root.navigationBar.theme_tintColor = .onPrimary
+    }
+    
+    #if DEBUG
+    private var currentTheme = "Light"
+    
+    func nextTheme() {
+    
+        ThemeManager.setTheme(plistName: currentTheme, path: .mainBundle)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.currentTheme = self.currentTheme == "Light" ? "Dark" : "Light"
+            self.nextTheme()
+        }
+    }
+    #endif
 
     func applicationWillResignActive(_ application: UIApplication) {
 

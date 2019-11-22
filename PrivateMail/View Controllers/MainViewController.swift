@@ -10,6 +10,7 @@ import UIKit
 import SideMenu
 import SVProgressHUD
 import RealmSwift
+import SwiftTheme
 
 extension Notification.Name {
     static let mainViewControllerShouldRefreshData = Notification.Name("mainViewControllerShouldRefreshData")
@@ -176,6 +177,10 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .surface
+        tableView.theme_separatorColor = .onSurfaceSeparator
+        composeMailButton.theme_backgroundColor = .accent
+        composeMailButton.theme_tintColor = .onAccent
         
         title = NSLocalizedString("Mail", comment: "")
         
@@ -650,12 +655,12 @@ class MainViewController: UIViewController {
         searchBar.enablesReturnKeyAutomatically = false
         
         let textField = searchBar.value(forKey: "searchField") as? UITextField
-        textField?.textColor = .white
+        textField?.theme_textColor = .onPrimary
         textField?.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Search", comment: ""), attributes: [NSAttributedString.Key.foregroundColor: UIColor(white: 1.0, alpha: 0.8)])
         
         let imageView = textField?.leftView as! UIImageView
         imageView.image = imageView.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
-        imageView.tintColor = .white
+        imageView.theme_tintColor = .onPrimary
         
     }
     
