@@ -11,6 +11,7 @@ PODS:
   - SDWebImage/Core (4.4.5)
   - SideMenu (4.0.0)
   - SVProgressHUD (2.2.5)
+  - SwiftTheme (0.4.7)
 
 DEPENDENCIES:
   - KeychainAccess (~> 3.1.2)
@@ -19,6 +20,7 @@ DEPENDENCIES:
   - SDWebImage (~> 4.4.5)
   - SideMenu (~> 4.0.0)
   - SVProgressHUD (~> 2.2.5)
+  - SwiftTheme (~> 0.4.7)
 
 SPEC REPOS:
   trunk:
@@ -29,6 +31,7 @@ SPEC REPOS:
     - SDWebImage
     - SideMenu
     - SVProgressHUD
+    - SwiftTheme
 
 SPEC CHECKSUMS:
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
@@ -38,7 +41,8 @@ SPEC CHECKSUMS:
   SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
   SideMenu: 70ee5657df63ec3382660ec4ef470bf1cf5db07d
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftTheme: 67bbb51f2ef69570164562376f441655a143399d
 
-PODFILE CHECKSUM: eb654e24b485eb918a8047f0c57d446c57a59ac2
+PODFILE CHECKSUM: 006969e238c3fc5c2ee80246b82f11e7f308758b
 
 COCOAPODS: 1.8.4

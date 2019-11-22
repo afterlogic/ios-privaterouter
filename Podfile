@@ -14,6 +14,7 @@ target 'PrivateMail' do
   pod 'SDWebImage', '~> 4.4.5'
   pod 'KeychainAccess', '~> 3.1.2'
   pod 'RealmSwift', '~> 3.16.2'
+  pod 'SwiftTheme', '~> 0.4.7'
   
   target 'PrivateMailTests' do
     inherit! :search_paths

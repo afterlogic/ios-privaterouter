@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PrimaryColor</key>
+	<string>#4A0C40</string>
+	<key>PrimaryDarkColor</key>
+	<string>#1D0826</string>
+	<key>OnPrimaryColor</key>
+	<string>#DFFFFF</string>
+	<key>AccentColor</key>
+	<string>#9C4799</string>
+	<key>OnAccentColor</key>
+	<string>#DFFFFF</string>
+    <key>AccentFavoriteColor</key>
+    <string>#DEBF40</string>
+	<key>SurfaceColor</key>
+	<string>#000</string>
+	<key>OnSurfaceMajorTextColor</key>
+	<string>#DFFFFF</string>
+	<key>OnSurfaceMinorTextColor</key>
+	<string>#DFFFFF</string>
+    <key>SecondarySurfaceColor</key>
+    <string>#141414</string>
+    <key>OnSurfaceSeparatorColor</key>
+    <string>#333333</string>
+</dict>
+</plist>
