@@ -1,23 +1,23 @@
 PODS:
-  - KeychainAccess (3.1.2)
-  - ObjectivePGP (0.13.0)
-  - Realm (3.16.2):
-    - Realm/Headers (= 3.16.2)
-  - Realm/Headers (3.16.2)
-  - RealmSwift (3.16.2):
-    - Realm (= 3.16.2)
-  - SDWebImage (4.4.5):
-    - SDWebImage/Core (= 4.4.5)
-  - SDWebImage/Core (4.4.5)
-  - SideMenu (4.0.0)
+  - KeychainAccess (4.1.0)
+  - ObjectivePGP (0.15.0)
+  - Realm (4.1.1):
+    - Realm/Headers (= 4.1.1)
+  - Realm/Headers (4.1.1)
+  - RealmSwift (4.1.1):
+    - Realm (= 4.1.1)
+  - SDWebImage (5.3.2):
+    - SDWebImage/Core (= 5.3.2)
+  - SDWebImage/Core (5.3.2)
+  - SideMenu (5.0.1)
   - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
-  - KeychainAccess (~> 3.1.2)
-  - ObjectivePGP (~> 0.13.0)
-  - RealmSwift (~> 3.16.2)
-  - SDWebImage (~> 4.4.5)
-  - SideMenu (~> 4.0.0)
+  - KeychainAccess (~> 4.1.0)
+  - ObjectivePGP (~> 0.15.0)
+  - RealmSwift (~> 4.1.1)
+  - SDWebImage (~> 5.3.1)
+  - SideMenu (~> 5.0.1)
   - SVProgressHUD (~> 2.2.5)
 
 SPEC REPOS:
@@ -31,14 +31,14 @@ SPEC REPOS:
     - SVProgressHUD
 
 SPEC CHECKSUMS:
-  KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
-  ObjectivePGP: a99461bc871424bdbb8fb6fd80dcd20cbeeee9ec
-  Realm: 0e73b4edeb5b6a90da3d83206883b2e34e00eb38
-  RealmSwift: a81e650171ef0a5f999df1ed8d39ba8d6fce88a4
-  SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
-  SideMenu: 70ee5657df63ec3382660ec4ef470bf1cf5db07d
+  KeychainAccess: 445e28864fe6d3458b41fa211bcdc39890e8bd5a
+  ObjectivePGP: 35a73ed3253e7e2982184ea86b1ff6c5773d1299
+  Realm: 25f0a8244cbb1c2271c922963ea8666fc2d8104d
+  RealmSwift: 9e2657b33764f80e4a4dffd6d440e24715782052
+  SDWebImage: 6ac2eb96571bff96ecde31a987172c5934a0eb7d
+  SideMenu: 87efd943737bb83aedf0358884d09fcf5576636d
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: eb654e24b485eb918a8047f0c57d446c57a59ac2
+PODFILE CHECKSUM: c1f72aeb569f2b567b7594b186c1dec6a9b159ca
 
 COCOAPODS: 1.8.4
