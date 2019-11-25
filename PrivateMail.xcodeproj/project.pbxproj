@@ -914,16 +914,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 35;
-				DEVELOPMENT_TEAM = 72664T4RU7;
+				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = PrivateMailDev;
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.PrivateRouter.PrivateMailApplication";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -938,16 +938,16 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 35;
-				DEVELOPMENT_TEAM = 72664T4RU7;
+				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = PrivateMailDistr;
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.PrivateRouter.PrivateMailApplication";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

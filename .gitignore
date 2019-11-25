@@ -24,3 +24,7 @@ PrivateMail/.DS_Store
 Pods/
 
 .idea/
+
+PrivateMail.app.dSYM.zip
+
+fastlane/report.xml
