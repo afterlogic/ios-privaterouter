@@ -840,7 +840,7 @@
                         <rightBarButtonItems>
                             <barButtonItem id="f7o-df-1hc">
                                 <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="0E3-cs-Dpi" userLabel="Icon">
-                                    <rect key="frame" x="354" y="0.0" width="40" height="44"/>
+                                    <rect key="frame" x="354.00000000000006" y="0.0" width="40" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="side_menu"/>

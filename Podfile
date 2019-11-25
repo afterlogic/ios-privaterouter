@@ -8,12 +8,12 @@ target 'PrivateMail' do
   
   # Pods for PrivateMail
 
-  pod 'ObjectivePGP', '~> 0.13.0'
-  pod 'SideMenu', '~> 4.0.0'
+  pod 'ObjectivePGP', '~> 0.15.0'
+  pod 'SideMenu', '~> 5.0.1'
   pod 'SVProgressHUD', '~> 2.2.5'
-  pod 'SDWebImage', '~> 4.4.5'
-  pod 'KeychainAccess', '~> 3.1.2'
-  pod 'RealmSwift', '~> 3.16.2'
+  pod 'SDWebImage', '~> 5.3.1'
+  pod 'KeychainAccess', '~> 4.1.0'
+  pod 'RealmSwift', '~> 4.1.1'
   pod 'SwiftTheme', '~> 0.4.7'
   
   target 'PrivateMailTests' do
@@ -32,7 +32,7 @@ target 'PrivateMail' do
     
     DEFAULT_SWIFT_VERSION = '5.1'
     POD_SWIFT_VERSION_MAP = {
-        'SideMenu' => '4.0'
+
     }
 
     installer.pods_project.targets.each do |target|
@@ -41,6 +41,19 @@ target 'PrivateMail' do
 
       target.build_configurations.each do |config|
         config.build_settings['SWIFT_VERSION'] = swift_version
+      end
+
+    end
+
+    #endregion
+
+    #region: MARK: - Bitcode
+    # ObjectivePGP doesn't contain bitcode, so disable for all.
+
+    installer.pods_project.targets.each do |target|
+
+      target.build_configurations.each do |config|
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
       end
 
     end
