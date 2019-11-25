@@ -397,8 +397,6 @@ extension ContactDetailsViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ContactDetailTableViewCell.cellID(), for: indexPath) as! ContactDetailTableViewCell
-        
-        cell.backgroundColor = .white
                 
         cell.isEditable = inEditMode || isAdding
         

@@ -68,11 +68,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UILabel.appearance().theme_textColor = .onSurfaceMajorText
     
         UIButton.appearance().theme_tintColor = .accent
+    
+        UIAccentButton.appearance().theme_backgroundColor = .accent
+        UIAccentButton.appearance().theme_tintColor = .onAccent
         
         UISwitch.appearance().theme_onTintColor = .accent
         
+        UITableView.appearance().theme_backgroundColor = .surface
+        UITableView.appearance().theme_separatorColor = .surface
+        UITableView.appearance().tableFooterView = nil
+        
+        UITableViewCell.appearance().theme_backgroundColor = .surface
+        
         if #available(iOS 9.0, *) {
             UIButton.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_tintColor = .onPrimary
+            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_textColor = .onPrimary
+            
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).theme_textColor = nil
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black
         }

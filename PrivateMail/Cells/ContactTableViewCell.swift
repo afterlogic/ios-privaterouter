@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftTheme
 
 class ContactTableViewCell: UITableViewCell {
     
@@ -23,6 +24,8 @@ class ContactTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        fullNameLabel.theme_textColor = .onSurfaceMajorText
+        emailLabel.theme_textColor = .onSurfaceMinorText
         selectionStyle = .none
     }
     

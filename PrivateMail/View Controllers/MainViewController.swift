@@ -178,9 +178,6 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.theme_backgroundColor = .surface
-        tableView.theme_separatorColor = .onSurfaceSeparator
-        composeMailButton.theme_backgroundColor = .accent
-        composeMailButton.theme_tintColor = .onAccent
         
         title = NSLocalizedString("Mail", comment: "")
         

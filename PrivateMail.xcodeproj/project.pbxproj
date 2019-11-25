@@ -13,6 +13,7 @@
 		68B696FFFEAA5C22DB6234B1 /* UILabel+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69E36135DB09FF4322554 /* UILabel+Extension.swift */; };
 		68B6979FB500692133EE880F /* Dark.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68B697B82EDD115507C9FECF /* Dark.plist */; };
 		68B6981AC67611DFC4C286A3 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69574BA173CD1D6C51F84 /* UIButton+Extension.swift */; };
+		68B699A88E768DE0E8FFB378 /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69FDD550AD3245AA36772 /* Buttons.swift */; };
 		68B69D19C4A295CF0668565B /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69AB2192F0D47609965A8 /* Localizable.swift */; };
 		68B69E0B97169433F5B29933 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B696135E089C59140FAC11 /* Collection+Extensions.swift */; };
 		68B69EBCB168B6C10FDB5F11 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B6933E619BB0B8013C0C67 /* Theme.swift */; };
@@ -115,6 +116,7 @@
 		68B69AE317A6CF9DA975B2FB /* Urls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
 		68B69DA402AEF3424B67DC73 /* Light.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Light.plist; sourceTree = "<group>"; };
 		68B69E36135DB09FF4322554 /* UILabel+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILabel+Extension.swift"; sourceTree = "<group>"; };
+		68B69FDD550AD3245AA36772 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		94A918A7C51F5483393C5599 /* Pods-PrivateMailTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A3EF513C238521C300B2D9C1 /* UserLimitsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLimitsViewController.swift; sourceTree = "<group>"; };
 		BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -452,6 +454,7 @@
 				68B69574BA173CD1D6C51F84 /* UIButton+Extension.swift */,
 				68B69AE317A6CF9DA975B2FB /* Urls.swift */,
 				68B6933E619BB0B8013C0C67 /* Theme.swift */,
+				68B69FDD550AD3245AA36772 /* Buttons.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -745,6 +748,7 @@
 				68B6981AC67611DFC4C286A3 /* UIButton+Extension.swift in Sources */,
 				68B69FCD8C45A8FE800F8D94 /* Urls.swift in Sources */,
 				68B69EBCB168B6C10FDB5F11 /* Theme.swift in Sources */,
+				68B699A88E768DE0E8FFB378 /* Buttons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

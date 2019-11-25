@@ -37,7 +37,6 @@ class ComposeMailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.theme_backgroundColor = .surface
-        tableView.theme_separatorColor = .onSurfaceSeparator
         encryptDialogView.theme_backgroundColor = .secondarySurface
         encryptDialogTitle.theme_textColor = .onSurfaceMajorText
         encryptTitle.theme_textColor = .onSurfaceMajorText
