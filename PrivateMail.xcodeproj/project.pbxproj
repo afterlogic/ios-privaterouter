@@ -921,7 +921,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = PrivateMailDev;
 				SWIFT_VERSION = 5.0;
@@ -945,7 +945,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailTest;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = PrivateMailDistr;
 				SWIFT_VERSION = 5.0;
