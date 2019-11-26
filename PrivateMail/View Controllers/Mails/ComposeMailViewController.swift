@@ -36,6 +36,8 @@ class ComposeMailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupIdentities()
+        
         view.theme_backgroundColor = .surface
         encryptDialogView.theme_backgroundColor = .secondarySurface
         encryptDialogTitle.theme_textColor = .onSurfaceMajorText
@@ -247,6 +249,34 @@ class ComposeMailViewController: UIViewController {
 //        tableView.reloadData()
     }
     
+    
+    // region: MARK: - Identities
+    
+    private func setupIdentities() {
+        NotificationCenter.default
+            .addObserver(self, selector: #selector(identitiesChanged), name: .identitiesChanged, object: nil)
+        
+        updateIdentities()
+    }
+    
+    private func updateIdentities() {
+        SVProgressHUD.show()
+        
+        IdentitiesRepository.shared.updateIdentities { (error) in
+            SVProgressHUD.dismiss()
+            
+            if let error = error {
+                SVProgressHUD.showError(withStatus: error.localizedDescription)
+                return
+            }
+        }
+    }
+    
+    @objc private func identitiesChanged() {
+        print("Updated identities: \(IdentitiesRepository.shared.identities)")
+    }
+    
+    // endregion
     
     // MARK: - Navigation
     
