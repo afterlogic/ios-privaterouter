@@ -22,7 +22,7 @@ class IdentitiesRepository {
             }
             
             self.identities = identities
-            NotificationCenter.default.post(name: .identitiesChanged, object: identities)
+            NotificationCenter.default.post(name: .identitiesChanged, object: self)
         }
     }
     

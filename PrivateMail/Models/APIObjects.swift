@@ -735,14 +735,14 @@ struct APIContact {
     }
 }
 
-struct APIIdentity: Codable {
+struct APIIdentity: Codable, Equatable {
     let entityID: Int
     let uuid: String
     let parentUUID: String
     let moduleName: String
     let idUser: Int
     let idAccount: Int
-    let apiIdentityDefault: Bool
+    let isDefault: Bool
     let email: String
     let friendlyName: String
     let useSignature: Bool
@@ -755,7 +755,7 @@ struct APIIdentity: Codable {
         case moduleName = "ModuleName"
         case idUser = "IdUser"
         case idAccount = "IdAccount"
-        case apiIdentityDefault = "Default"
+        case isDefault = "Default"
         case email = "Email"
         case friendlyName = "FriendlyName"
         case useSignature = "UseSignature"

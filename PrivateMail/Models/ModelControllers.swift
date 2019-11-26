@@ -12,6 +12,7 @@ class ComposeMailModelController: NSObject {
     static let shared = ComposeMailModelController()
     var mail: APIMail = APIMail()
     var attachmentFileURL: URL?
+    var selectedIdentity: APIIdentity?
 }
 
 class ContactsModelController: NSObject {

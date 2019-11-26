@@ -21,10 +21,29 @@ protocol UITextViewDelegateExtensionProtocol: NSObjectProtocol {
     func textViewDidChanged(textView: UITextView)
 }
 
+extension UITableViewCellExtensionProtocol {
+    
+    static func cellID() -> String {
+        "\(Self.self)"
+    }
+    
+}
+
 
 extension UITableView {
-    func register<T: UITableViewCellExtensionProtocol>(cellClass: T) {
+    
+    // TODO: I think it's better to use register<T>(cellClass: T.Type) to avoid unnecessary cell initialization
+    @available(*, deprecated, message: "Use register<T>(cellClass: T.Type) instead.")
+    func register<T: UITableViewCellExtensionProtocol & UITableViewCell>(cellClass: T) {
         register(UINib.init(nibName: T.cellID(), bundle: Bundle.main), forCellReuseIdentifier: T.cellID())
+    }
+    
+    func register<T: UITableViewCellExtensionProtocol & UITableViewCell>(cellClass: T.Type) {
+        register(UINib.init(nibName: T.cellID(), bundle: Bundle.main), forCellReuseIdentifier: T.cellID())
+    }
+    
+    func dequeueReusableCell<T: UITableViewCellExtensionProtocol & UITableViewCell>(for i: IndexPath) -> T {
+        dequeueReusableCell(withIdentifier: T.cellID(), for: i) as! T
     }
 }
 
