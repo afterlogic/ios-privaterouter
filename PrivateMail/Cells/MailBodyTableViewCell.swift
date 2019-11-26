@@ -18,6 +18,9 @@ class MailBodyTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        theme_backgroundColor = .surface
+        textView.theme_textColor = .onSurfaceMajorText
+        placeholderLabel.theme_textColor = .onSurfaceMinorText
         
         textView.isScrollEnabled = false
         textView.delegate = self

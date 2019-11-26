@@ -10,7 +10,10 @@ extension UILabel {
     
     // Localizable text
     @IBInspectable var localizedText: String? {
-        set { text = newValue.map { .localized($0) } }
+        set {
+            guard localizedText != "" else { return }
+            text = newValue.map { .localized($0) }
+        }
         get { text }
     }
     

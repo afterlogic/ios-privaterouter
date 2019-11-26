@@ -15,6 +15,9 @@ class MailSubjectTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        theme_backgroundColor = .surface
+        titleLabel.theme_textColor = .onSurfaceMinorText
+        textField.theme_textColor = .onSurfaceMajorText
         textField.delegate = self
         titleLabel.text = NSLocalizedString("Subject", comment: "")
         textField.text = ComposeMailModelController.shared.mail.subject

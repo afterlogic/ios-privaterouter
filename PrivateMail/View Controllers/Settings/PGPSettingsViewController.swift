@@ -185,6 +185,10 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
         return nil
     }
     
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        Themer.themeTableViewSectionHeader(view)
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section < 2 {
             selectedKey = indexPath.section == 0 ? publicKeys[indexPath.row] : privateKeys[indexPath.row]

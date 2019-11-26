@@ -19,33 +19,28 @@ class ComposeMailViewController: UIViewController {
     @IBOutlet var tableViewBottomConstraint: NSLayoutConstraint!
     
     @IBOutlet var dialogView: UIView!
+    @IBOutlet var encryptDialogView: UIView!
+    @IBOutlet var encryptDialogTitle: UILabel!
+    @IBOutlet var signTitle: UILabel!
     @IBOutlet var signSwitch: UISwitch!
+    @IBOutlet var encryptTitle: UILabel!
     @IBOutlet var encryptSwitch: UISwitch!
     @IBOutlet var passwordTextField: UITextField!
     @IBOutlet var eyeButton: UIButton!
+    @IBOutlet var encryptButton: UIButton!
+    @IBOutlet var cancelEncryptButton: UIButton!
     
     var attachementPreviewURL: URL?
-    
-    let editorBegin = """
-            <style>
-            #editor {
-            font-family: -apple-system;
-            font-size: 14pt;
-            .element:read-write:focus {
-            outline: none;
-            }
-            }
-            </style>
-            <body id="editor" contenteditable="true">
-            """
-    let editorEnd = """
-            </body>
-            """
     
     var shouldShowBcc = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .surface
+        encryptDialogView.theme_backgroundColor = .secondarySurface
+        encryptDialogTitle.theme_textColor = .onSurfaceMajorText
+        encryptTitle.theme_textColor = .onSurfaceMajorText
+        signTitle.theme_textColor = .onSurfaceMajorText
         
         title = NSLocalizedString("Compose", comment: "")
         
@@ -318,10 +313,8 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
                 let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
                 
-                let html = editorBegin + ((mail.htmlBody ?? mail.plainBody) ?? "") + editorEnd
-                
                 cell.isEditor = true
-                cell.webView.loadHTMLString(html, baseURL: nil)
+                cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
                 cell.delegate = self
                 
                 cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
@@ -395,10 +388,8 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
                 let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
                 
-                let html = editorBegin + ((mail.htmlBody ?? mail.plainBody) ?? "") + editorEnd
-                
                 cell.isEditor = true
-                cell.webView.loadHTMLString(html, baseURL: nil)
+                cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
                 cell.delegate = self
                 
                 cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)

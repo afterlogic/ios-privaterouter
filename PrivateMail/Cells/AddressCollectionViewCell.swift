@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftTheme
 
 protocol AddressCollectionViewCellProtocol: NSObjectProtocol {
     func deleteAddress(email: String)
@@ -29,6 +30,8 @@ class AddressCollectionViewCell: UICollectionViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        backView.theme_backgroundColor = .secondarySurface
+        titleLabel.theme_textColor = .onSurfaceMinorText
     }
 
     @IBAction func deleteButtonAction(_ sender: Any) {

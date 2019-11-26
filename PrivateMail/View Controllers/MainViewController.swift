@@ -10,6 +10,7 @@ import UIKit
 import SideMenu
 import SVProgressHUD
 import RealmSwift
+import SwiftTheme
 
 extension Notification.Name {
     static let mainViewControllerShouldRefreshData = Notification.Name("mainViewControllerShouldRefreshData")
@@ -25,6 +26,11 @@ class MainViewController: UIViewController {
     @IBOutlet var optionsButton: UIBarButtonItem!
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
+    
+    @IBOutlet var progressHolder: UIView!
+    @IBOutlet var progressLabel: UILabel!
+    @IBOutlet weak var progressIndicator: UIActivityIndicatorView!
+    @IBOutlet var progressConstraint: NSLayoutConstraint!
     
     var shouldShowMoreButton = true {
         didSet {
@@ -165,17 +171,16 @@ class MainViewController: UIViewController {
     var refreshTimer: Timer?
     var searchTimer: Timer?
     
-    @IBOutlet var progressHolder: UIView!
-    @IBOutlet var progressLabel: UILabel!
-    
-    @IBOutlet var progressConstraint: NSLayoutConstraint!
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .surface
+        progressHolder.theme_backgroundColor = .secondarySurface
+        progressLabel.theme_textColor = .onSurfaceMajorText
+        progressIndicator.theme_activityIndicatorViewStyle = .onSurface
         
         title = NSLocalizedString("Mail", comment: "")
         
@@ -650,12 +655,12 @@ class MainViewController: UIViewController {
         searchBar.enablesReturnKeyAutomatically = false
         
         let textField = searchBar.value(forKey: "searchField") as? UITextField
-        textField?.textColor = .white
+        textField?.theme_textColor = .onPrimary
         textField?.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Search", comment: ""), attributes: [NSAttributedString.Key.foregroundColor: UIColor(white: 1.0, alpha: 0.8)])
         
         let imageView = textField?.leftView as! UIImageView
         imageView.image = imageView.image?.withRenderingMode(UIImage.RenderingMode.alwaysTemplate)
-        imageView.tintColor = .white
+        imageView.theme_tintColor = .onPrimary
         
     }
     

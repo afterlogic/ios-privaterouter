@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftTheme
 
 protocol MailTableViewCellDelegate {
     
@@ -47,7 +48,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     var isFlagged: Bool = false {
         didSet {
             flagButton.isHidden = !isFlagged
-            flagButton.tintColor = isFlagged ? UIColor(rgb: 0xF5A623) : UIColor(white: 0.85, alpha: 1.0)
+            flagButton.theme_tintColor = isFlagged ? .accentFavorite : .onSurfaceMinorText
             flagConstraint.isActive = isFlagged
             layoutSubviews()
         }
@@ -86,7 +87,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
                 dateLabel.font = isSeen ? UIFont.systemFont(ofSize: dateLabel.font.pointSize) : UIFont.boldSystemFont(ofSize: dateLabel.font.pointSize)
             }
             
-            subjectLabel.textColor = isSeen ? .darkGray : .black
+            subjectLabel.theme_textColor = isSeen ? .onSurfaceMinorText : .onSurfaceMajorText
         }
     }
     
@@ -146,6 +147,15 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        contentView.theme_backgroundColor = .surface
+        threadBackground.theme_backgroundColor = .secondarySurface
+        senderLabel.theme_textColor = .onSurfaceMajorText
+        attachmentImageView.theme_tintColor = .onSurfaceMajorText
+        dateLabel.theme_textColor = .onSurfaceMajorText
+        unfoldButton.theme_tintColor = .onSurfaceMinorText
+        answeredImageView.theme_tintColor = .onSurfaceMinorText
+        forwardedImageView.theme_tintColor = .onSurfaceMinorText
+        
         flagButton.isUserInteractionEnabled = false
         
         longPressGestureRecognizer.addTarget(self, action: #selector(self.longPressGestureAction(_:)))

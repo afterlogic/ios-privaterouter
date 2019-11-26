@@ -29,6 +29,7 @@ class MailHeaderTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        theme_backgroundColor = .surface
         
         fromTitleLabel.text = NSLocalizedString("From", comment: "")
         toTitleLabel.text = NSLocalizedString("To", comment: "")

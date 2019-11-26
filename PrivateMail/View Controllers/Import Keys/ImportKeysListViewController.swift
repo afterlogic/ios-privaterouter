@@ -75,6 +75,7 @@ class ImportKeysListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .secondarySurface
 
         title = NSLocalizedString("Import keys", comment: "")
         addSelectedButton.setTitle(NSLocalizedString("IMPORT SELECTED KEYS", comment: ""), for: .normal)
@@ -90,7 +91,6 @@ class ImportKeysListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(cellClass: KeyImportTableViewCell())
-        tableView.tableFooterView = UIView(frame: .zero)
     }
 
     override func viewDidAppear(_ animated: Bool) {

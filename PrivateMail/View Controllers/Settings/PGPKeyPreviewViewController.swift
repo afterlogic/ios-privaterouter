@@ -81,7 +81,7 @@ extension PGPKeyPreviewViewController: UITableViewDelegate, UITableViewDataSourc
             if var body = key?.armoredKey {
                 body = body.replacingOccurrences(of: "\n", with: "<br>")
                 body = """
-                <div style=\"background-color: #F5F5F5; padding: 10px; word-break: break-word; font-size: 10px;\">
+                <div style=\"padding: 10px; word-break: break-word; font-size: 10px;\">
                 \(body)
                 </div>
                 """
@@ -108,6 +108,10 @@ extension PGPKeyPreviewViewController: UITableViewDelegate, UITableViewDataSourc
         }
 
         return nil
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        Themer.themeTableViewSectionHeader(view)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

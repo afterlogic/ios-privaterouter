@@ -3,7 +3,7 @@
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15509"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -24,14 +24,14 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NoMessagesCell" id="SlR-oV-lbn">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="42.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="43"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SlR-oV-lbn" id="UEA-61-tFI">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="42.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" text="No messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bku-4o-qyE">
-                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="20.666666666666671"/>
+                                                    <rect key="frame" x="20" y="11" width="374" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -49,14 +49,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
-                                        <rect key="frame" x="0.0" y="70.666667938232422" width="414" height="43.333332061767578"/>
+                                        <rect key="frame" x="0.0" y="71" width="414" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.333332061767578"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
-                                                    <rect key="frame" x="20" y="10.999999999999998" width="374" height="21.333333333333329"/>
+                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="21.666666666666671"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -72,7 +72,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rDm-N1-kMN">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rDm-N1-kMN" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="334" y="694" width="60" height="60"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -174,6 +174,7 @@
                         <outlet property="optionsButton" destination="Ush-HH-5pY" id="xw9-qM-2UZ"/>
                         <outlet property="progressConstraint" destination="feb-as-oVw" id="hZY-In-nY1"/>
                         <outlet property="progressHolder" destination="VhP-98-coM" id="mbe-As-Mpp"/>
+                        <outlet property="progressIndicator" destination="bdv-S1-bSb" id="bm8-nG-42g"/>
                         <outlet property="progressLabel" destination="GkO-ha-btV" id="juG-iN-F7V"/>
                         <outlet property="searchButton" destination="Dyf-Sy-Uh3" id="ifB-h3-q53"/>
                         <outlet property="tableView" destination="deA-tp-Mli" id="xPT-bI-f2a"/>
@@ -201,7 +202,7 @@
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="6A1-A0-G6B">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Xp-NJ-FIO">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
@@ -394,11 +395,17 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="cancelEncryptButton" destination="Vl3-bv-bZP" id="Ifc-LN-Zl4"/>
                         <outlet property="dialogView" destination="8Xp-NJ-FIO" id="cnV-0N-k2y"/>
+                        <outlet property="encryptButton" destination="Yfr-aa-ADM" id="q96-Uf-w7e"/>
+                        <outlet property="encryptDialogTitle" destination="g8P-oH-tBI" id="gMh-X2-ZTT"/>
+                        <outlet property="encryptDialogView" destination="IDm-WY-dVn" id="uuN-DK-P5F"/>
                         <outlet property="encryptSwitch" destination="SbB-sz-gNf" id="I5F-xF-SnZ"/>
+                        <outlet property="encryptTitle" destination="5w1-uX-gSj" id="yxf-KX-bXL"/>
                         <outlet property="eyeButton" destination="t8n-P2-hZQ" id="SXT-tV-Bbm"/>
                         <outlet property="passwordTextField" destination="Cvm-Q8-w2v" id="xgI-l2-o2C"/>
                         <outlet property="signSwitch" destination="Faw-Vk-gHe" id="eFZ-wh-fkb"/>
+                        <outlet property="signTitle" destination="3F2-Cr-XUC" id="3Fg-bm-j4J"/>
                         <outlet property="tableView" destination="6A1-A0-G6B" id="SzP-Dq-7Ms"/>
                         <outlet property="tableViewBottomConstraint" destination="N80-TA-jcR" id="KIO-iS-KEc"/>
                         <segue destination="KHX-tI-2PR" kind="show" identifier="AddContact" id="DBZ-Gj-4Il"/>
@@ -618,7 +625,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7BO-ey-jmS">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7BO-ey-jmS" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="334" y="624" width="60" height="60"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -631,7 +638,7 @@
                                     <action selector="addContactButtonAction:" destination="KHX-tI-2PR" eventType="touchUpInside" id="2hQ-VA-Op6"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kd6-DQ-VQx">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kd6-DQ-VQx" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="334" y="694" width="60" height="60"/>
                                 <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -834,7 +841,7 @@
                         <rightBarButtonItems>
                             <barButtonItem id="f7o-df-1hc">
                                 <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="0E3-cs-Dpi" userLabel="Icon">
-                                    <rect key="frame" x="354.00000000000006" y="0.0" width="40" height="44"/>
+                                    <rect key="frame" x="354" y="0.0" width="40" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="side_menu"/>
@@ -964,7 +971,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                             </textView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="10" y="674" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -978,7 +985,7 @@
                                     <action selector="checkButtonAction:" destination="2t8-kH-sE8" eventType="touchUpInside" id="ydF-nW-VC9"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="10" y="724" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -1142,7 +1149,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VLa-w3-hj2" userLabel="Center View">
                                 <rect key="frame" x="30" y="372" width="354" height="152"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UQu-48-iUE">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UQu-48-iUE" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="108" width="354" height="44"/>
                                         <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -1400,6 +1407,7 @@
                         <outlet property="nameLabel" destination="CKD-cV-2RP" id="fen-yH-sUy"/>
                         <outlet property="settingsButton" destination="Maz-Xv-tUN" id="LQ1-Rh-rAQ"/>
                         <outlet property="tableView" destination="wzU-oJ-YND" id="6Ka-pg-Oc3"/>
+                        <outlet property="topBarContainer" destination="raK-Kk-r5T" id="7hu-xV-O6P"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="F0m-dL-lIb" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1450,7 +1458,7 @@
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2n2-hX-I44">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2n2-hX-I44" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="10" y="674" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -1464,7 +1472,7 @@
                                     <action selector="importKeysButtonAction:" destination="fxH-8q-bMe" eventType="touchUpInside" id="KP5-nm-Mzs"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iQF-GL-hhr">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iQF-GL-hhr" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="10" y="724" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -1592,7 +1600,7 @@
                                     <userDefinedRuntimeAttribute type="string" keyPath="localizedText" value="userLimitsDescription"/>
                                 </userDefinedRuntimeAttributes>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yhe-aC-oXA">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yhe-aC-oXA" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
                                 <rect key="frame" x="44" y="694" width="326" height="44"/>
                                 <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
