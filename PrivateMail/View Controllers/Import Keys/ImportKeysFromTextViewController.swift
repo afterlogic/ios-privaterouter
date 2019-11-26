@@ -16,6 +16,9 @@ class ImportKeysFromTextViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .secondarySurface
+        textView.theme_backgroundColor = .surface
+        textView.theme_textColor = .onSurfaceMajorText
 
         title = NSLocalizedString("Import keys", comment: "")
         checkButton.setTitle(NSLocalizedString("CHECK KEYS", comment: ""), for: .normal)

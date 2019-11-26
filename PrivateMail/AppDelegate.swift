@@ -71,6 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         UIAccentButton.appearance().theme_backgroundColor = .accent
         UIAccentButton.appearance().theme_tintColor = .onAccent
+        UIAccentButton.appearance().theme_setTitleColor(.onAccent, forState: .normal)
         
         UISwitch.appearance().theme_onTintColor = .accent
         
@@ -83,6 +84,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if #available(iOS 9.0, *) {
             UIButton.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_tintColor = .onPrimary
             UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_textColor = .onPrimary
+            
+            UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).theme_textColor = .onSurfaceMajorText
             
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).theme_textColor = nil
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black
