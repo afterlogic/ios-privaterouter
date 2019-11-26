@@ -74,7 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UISwitch.appearance().theme_onTintColor = .accent
         
         UITableView.appearance().theme_backgroundColor = .surface
-        UITableView.appearance().theme_separatorColor = .surface
+        UITableView.appearance().theme_separatorColor = .onSurfaceSeparator
         UITableView.appearance().tableFooterView = nil
         
         UITableViewCell.appearance().theme_backgroundColor = .surface
