@@ -81,11 +81,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UITableViewCell.appearance().theme_backgroundColor = .surface
         
+        UIRefreshControl.appearance().theme_tintColor = .onSurfaceMinorText
+        
         if #available(iOS 9.0, *) {
             UIButton.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_tintColor = .onPrimary
             UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_textColor = .onPrimary
             
-            UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).theme_textColor = .onSurfaceMajorText
+            UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).theme_textColor = nil
             
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).theme_textColor = nil
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black

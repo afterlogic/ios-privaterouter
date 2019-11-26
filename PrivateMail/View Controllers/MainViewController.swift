@@ -27,6 +27,11 @@ class MainViewController: UIViewController {
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
     
+    @IBOutlet var progressHolder: UIView!
+    @IBOutlet var progressLabel: UILabel!
+    @IBOutlet weak var progressIndicator: UIActivityIndicatorView!
+    @IBOutlet var progressConstraint: NSLayoutConstraint!
+    
     var shouldShowMoreButton = true {
         didSet {
             tableView.reloadData()
@@ -166,11 +171,6 @@ class MainViewController: UIViewController {
     var refreshTimer: Timer?
     var searchTimer: Timer?
     
-    @IBOutlet var progressHolder: UIView!
-    @IBOutlet var progressLabel: UILabel!
-    
-    @IBOutlet var progressConstraint: NSLayoutConstraint!
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -178,6 +178,9 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.theme_backgroundColor = .surface
+        progressHolder.theme_backgroundColor = .secondarySurface
+        progressLabel.theme_textColor = .onSurfaceMajorText
+        progressIndicator.theme_activityIndicatorViewStyle = .onSurface
         
         title = NSLocalizedString("Mail", comment: "")
         

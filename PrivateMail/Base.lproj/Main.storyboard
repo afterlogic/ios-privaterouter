@@ -24,14 +24,14 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NoMessagesCell" id="SlR-oV-lbn">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="43.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="43"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SlR-oV-lbn" id="UEA-61-tFI">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" text="No messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bku-4o-qyE">
-                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="21.666666666666671"/>
+                                                    <rect key="frame" x="20" y="11" width="374" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -49,14 +49,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
-                                        <rect key="frame" x="0.0" y="71.666667938232422" width="414" height="43"/>
+                                        <rect key="frame" x="0.0" y="71" width="414" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
-                                                    <rect key="frame" x="20" y="11" width="374" height="21"/>
+                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="21.666666666666671"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -174,6 +174,7 @@
                         <outlet property="optionsButton" destination="Ush-HH-5pY" id="xw9-qM-2UZ"/>
                         <outlet property="progressConstraint" destination="feb-as-oVw" id="hZY-In-nY1"/>
                         <outlet property="progressHolder" destination="VhP-98-coM" id="mbe-As-Mpp"/>
+                        <outlet property="progressIndicator" destination="bdv-S1-bSb" id="bm8-nG-42g"/>
                         <outlet property="progressLabel" destination="GkO-ha-btV" id="juG-iN-F7V"/>
                         <outlet property="searchButton" destination="Dyf-Sy-Uh3" id="ifB-h3-q53"/>
                         <outlet property="tableView" destination="deA-tp-Mli" id="xPT-bI-f2a"/>
@@ -965,13 +966,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L5m-j3-Oh4">
-                                <rect key="frame" x="10" y="10" width="394" height="605"/>
+                                <rect key="frame" x="10" y="10" width="394" height="654"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rZS-Jp-5h5" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
-                                <rect key="frame" x="10" y="625" width="394" height="40"/>
+                                <rect key="frame" x="10" y="674" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="h0r-0H-o0k"/>
@@ -985,7 +986,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iwb-ev-OXQ" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
-                                <rect key="frame" x="10" y="675" width="394" height="40"/>
+                                <rect key="frame" x="10" y="724" width="394" height="40"/>
                                 <color key="backgroundColor" red="0.73725490196078436" green="0.27843137254901962" blue="0.59999999999999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="bA1-od-46b"/>
@@ -1688,12 +1689,12 @@
         <image name="trash" width="20.333333969116211" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ShJ-eP-Qpt"/>
-        <segue reference="wcd-hS-Cmg"/>
+        <segue reference="ZCy-BS-EsO"/>
+        <segue reference="DhZ-du-u9t"/>
         <segue reference="gGo-gR-10m"/>
         <segue reference="R6G-FH-6Be"/>
         <segue reference="cAx-WG-7Li"/>
         <segue reference="Mf6-5H-tvn"/>
-        <segue reference="TRe-7R-CiQ"/>
+        <segue reference="drG-5J-rV3"/>
     </inferredMetricsTieBreakers>
 </document>

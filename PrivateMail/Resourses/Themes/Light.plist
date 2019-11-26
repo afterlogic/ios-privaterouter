@@ -13,7 +13,7 @@
 	<key>OnAccentColor</key>
 	<string>#FFF</string>
 	<key>AccentFavoriteColor</key>
-	<string>#DEBF40</string>
+	<string>#F5A623</string>
 	<key>SurfaceColor</key>
 	<string>#FFF</string>
 	<key>OnSurfaceMajorTextColor</key>
@@ -24,5 +24,7 @@
 	<string>#F2F2F2</string>
 	<key>OnSurfaceSeparatorColor</key>
 	<string>#E0E0E0</string>
+	<key>OnSurfaceActivityIndicatorStyle</key>
+	<string>gray</string>
 </dict>
 </plist>

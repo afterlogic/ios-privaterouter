@@ -62,3 +62,25 @@ extension ThemeColorPicker {
     }
     
 }
+
+extension ThemeActivityIndicatorViewStylePicker {
+    
+    static var onSurface: ThemeActivityIndicatorViewStylePicker {
+        ThemeActivityIndicatorViewStylePicker(keyPath: "OnSurfaceActivityIndicatorStyle")
+    }
+    
+}
+
+struct Themer {
+    
+    static func themeTableViewSectionHeader(_ view: UIView) {
+        guard let view = view as? UITableViewHeaderFooterView else {
+            return
+        }
+    
+        view.backgroundView?.theme_backgroundColor = .secondarySurface
+        view.textLabel?.theme_textColor = .onSurfaceMajorText
+        view.detailTextLabel?.theme_textColor = .onSurfaceMinorText
+    }
+    
+}

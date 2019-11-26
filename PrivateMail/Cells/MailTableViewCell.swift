@@ -48,7 +48,7 @@ class MailTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     var isFlagged: Bool = false {
         didSet {
             flagButton.isHidden = !isFlagged
-            flagButton.tintColor = isFlagged ? UIColor(rgb: 0xF5A623) : UIColor(white: 0.85, alpha: 1.0)
+            flagButton.theme_tintColor = isFlagged ? .accentFavorite : .onSurfaceMinorText
             flagConstraint.isActive = isFlagged
             layoutSubviews()
         }
