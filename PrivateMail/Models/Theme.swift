@@ -71,6 +71,19 @@ extension ThemeActivityIndicatorViewStylePicker {
     
 }
 
+enum ThemeName: String {
+    case light = "Light"
+    case dark = "Dark"
+}
+
+extension ThemeManager {
+    
+    static func setTheme(_ theme: ThemeName) {
+        ThemeManager.setTheme(plistName: theme.rawValue, path: .mainBundle)
+    }
+    
+}
+
 struct Themer {
     
     static func themeTableViewSectionHeader(_ view: UIView) {
