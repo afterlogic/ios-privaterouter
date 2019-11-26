@@ -24,6 +24,7 @@ enum SettingsParameter {
     case syncFrequency
     case syncPeriod
     case lastRefresh
+    case darkTheme
 }
 
 class SettingsModelController: NSObject {
@@ -47,6 +48,8 @@ class SettingsModelController: NSObject {
             return "syncPeriod"
         case .lastRefresh:
             return "lastRefresh"
+        case .darkTheme:
+            return "darkTheme"
         }
     }
     

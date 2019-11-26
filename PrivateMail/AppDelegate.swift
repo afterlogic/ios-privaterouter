@@ -21,10 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        #if DEBUG
-        nextTheme()
-        #endif
-        
         applyTheme()
             
         SVProgressHUD.setMaximumDismissTimeInterval(1)
@@ -52,6 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func applyTheme() {
+        let isDarkTheme = (SettingsModelController.shared.getValueFor(.darkTheme) as? Bool) ?? false
+        ThemeManager.setTheme(isDarkTheme ? .dark : .light)
         
         UITabBar.appearance().theme_backgroundColor = .secondarySurface
         UITabBar.appearance().theme_barTintColor = .secondarySurface
@@ -93,20 +91,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black
         }
     }
-    
-    #if DEBUG
-    private var currentTheme = "Light"
-    
-    func nextTheme() {
-    
-        ThemeManager.setTheme(plistName: currentTheme, path: .mainBundle)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.currentTheme = self.currentTheme == "Light" ? "Dark" : "Light"
-            self.nextTheme()
-        }
-    }
-    #endif
 
     func applicationWillResignActive(_ application: UIApplication) {
 
