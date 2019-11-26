@@ -105,38 +105,30 @@ class ComposeMailViewController: UIViewController {
     // MARK: - Button actions
     
     @IBAction func sendAction(_ sender: Any) {
-        DispatchQueue.main.async {
-            if let to = self.modelController.mail.to {
-                if to.count > 0 {
-                    SVProgressHUD.show()
-                    self.view.isUserInteractionEnabled = false
-                    
-                    let mail = self.modelController.mail
-                    
-                    API.shared.sendMail(mail: mail) { (result, error) in
-                        DispatchQueue.main.async {
-                            SVProgressHUD.dismiss()
-                            self.view.isUserInteractionEnabled = true
-                            
-                            if let success = result {
-                                if success {
-                                    self.navigationController?.popViewController(animated: true)
-                                } else {
-                                    SVProgressHUD.showError(withStatus: NSLocalizedString("Message wasn't sent", comment: ""))
-                                }
-                            } else if let error = error {
-                                SVProgressHUD.showError(withStatus: error.localizedDescription)
-                                return
-                            }
-                            
-                        }
-                        
-                    }
-                    
+        guard let to = self.modelController.mail.to, to.count > 0 else  {
+            return
+        }
+    
+        let progressCompletion = ProgressHUD.showWithCompletion()
+    
+        self.view.isUserInteractionEnabled = false
+    
+        let mail = self.modelController.mail
+    
+        API.shared.sendMail(mail: mail, identity: self.modelController.selectedIdentity) { (result, error) in
+            DispatchQueue.main.async {
+                self.view.isUserInteractionEnabled = true
+            
+                if let error = error {
+                    progressCompletion(.error(error.localizedDescription))
+                } else if result != nil {
+                    progressCompletion(.dismiss)
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    progressCompletion(.error(NSLocalizedString("Message wasn't sent", comment: "")))
                 }
             }
         }
-        
     }
     
     @IBAction func optionsAction(_ sender: Any) {
@@ -227,7 +219,7 @@ class ComposeMailViewController: UIViewController {
     @IBAction func saveButtonAction(_ sender: Any) {
         SVProgressHUD.show()
         
-        API.shared.sendMail(mail: modelController.mail, isSaving: true) { (result, error) in
+        API.shared.sendMail(mail: modelController.mail, identity: nil, isSaving: true) { (result, error) in
             DispatchQueue.main.async {
                 if result ?? false {
                     SVProgressHUD.showSuccess(withStatus: nil)

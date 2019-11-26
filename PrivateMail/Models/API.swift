@@ -530,11 +530,14 @@ class API: NSObject {
         }
     }
     
-    func sendMail(mail: APIMail, isSaving: Bool = false, completionHandler: @escaping (Bool?, Error?) -> Void) {
-        let parameters = [
+    func sendMail(mail: APIMail,
+                  identity: APIIdentity?,
+                  isSaving: Bool = false,
+                  completionHandler: @escaping (Bool?, Error?) -> Void) {
+        let parametersSource: [String : Any?] = [
             "AccountID": currentUser.id,
             "FetcherID": "",
-            "IdentityID": currentUser.id,
+            "IdentityID": identity?.entityID,
             "DraftInfo": [],
             "DraftUid": "",
             "To": mail.to?.first ?? "",
@@ -553,15 +556,17 @@ class API: NSObject {
             "DraftFolder": "Drafts",
             "ConfirmFolder": "",
             "ConfirmUid": ""
-            ] as [String : Any]
+            ]
         
-        callAPI(module: "Mail", method: isSaving ? "SaveMessage" : "SendMessage", parameters: parameters) { (result, error) in
-            if let result = result["Result"] as? Bool {
-                completionHandler(result, nil)
-            } else {
-                completionHandler(false, error)
-            }
-        }
+        let parameters = parametersSource
+            .filter { (key, value) in value != nil }
+            .mapValues { $0! }
+        
+        callAPIForResult(
+            module: "Mail",
+            method: isSaving ? "SaveMessage" : "SendMessage",
+            parameters: parameters,
+            completionHandler: completionHandler)
     }
     
     func setMailSeen(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {

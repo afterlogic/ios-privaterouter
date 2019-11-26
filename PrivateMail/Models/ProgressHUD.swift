@@ -9,7 +9,7 @@ import SVProgressHUD
 public struct ProgressHUD {
     
     public enum Result {
-        case error(Error)
+        case error(String)
         case dismiss
         case info(String)
     }
@@ -25,8 +25,8 @@ public struct ProgressHUD {
             SVProgressHUD.dismiss()
             
             switch result {
-            case .error(let error):
-                SVProgressHUD.showError(withStatus: error.localizedDescription)
+            case .error(let message):
+                SVProgressHUD.showError(withStatus: message)
             case .info(let message):
                 SVProgressHUD.showInfo(withStatus: message)
             default:
@@ -40,7 +40,7 @@ public struct ProgressHUD {
         let completion = showWithCompletion()
         return {
             if let error = $0 {
-                completion(.error(error))
+                completion(.error(error.localizedDescription))
             } else {
                 completion(.dismiss)
             }
