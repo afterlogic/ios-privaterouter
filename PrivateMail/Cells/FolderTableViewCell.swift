@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftTheme
 
 class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
@@ -52,6 +53,8 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
         }
     }
     
+    var theme_iconTintColor: ThemeColorPicker = .onSurfaceMajorText
+    
     static func cellID() -> String {
         return "FolderTableViewCell"
     }
@@ -67,17 +70,17 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     
     func setSelected(_ selected: Bool) {        
         if selected {
-            backgroundColor = ColorScheme.accentColor
-            titleLabel.textColor = .white
-            unreadLabel.textColor = .white
-            iconImageView.tintColor = .white
-            expandImageView.tintColor = .white
+            theme_backgroundColor = .accent
+            titleLabel.theme_textColor = .onAccent
+            unreadLabel.theme_textColor = .onAccent
+            iconImageView.theme_tintColor = .onAccent
+            expandImageView.theme_tintColor = .onAccent
         } else {
-            backgroundColor = .white
-            titleLabel.textColor = .black
-            unreadLabel.textColor = .black
-            iconImageView.tintColor = .black
-            expandImageView.tintColor = .black
+            theme_backgroundColor = .surface
+            titleLabel.theme_textColor = .onSurfaceMajorText
+            unreadLabel.theme_textColor = .onSurfaceMajorText
+            iconImageView.theme_tintColor = theme_iconTintColor
+            expandImageView.theme_tintColor = .onSurfaceMajorText
         }
         
         #if DEBUG

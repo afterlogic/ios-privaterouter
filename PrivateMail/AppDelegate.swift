@@ -10,6 +10,7 @@ import UIKit
 import KeychainAccess
 import SVProgressHUD
 import ObjectivePGP
+import SwiftTheme
 
 let keychain = Keychain(service: "com.PrivateRouter.PrivateMail")
 
@@ -19,6 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        #if DEBUG
+        nextTheme()
+        #endif
+        
+        applyTheme()
             
         SVProgressHUD.setMaximumDismissTimeInterval(1)
         StorageProvider.migrateIfNeeded()
@@ -43,6 +50,63 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         return true
     }
+    
+    private func applyTheme() {
+        
+        UITabBar.appearance().theme_backgroundColor = .secondarySurface
+        UITabBar.appearance().theme_barTintColor = .secondarySurface
+        UITabBar.appearance().theme_tintColor = .accent
+        
+        UIToolbar.appearance().theme_backgroundColor = .secondarySurface
+        UIToolbar.appearance().theme_barTintColor = .secondarySurface
+        UIToolbar.appearance().theme_tintColor = .accent
+        
+        UINavigationBar.appearance().theme_backgroundColor = .primary
+        UINavigationBar.appearance().theme_barTintColor = .primary
+        UINavigationBar.appearance().theme_tintColor = .onPrimary
+        
+        UILabel.appearance().theme_textColor = .onSurfaceMajorText
+    
+        UIButton.appearance().theme_tintColor = .accent
+    
+        UIAccentButton.appearance().theme_backgroundColor = .accent
+        UIAccentButton.appearance().theme_tintColor = .onAccent
+        UIAccentButton.appearance().theme_setTitleColor(.onAccent, forState: .normal)
+        
+        UISwitch.appearance().theme_onTintColor = .accent
+        
+        UITableView.appearance().theme_backgroundColor = .surface
+        UITableView.appearance().theme_separatorColor = .surface
+        UITableView.appearance().tableFooterView = nil
+        
+        UITableViewCell.appearance().theme_backgroundColor = .surface
+        
+        UIRefreshControl.appearance().theme_tintColor = .onSurfaceMinorText
+        
+        if #available(iOS 9.0, *) {
+            UIButton.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_tintColor = .onPrimary
+            UILabel.appearance(whenContainedInInstancesOf: [UINavigationBar.self]).theme_textColor = .onPrimary
+            
+            UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).theme_textColor = nil
+            
+            UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).theme_textColor = nil
+            UILabel.appearance(whenContainedInInstancesOf: [UITextField.self]).textColor = .black
+        }
+    }
+    
+    #if DEBUG
+    private var currentTheme = "Light"
+    
+    func nextTheme() {
+    
+        ThemeManager.setTheme(plistName: currentTheme, path: .mainBundle)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.currentTheme = self.currentTheme == "Light" ? "Dark" : "Light"
+            self.nextTheme()
+        }
+    }
+    #endif
 
     func applicationWillResignActive(_ application: UIApplication) {
 

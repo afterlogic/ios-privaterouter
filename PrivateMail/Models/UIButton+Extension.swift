@@ -10,7 +10,10 @@ extension UIButton {
     
     // Localizable text
     @IBInspectable var localizedTitle: String? {
-        set { setTitle(newValue.map { .localized($0) } , for: .normal)}
+        set {
+            guard localizedTitle != "" else { return }
+            setTitle(newValue.map { .localized($0) } , for: .normal)
+        }
         get { title(for: .normal) }
     }
     

@@ -16,7 +16,8 @@ class SettingsButtonTableViewCell: UITableViewCell {
         super.awakeFromNib()
         selectionStyle = .none
         titleLabel.layer.cornerRadius = titleLabel.bounds.height / 2.0
-        titleLabel.backgroundColor = ColorScheme.accentColor
+        titleLabel.theme_textColor = .onAccent
+        titleLabel.theme_backgroundColor = .accent
     }
     
 }

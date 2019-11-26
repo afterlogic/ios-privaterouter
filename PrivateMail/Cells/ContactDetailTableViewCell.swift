@@ -91,6 +91,7 @@ class ContactDetailTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         selectionStyle = .none
+        contentField.theme_textColor = .onSurfaceMajorText
         
         contentField.delegate = self
     }
@@ -101,16 +102,20 @@ class ContactDetailTableViewCell: UITableViewCell {
         let contact = ContactsModelController.shared.contact
         let group = GroupsModelController.shared.group
         
-        backgroundColor = .white
         showAdditionalFieldsLabel.isHidden = true
         contentField.isHidden = false
         groupSwitch.isHidden = true
         contentField.tag = 0
+    
+        if case .header = style {
+            theme_backgroundColor = .secondarySurface
+        } else {
+            theme_backgroundColor = .surface
+        }
         
         switch style {
         case .header:
             contentField.isHidden = true
-            backgroundColor = .init(white: 0.93, alpha: 1.0)
             content = nil
             break
             

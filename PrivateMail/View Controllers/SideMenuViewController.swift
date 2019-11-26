@@ -9,6 +9,7 @@
 import UIKit
 import SDWebImage
 import SideMenu
+import SwiftTheme
 
 extension Notification.Name {
     static let didSelectFolder = Notification.Name("didSelectFolder")
@@ -17,6 +18,7 @@ extension Notification.Name {
 
 class SideMenuViewController: UIViewController {
     
+    @IBOutlet weak var topBarContainer: UIView!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var emailLabel: UILabel!
@@ -34,6 +36,12 @@ class SideMenuViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.theme_backgroundColor = .surface
+        topBarContainer.theme_backgroundColor = .primary
+        nameLabel.theme_textColor = .onPrimary
+        emailLabel.theme_textColor = .onPrimary
+        settingsButton.theme_tintColor = .onPrimary
         
         avatarImageView.layer.cornerRadius = avatarImageView.frame.size.height / 2.0
         
@@ -222,10 +230,8 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         let item = MenuModelController.shared.menuItems()[indexPath.row]
         
-        if item == MenuModelController.shared.selectedMenuItem {
-            cell.setSelected(true)
-        } else {
-            cell.setSelected(false)
+        defer {
+            cell.setSelected(item == MenuModelController.shared.selectedMenuItem)
         }
         
         switch item {
@@ -236,7 +242,7 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             cell.titleLabel.text = Strings.starred
             cell.iconImageView.image = nil
             cell.iconImageView.image = UIImage(named: "folder_starred")?.withRenderingMode(.alwaysTemplate)
-            cell.iconImageView.tintColor = UIColor(red: 222, green: 191, blue: 64)
+            cell.theme_iconTintColor = .accentFavorite
             return cell
             
         case .folder(let folderName):
@@ -245,6 +251,7 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             }
     
             cell.folder = folder
+            cell.theme_iconTintColor = .onSurfaceMajorText
     
             if folder.type == 3 {
                 cell.unreadCount = folder.messagesCount ?? 0
@@ -257,7 +264,6 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     
             cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
     
-            cell.iconImageView.tintColor = .black
             switch folder.type {
             case 1:
                 cell.iconImageView.image = UIImage(named: "folder_inbox")

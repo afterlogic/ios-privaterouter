@@ -101,4 +101,9 @@ extension GroupsViewController: UITableViewDelegate, UITableViewDataSource {
             return nil
         }
     }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        Themer.themeTableViewSectionHeader(view)
+    }
+    
 }

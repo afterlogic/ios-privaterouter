@@ -9,6 +9,7 @@
 import UIKit
 import SVProgressHUD
 import ObjectivePGP
+import SwiftTheme
 
 class MailPageViewController: UIPageViewController {
 
@@ -43,6 +44,8 @@ class MailPageViewController: UIPageViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.theme_backgroundColor = .surface
+        
         dataSource = self
         delegate = self
         

@@ -99,6 +99,9 @@ class AddressTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        contentView.theme_backgroundColor = .surface
+        titleLabel.theme_textColor = .onSurfaceMinorText
+        plusButton.theme_tintColor = .accent
         
         collectionView.delegate = self
         collectionView.dataSource = self
