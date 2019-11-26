@@ -461,10 +461,10 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         dropdown.bottomOffset = CGPoint(x: 24, y: 40)
         dropdown.anchorView = tableView.cellForRow(at: indexPath)
     
-        dropdown.textColor = ThemeManager.color(for: "OnSurfaceMajorTextColor")!
-        dropdown.backgroundColor = ThemeManager.color(for: "SecondarySurfaceColor")!
-        dropdown.selectedTextColor = ThemeManager.color(for: "OnAccentColor")!
-        dropdown.selectionBackgroundColor = ThemeManager.color(for: "AccentColor")!
+        dropdown.textColor = ThemeManager.color(.onSurfaceMajorText)
+        dropdown.backgroundColor = ThemeManager.color(.surface)
+        dropdown.selectedTextColor = ThemeManager.color(.onAccent)
+        dropdown.selectionBackgroundColor = ThemeManager.color(.accent)
         
         dropdown.show()
     }
