@@ -34,9 +34,9 @@ class ComposeMailViewController: UIViewController {
     
     var attachementPreviewURL: URL?
     
-    var shouldShowBcc = false
+    private var shouldShowBcc = false
     
-    private var showFrom = false
+    private var shouldShowFrom = false
     
     private var isFirstIdentityUpdate = true
     
@@ -282,7 +282,7 @@ class ComposeMailViewController: UIViewController {
             selectDefaultIdentity()
         }
         
-        showFrom = identities.isNotEmpty
+        shouldShowFrom = identities.isNotEmpty
         reloadData()
     }
     
@@ -315,7 +315,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        (showFrom ? 1 : 0)
+        (shouldShowFrom ? 1 : 0)
             + (shouldShowBcc ? 5 : 4)
             + (modelController.mail.attachmentsToSend?.keys.count ?? 0)
     }
@@ -325,11 +325,11 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         
         var result: UITableViewCell?
         
-        let fromShift = showFrom ? 1 : 0
+        let fromShift = shouldShowFrom ? 1 : 0
         let bccShift = fromShift + (shouldShowBcc ? 1 : 0)
     
         switch true {
-        case showFrom && indexPath.row == 0:
+        case shouldShowFrom && indexPath.row == 0:
             let cell: IdentityChooserTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             
             cell.valueText = modelController.selectedIdentity?.description
@@ -340,7 +340,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
             
         case indexPath.row == 0 + fromShift:
-            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.style = .to
             cell.setItems(modelController.mail.to ?? [])
             cell.delegate = self
@@ -349,7 +349,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
     
         case indexPath.row == 1 + fromShift:
-            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.style = .cc
             cell.setItems(modelController.mail.cc ?? [])
             cell.delegate = self
@@ -358,7 +358,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
     
         case shouldShowBcc && indexPath.row == 2 + fromShift:
-            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.style = .bcc
             cell.setItems(modelController.mail.bcc ?? [])
             cell.delegate = self
@@ -367,14 +367,14 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
     
         case indexPath.row == 2 + bccShift:
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailSubjectTableViewCell.cellID(), for: indexPath) as! MailSubjectTableViewCell
+            let cell: MailSubjectTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.textField.text = mail.subject
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
             break
     
         case indexPath.row == (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
+            let cell: MailHTMLBodyTableViewCell = tableView.dequeueReusableCell(for: indexPath)
         
             cell.isEditor = true
             cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
@@ -432,7 +432,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard showFrom && indexPath.row == 0 else { return }
+        guard shouldShowFrom && indexPath.row == 0 else { return }
         
         let dropdown = DropDown()
         dropdown.dataSource = [defaultIdentityText] + identitiesRepository.identities.map { $0.description }
@@ -454,7 +454,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         dropdown.anchorView = tableView.cellForRow(at: indexPath)
     
         dropdown.textColor = ThemeManager.color(.onSurfaceMajorText)
-        dropdown.backgroundColor = ThemeManager.color(.surface)
+        dropdown.backgroundColor = ThemeManager.color(.secondarySurface)
         dropdown.selectedTextColor = ThemeManager.color(.onAccent)
         dropdown.selectionBackgroundColor = ThemeManager.color(.accent)
         
@@ -463,13 +463,28 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
 }
 
 
-extension ComposeMailViewController: UITableViewDelegateExtensionProtocol & UITextViewDelegateExtensionProtocol {
+extension ComposeMailViewController: AddressTableViewCellDelegate {
+    
     func cellSizeDidChanged() {
         UIView.setAnimationsEnabled(false)
         tableView.beginUpdates()
         tableView.endUpdates()
         UIView.setAnimationsEnabled(true)
     }
+    
+    func addressCellContentTriggered(_ cell: AddressTableViewCell) {
+        if cell.style == .cc {
+            if !shouldShowBcc {
+                shouldShowBcc = true
+                let bccCellIndexPath = IndexPath(row: shouldShowFrom ? 3 : 2, section: 0)
+                tableView.insertRows(at: [bccCellIndexPath], with: .automatic)
+            }
+        }
+    }
+    
+}
+
+extension ComposeMailViewController: UITextViewDelegateExtensionProtocol {
     
     func textViewDidChanged(textView: UITextView) {
 //        let caret = textView.caretRect(for: textView.selectedTextRange!.start)
@@ -480,6 +495,7 @@ extension ComposeMailViewController: UITableViewDelegateExtensionProtocol & UITe
 //            self.tableView.setContentOffset(CGPoint.init(x: 0.0, y: self.tableView.contentOffset.y + diffY), animated: true)
 //        }
     }
+    
 }
 
 

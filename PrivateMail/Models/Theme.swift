@@ -98,7 +98,7 @@ extension ThemeManager {
     
 }
 
-struct Themer {
+struct ThemeUtil {
     
     static func themeTableViewSectionHeader(_ view: UIView) {
         guard let view = view as? UITableViewHeaderFooterView else {
