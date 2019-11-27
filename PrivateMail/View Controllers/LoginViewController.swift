@@ -74,38 +74,73 @@ class LoginViewController: UIViewController {
     }
     
     private func proceedLogin(login: String, password: String) {
-        SVProgressHUD.show()
+        guard let domain = extractDomainFromLogin(login) else {
+            return
+        }
+    
+        let progressCompletion = ProgressHUD.showWithCompletion()
         
-        API.shared.login(login: login, password: password) { (success, error) in
-            SVProgressHUD.dismiss()
-            
-            if let error = error {
-                if let apiError = error as? APIError, apiError.code == 108 {
-                    DispatchQueue.main.async {
-                        self.performSegue(withIdentifier: "showUserLimits", sender: nil)
-                    }
+        API.shared.autoDiscover(domain: domain) { (url, error) in
+            guard let url = url, error == nil else {
+                if let error = error {
+                    progressCompletion(.error(error.localizedDescription))
                 } else {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    progressCompletion(.dismiss)
                 }
-            } else {
-                if success {
+                DispatchQueue.main.async {
+                    self.view.isUserInteractionEnabled = true
+                }
+                return
+            }
+            
+            Urls.baseURL = url
+            API.shared.cancelAllRequests()
+            API.shared.removeCookies()
+    
+            API.shared.login(login: login, password: password) { (success, error) in
+                DispatchQueue.main.async {
+                    self.view.isUserInteractionEnabled = true
+                }
+                
+                guard success, error == nil else {
+                    if let error = error {
+                        if let apiError = error as? APIError, apiError.code == 108 {
+                            progressCompletion(.dismiss)
+                            DispatchQueue.main.async {
+                                self.performSegue(withIdentifier: "showUserLimits", sender: nil)
+                            }
+                        } else {
+                            progressCompletion(.error(error.localizedDescription))
+                        }
+                    } else {
+                        progressCompletion(.dismiss)
+                    }
+                    return
+                }
+    
+                API.shared.getAccounts { (result, error) in
+                    if let error = error {
+                        progressCompletion(.error(error.localizedDescription))
+                    } else {
+                        progressCompletion(.dismiss)
+                    }
+                    
                     DispatchQueue.main.async {
                         self.dismiss(animated: true, completion: nil)
                     }
                 }
-            
-                API.shared.getAccounts{(result, error) in
-                    if let error = error {
-                        SVProgressHUD.showError(withStatus: error.localizedDescription)
-                        return
-                    }
-                }
-            }
-        
-            DispatchQueue.main.async {
-                self.view.isUserInteractionEnabled = true
             }
         }
+    }
+    
+    private func extractDomainFromLogin(_ login: String) -> String? {
+        guard let indexOfEmailChar = login.firstIndex(of: "@") else {
+            return nil
+        }
+        
+        let startDomainIndex = login.index(after: indexOfEmailChar)
+        return login[startDomainIndex...]
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     @IBAction func eyeButtonAction(_ sender: UIButton) {

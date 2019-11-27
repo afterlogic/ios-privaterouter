@@ -8,12 +8,10 @@ import Foundation
 struct Urls {
     
     static var domain: String {
-        "test.afterlogic.com" //"webmail.afterlogic.com" //"privatemail.com"
+        baseURL.host ?? ""
     }
     
-    static var baseURL: URL {
-        URL(string: "https://\(domain)/")!
-    }
+    static var baseURL: URL = URL(string: "https://test.afterlogic.com")!
     
     static var upgradePlan: URL {
         URL(string: "\(baseURL)supporttickets.php")!

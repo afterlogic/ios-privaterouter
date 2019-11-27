@@ -20,6 +20,8 @@ class API: NSObject {
     
     let delay = 0.4
     
+    private var activeTasks: [UUID: URLSessionTask] = [:]
+    
     override init() {
         super.init()
         
@@ -31,7 +33,7 @@ class API: NSObject {
     
     // MARK: - API Methods
     
-    func autoDiscover(domain: String, completionHandler: @escaping (String?, Error?) -> Void) {
+    func autoDiscover(domain: String, completionHandler: @escaping (URL?, Error?) -> Void) {
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
@@ -54,7 +56,7 @@ class API: NSObject {
                 
                 if let errorMessage = result.error, errorMessage.isNotEmpty {
                     completionHandler(nil, AutodiscoverError(message: errorMessage))
-                } else if let url = result.url, url.isNotEmpty {
+                } else if let urlString = result.url, urlString.isNotEmpty, let url = URL(string: urlString) {
                     completionHandler(url, nil)
                 } else {
                     completionHandler(nil, AutodiscoverError(message: "Url is empty."))
@@ -960,6 +962,16 @@ class API: NSObject {
             completionHandler: completionHandler)
     }
     
+    func cancelAllRequests() {
+        let tasks = [URLSessionTask](activeTasks.values)
+        
+        activeTasks.removeAll()
+        
+        tasks.forEach {
+            $0.cancel()
+        }
+    }
+    
     // region: MARK: - Api call helpers
     
     func callAPIForResult<T: Decodable>(module: String,
@@ -1001,7 +1013,10 @@ class API: NSObject {
         }
         
         if let request = generateRequest(module: module, method: method, parameters: parameters) {
-            URLSession.shared.dataTask(with: request) { (data, response, error) in
+            let taskUID = UUID()
+            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                self.activeTasks.removeValue(forKey: taskUID)
+                
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
@@ -1055,7 +1070,10 @@ class API: NSObject {
                     
                 }
                 
-            }.resume()
+            }
+            
+            task.resume()
+            activeTasks[taskUID] = task
         } else {
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
