@@ -88,18 +88,11 @@ class LoginViewController: UIViewController {
     }
     
     private func proceedLogin(login: String, password: String) {
-        guard let domain = extractDomainFromLogin(login) else {
-            SVProgressHUD.showInfo(withStatus: Strings.specifyYourServerUrl)
-            hostView.isHidden = false
-            hostConstraint.isActive = true
-            return
-        }
-        
         setIsUserInteractionEnabled(false)
         
         let progressCompletion = ProgressHUD.showWithCompletion()
         
-        API.shared.autoDiscover(domain: domain) { (url, error) in
+        API.shared.autoDiscover(email: login) { (url, error) in
             guard let url = url, error == nil else {
                 self.autoDiscoverFailed(withError: error, progressCompletion: progressCompletion)
                 return

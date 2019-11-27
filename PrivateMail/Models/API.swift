@@ -47,12 +47,12 @@ class API: NSObject {
     
     // MARK: - API Methods
     
-    func autoDiscover(domain: String, completionHandler: @escaping (URL?, Error?) -> Void) {
+    func autoDiscover(email: String, completionHandler: @escaping (URL?, Error?) -> Void) {
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
         
-        let url = URL(string: "\(Config.standard.autodiscoverUrl)?domain=\(domain)")!
+        let url = URL(string: "\(Config.standard.autodiscoverUrl)?email=\(email)")!
         let request = URLRequest(url: url)
     
         URLSession.shared.dataTask(with: request) { (data, response, error) in
