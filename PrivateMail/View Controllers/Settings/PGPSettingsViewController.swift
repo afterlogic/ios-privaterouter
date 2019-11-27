@@ -186,7 +186,7 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        Themer.themeTableViewSectionHeader(view)
+        ThemeUtil.themeTableViewSectionHeader(view)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
