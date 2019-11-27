@@ -38,7 +38,7 @@ class MainViewController: UIViewController {
         }
     }
     
-    var showThreads = true
+    private var showThreads = true
     
     var mails: [APIMail] = [] {
         didSet {
@@ -58,8 +58,14 @@ class MainViewController: UIViewController {
                 }
             }
                 
-            if searchBar.text?.count ?? 0 > 0 || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "") {
+            if searchBar.text?.count ?? 0 > 0
+                   || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "")
+                   || MenuModelController.shared.selectedMenuItem.isStarred {
                 showThreads = false
+                
+                if MenuModelController.shared.selectedMenuItem.isStarred {
+                    mails = mails.filter { $0.isFlagged ?? false }
+                }
                 return
             }
             
@@ -90,13 +96,8 @@ class MainViewController: UIViewController {
             threadedList.sort { (a, b) -> Bool in
                 return a.date?.timeIntervalSince1970 ?? 0.0 > b.date?.timeIntervalSince1970 ?? 0.0
             }
-    
-            if case .custom(.starred) = MenuModelController.shared.selectedMenuItem {
-                self.mails = threadedList
-                    .filter { $0.isFlagged ?? false }
-            } else {
-                self.mails = threadedList
-            }
+            
+            self.mails = threadedList
         }
     }
     
@@ -929,4 +930,16 @@ extension MainViewController: MailTableViewCellDelegate {
             }
         }
     }
+}
+
+fileprivate extension MenuItem {
+    
+    var isStarred: Bool {
+        if case .custom(.starred) = self {
+            return true
+        } else {
+            return false
+        }
+    }
+    
 }
