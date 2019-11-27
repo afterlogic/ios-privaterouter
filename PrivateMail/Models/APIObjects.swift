@@ -734,3 +734,57 @@ struct APIContact {
         }
     }
 }
+
+struct APIIdentity: Codable, Equatable {
+    let entityID: Int
+    let uuid: String
+    let parentUUID: String
+    let moduleName: String
+    let idUser: Int
+    let idAccount: Int
+    let isDefault: Bool
+    let email: String
+    let friendlyName: String
+    let useSignature: Bool
+    let signature: String
+    
+    enum CodingKeys: String, CodingKey {
+        case entityID = "EntityId"
+        case uuid = "UUID"
+        case parentUUID = "ParentUUID"
+        case moduleName = "ModuleName"
+        case idUser = "IdUser"
+        case idAccount = "IdAccount"
+        case isDefault = "Default"
+        case email = "Email"
+        case friendlyName = "FriendlyName"
+        case useSignature = "UseSignature"
+        case signature = "Signature"
+    }
+}
+
+struct APIError: Error, LocalizedError, Decodable {
+    
+    let code: Int
+    let message: String?
+    
+    var errorDescription: String? {
+        message ?? "\(code) Error has occurred."
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case code = "ErrorCode"
+        case message = "ErrorMessage"
+    }
+    
+}
+
+struct APIResponse<T: Decodable>: Decodable {
+    
+    let result: T
+    
+    enum CodingKeys: String, CodingKey {
+        case result = "Result"
+    }
+    
+}

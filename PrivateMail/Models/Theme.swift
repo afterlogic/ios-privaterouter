@@ -7,58 +7,73 @@ import Foundation
 import UIKit
 import SwiftTheme
 
-extension Notification.Name {
-    
-    static var themeUpdate: Notification.Name {
-        Notification.Name(rawValue: ThemeUpdateNotification)
-    }
-    
+enum ThemeName: String {
+    case light = "Light"
+    case dark = "Dark"
+}
+
+enum ThemeColorName: String {
+    case surface = "SurfaceColor"
+    case onSurfaceMajorText = "OnSurfaceMajorTextColor"
+    case onSurfaceMinorText = "OnSurfaceMinorTextColor"
+    case onAccent = "OnAccentColor"
+    case accent = "AccentColor"
+    case accentFavorite = "AccentFavoriteColor"
+    case primary = "PrimaryColor"
+    case primaryDark = "PrimaryDarkColor"
+    case onPrimary = "OnPrimaryColor"
+    case secondarySurface = "SecondarySurfaceColor"
+    case onSurfaceSeparator = "OnSurfaceSeparatorColor"
 }
 
 extension ThemeColorPicker {
     
+    convenience init(_ color: ThemeColorName) {
+        self.init(keyPath: color.rawValue)
+    }
+    
     static var surface: ThemeColorPicker {
-        ThemeColorPicker("SurfaceColor")
+        ThemeColorPicker(.surface)
     }
     
     static var onSurfaceMajorText: ThemeColorPicker {
-        ThemeColorPicker("OnSurfaceMajorTextColor")
+        ThemeColorPicker(.onSurfaceMajorText)
     }
     
     static var onSurfaceMinorText: ThemeColorPicker {
-        ThemeColorPicker("OnSurfaceMinorTextColor")
+        ThemeColorPicker(.onSurfaceMinorText)
     }
     
     static var onAccent: ThemeColorPicker {
-        ThemeColorPicker("OnAccentColor")
+        ThemeColorPicker(.onAccent)
     }
     
     static var accent: ThemeColorPicker {
-        ThemeColorPicker("AccentColor")
+        ThemeColorPicker(.accent)
     }
     
     static var accentFavorite: ThemeColorPicker {
-        ThemeColorPicker("AccentFavoriteColor")
+        ThemeColorPicker(.accentFavorite)
     }
     
     static var primary: ThemeColorPicker {
-        ThemeColorPicker("PrimaryColor")
+        ThemeColorPicker(.primary)
     }
     
     static var primaryDark: ThemeColorPicker {
-        ThemeColorPicker("PrimaryDarkColor")
+        ThemeColorPicker(.primaryDark)
     }
     
     static var onPrimary: ThemeColorPicker {
-        ThemeColorPicker("OnPrimaryColor")
+        ThemeColorPicker(.onPrimary)
     }
     
     static var secondarySurface: ThemeColorPicker {
-        ThemeColorPicker("SecondarySurfaceColor")
+        ThemeColorPicker(.secondarySurface)
     }
     
     static var onSurfaceSeparator: ThemeColorPicker {
-        ThemeColorPicker("OnSurfaceSeparatorColor")
+        ThemeColorPicker(.onSurfaceSeparator)
     }
     
 }
@@ -71,29 +86,37 @@ extension ThemeActivityIndicatorViewStylePicker {
     
 }
 
-enum ThemeName: String {
-    case light = "Light"
-    case dark = "Dark"
-}
-
 extension ThemeManager {
     
     static func setTheme(_ theme: ThemeName) {
         ThemeManager.setTheme(plistName: theme.rawValue, path: .mainBundle)
     }
     
+    static func color(_ name: ThemeColorName) -> UIColor {
+        ThemeManager.color(for: name.rawValue)!
+    }
+    
 }
 
-struct Themer {
+struct ThemeUtil {
     
     static func themeTableViewSectionHeader(_ view: UIView) {
         guard let view = view as? UITableViewHeaderFooterView else {
             return
         }
-    
+        
+        view.contentView.theme_backgroundColor = .secondarySurface
         view.backgroundView?.theme_backgroundColor = .secondarySurface
         view.textLabel?.theme_textColor = .onSurfaceMajorText
         view.detailTextLabel?.theme_textColor = .onSurfaceMinorText
+    }
+    
+}
+
+extension Notification.Name {
+    
+    static var themeUpdate: Notification.Name {
+        Notification.Name(rawValue: ThemeUpdateNotification)
     }
     
 }

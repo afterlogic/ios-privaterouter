@@ -103,7 +103,7 @@ extension GroupsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        Themer.themeTableViewSectionHeader(view)
+        ThemeUtil.themeTableViewSectionHeader(view)
     }
     
 }

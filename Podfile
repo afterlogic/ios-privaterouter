@@ -15,7 +15,8 @@ target 'PrivateMail' do
   pod 'KeychainAccess', '~> 4.1.0'
   pod 'RealmSwift', '~> 4.1.1'
   pod 'SwiftTheme', '~> 0.4.7'
-  
+  pod 'DropDown', '2.3.12'
+
   target 'PrivateMailTests' do
     inherit! :search_paths
     # Pods for testing

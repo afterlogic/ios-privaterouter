@@ -33,8 +33,8 @@ class PGPSettingsViewController: UIViewController {
    
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(cellClass: SettingsTableViewCell())
-        tableView.register(cellClass: SettingsButtonTableViewCell())
+        tableView.register(cellClass: SettingsTableViewCell.self)
+        tableView.register(cellClass: SettingsButtonTableViewCell.self)
         tableView.tableFooterView = UIView(frame: .zero)
     }
     
@@ -186,7 +186,7 @@ extension PGPSettingsViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        Themer.themeTableViewSectionHeader(view)
+        ThemeUtil.themeTableViewSectionHeader(view)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

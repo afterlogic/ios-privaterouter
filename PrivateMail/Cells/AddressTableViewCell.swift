@@ -30,7 +30,7 @@ class AddressTableViewCell: UITableViewCell {
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     @IBOutlet var plusButton: UIButton!
     
-    weak open var delegate: UITableViewDelegateExtensionProtocol?
+    weak open var delegate: AddressTableViewCellDelegate?
     
     var style: AddressTableViewCellStyle = .from {
         didSet {
@@ -209,32 +209,23 @@ extension AddressTableViewCell: AddressCollectionViewCellProtocol {
     }
 }
 
+protocol AddressTableViewCellDelegate: UITableViewDelegateExtensionProtocol {
+    
+    func addressCellContentTriggered(_ cell: AddressTableViewCell)
+    
+}
+
 
 extension AddressTableViewCell: AddressFieldCollectionViewCellProtocol {
+    
     func addressTextFieldBeginEditing() {
         plusButton.isHidden = false
-        
-        if style == .cc {
-            if let vc = delegate as? ComposeMailViewController {
-                if !vc.shouldShowBcc {
-                    vc.shouldShowBcc = true
-                    vc.tableView.insertRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
-                }
-            }
-        }
+        delegate?.addressCellContentTriggered(self)
     }
     
     func addAddress(email: String?) {
         plusButton.isHidden = true
-        
-        if style == .cc {
-            if let vc = delegate as? ComposeMailViewController {
-                if !vc.shouldShowBcc {
-                    vc.shouldShowBcc = true
-                    vc.tableView.reloadData()
-                }
-            }
-        }
+        delegate?.addressCellContentTriggered(self)
         
         if let email = email?.replacingOccurrences(of: " ", with: ""), email.count > 0 {
             if email.isEmail {
