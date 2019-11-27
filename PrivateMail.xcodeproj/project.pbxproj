@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0CC32E07953282CE2F7F91C3 /* Pods_PrivateMail.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */; };
 		321743B6A25A55F898A69FA7 /* Pods_PrivateMailTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */; };
+		68B691FEFCD437BAD0B5D0FF /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68B696C31F0F200FA20ABCE7 /* Config.plist */; };
 		68B692B854E411066EFCFEA5 /* Light.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68B69DA402AEF3424B67DC73 /* Light.plist */; };
 		68B696FFFEAA5C22DB6234B1 /* UILabel+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69E36135DB09FF4322554 /* UILabel+Extension.swift */; };
 		68B6979FB500692133EE880F /* Dark.plist in Resources */ = {isa = PBXBuildFile; fileRef = 68B697B82EDD115507C9FECF /* Dark.plist */; };
@@ -19,7 +20,8 @@
 		68B69D19C4A295CF0668565B /* Localizable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69AB2192F0D47609965A8 /* Localizable.swift */; };
 		68B69E0B97169433F5B29933 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B696135E089C59140FAC11 /* Collection+Extensions.swift */; };
 		68B69EBCB168B6C10FDB5F11 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B6933E619BB0B8013C0C67 /* Theme.swift */; };
-		68B69FCD8C45A8FE800F8D94 /* Urls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69AE317A6CF9DA975B2FB /* Urls.swift */; };
+		68B69FBBED1384FDD1E46E92 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B693E3D1BF5A3789A81CA9 /* Config.swift */; };
+		68B69FCD8C45A8FE800F8D94 /* UrlsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B69AE317A6CF9DA975B2FB /* UrlsManager.swift */; };
 		8251612B96DDB65962FF4437 /* Pods_PrivateMailUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */; };
 		A343D6F0238D576A00EF8BD9 /* IdentityChooserTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A343D6EF238D576A00EF8BD9 /* IdentityChooserTableViewCell.xib */; };
 		A343D6F2238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343D6F1238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift */; };
@@ -114,12 +116,14 @@
 		40D2CBDF1905F6336C38A08A /* Pods-PrivateMail.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMail.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMail/Pods-PrivateMail.debug.xcconfig"; sourceTree = "<group>"; };
 		68B6933E619BB0B8013C0C67 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		68B6936AB1C68DC6749E5E28 /* ProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHUD.swift; sourceTree = "<group>"; };
+		68B693E3D1BF5A3789A81CA9 /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		68B69574BA173CD1D6C51F84 /* UIButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
 		68B696135E089C59140FAC11 /* Collection+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
+		68B696C31F0F200FA20ABCE7 /* Config.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Config.plist; sourceTree = "<group>"; };
 		68B697B82EDD115507C9FECF /* Dark.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Dark.plist; sourceTree = "<group>"; };
 		68B698A9017D76CE64A1A583 /* IdentitiesRepository.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IdentitiesRepository.swift; sourceTree = "<group>"; };
 		68B69AB2192F0D47609965A8 /* Localizable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Localizable.swift; sourceTree = "<group>"; };
-		68B69AE317A6CF9DA975B2FB /* Urls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
+		68B69AE317A6CF9DA975B2FB /* UrlsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UrlsManager.swift; sourceTree = "<group>"; };
 		68B69DA402AEF3424B67DC73 /* Light.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Light.plist; sourceTree = "<group>"; };
 		68B69E36135DB09FF4322554 /* UILabel+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UILabel+Extension.swift"; sourceTree = "<group>"; };
 		68B69FDD550AD3245AA36772 /* Buttons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
@@ -340,6 +344,7 @@
 				E567B46E2236D51D00FA9945 /* LaunchScreen.storyboard */,
 				E5A032E2223ADEA1001BC795 /* Localizable.strings */,
 				E567B4712236D51D00FA9945 /* Info.plist */,
+				68B696C31F0F200FA20ABCE7 /* Config.plist */,
 			);
 			path = PrivateMail;
 			sourceTree = "<group>";
@@ -462,11 +467,12 @@
 				68B69AB2192F0D47609965A8 /* Localizable.swift */,
 				68B69E36135DB09FF4322554 /* UILabel+Extension.swift */,
 				68B69574BA173CD1D6C51F84 /* UIButton+Extension.swift */,
-				68B69AE317A6CF9DA975B2FB /* Urls.swift */,
+				68B69AE317A6CF9DA975B2FB /* UrlsManager.swift */,
 				68B6933E619BB0B8013C0C67 /* Theme.swift */,
 				68B69FDD550AD3245AA36772 /* Buttons.swift */,
 				68B698A9017D76CE64A1A583 /* IdentitiesRepository.swift */,
 				68B6936AB1C68DC6749E5E28 /* ProgressHUD.swift */,
+				68B693E3D1BF5A3789A81CA9 /* Config.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -615,6 +621,7 @@
 				E567B46B2236D51C00FA9945 /* Main.storyboard in Resources */,
 				68B692B854E411066EFCFEA5 /* Light.plist in Resources */,
 				68B6979FB500692133EE880F /* Dark.plist in Resources */,
+				68B691FEFCD437BAD0B5D0FF /* Config.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -760,11 +767,12 @@
 				68B69D19C4A295CF0668565B /* Localizable.swift in Sources */,
 				68B696FFFEAA5C22DB6234B1 /* UILabel+Extension.swift in Sources */,
 				68B6981AC67611DFC4C286A3 /* UIButton+Extension.swift in Sources */,
-				68B69FCD8C45A8FE800F8D94 /* Urls.swift in Sources */,
+				68B69FCD8C45A8FE800F8D94 /* UrlsManager.swift in Sources */,
 				68B69EBCB168B6C10FDB5F11 /* Theme.swift in Sources */,
 				68B699A88E768DE0E8FFB378 /* Buttons.swift in Sources */,
 				68B69A9D5F29A7BEA8DA7DA1 /* IdentitiesRepository.swift in Sources */,
 				68B69BC500695504BF207CE0 /* ProgressHUD.swift in Sources */,
+				68B69FBBED1384FDD1E46E92 /* Config.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

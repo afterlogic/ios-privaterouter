@@ -6,6 +6,16 @@
   Copyright © 2019 PrivateRouter. All rights reserved.
 */
 
+"email" = "Email";
+"password" = "Password";
+"host" = "Host";
+"login" = "LOGIN";
+"pleaseEnterPassword" = "Please enter password";
+"pleaseEnterEmail" = "Please enter email";
+"pleaseEnterHost" = "Please enter host";
+"specifyYourServerUrl" = "Please specify your server url.";
+"loginFailedInvalidCredentials" = "Login failed. Invalid credentials.";
+
 "starred" = "Starred";
 "noMessages" = "No messages";
 "showMoreMessages" = "Show more messages";

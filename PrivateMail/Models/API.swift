@@ -20,16 +20,66 @@ class API: NSObject {
     
     let delay = 0.4
     
+    private var activeTasks: [UUID: URLSessionTask] = [:]
+    
     override init() {
         super.init()
         
         if let token = keychain["AccessToken"] {
             setCookie(key: "AuthToken", value: token as AnyObject)
         }
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(baseUrlChanged),
+            name: .baseUrlChanged,
+            object: UrlsManager.shared)
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func baseUrlChanged() {
+        cancelAllRequests()
+        removeCookies()
+    }
     
     // MARK: - API Methods
+    
+    func autoDiscover(domain: String, completionHandler: @escaping (URL?, Error?) -> Void) {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+        
+        let url = URL(string: "\(Config.standard.autodiscoverUrl)?domain=\(domain)")!
+        let request = URLRequest(url: url)
+    
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+        
+            guard let data = data, error == nil else {
+                completionHandler(nil, error ?? AutodiscoverError(message: "Autodiscover data is nil."))
+                return
+            }
+            
+            do {
+                let result = try JSONDecoder().decode(AutodiscoverResult.self, from: data)
+                
+                if let errorMessage = result.error, errorMessage.isNotEmpty {
+                    completionHandler(nil, AutodiscoverError(message: errorMessage))
+                } else if let urlString = result.url, urlString.isNotEmpty, let url = URL(string: urlString) {
+                    completionHandler(url, nil)
+                } else {
+                    completionHandler(nil, AutodiscoverError(message: "Url is empty."))
+                }
+            } catch(let e){
+                completionHandler(nil, e)
+            }
+        }.resume()
+    }
     
     func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
         let parameters = ["Login": login, "Password": password]
@@ -66,6 +116,7 @@ class API: NSObject {
         
         callAPI(module: "Core", method: "Logout", parameters: [:]) { (result, error) in
             keychain["AccessToken"] = nil
+            UrlsManager.shared.baseUrl = nil
             
             if let success = result["Result"] as? Bool {
                 completionHandler(success, nil)
@@ -753,7 +804,7 @@ class API: NSObject {
     }
     
     func uploadAttachment(fileName: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
-        guard let token = keychain["AccessToken"] else {
+        guard let baseUrl = UrlsManager.shared.baseUrl, let token = keychain["AccessToken"] else {
             completionHandler(nil, nil)
             return
         }
@@ -804,7 +855,7 @@ class API: NSObject {
             
             body.appendString("--\(boundary)")
             
-            let request = NSMutableURLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!,
+            let request = NSMutableURLRequest(url: URL(string: "\(baseUrl)?/Api/")!,
                                               cachePolicy: .useProtocolCachePolicy,
                                               timeoutInterval: 10.0)
             
@@ -893,7 +944,7 @@ class API: NSObject {
     
     func setCookie(key: String, value: AnyObject) {
         let cookieProps = [
-            .domain: Urls.domain,
+            .domain: UrlsManager.shared.domain,
             .path: "/",
             .name: key,
             .value: value,
@@ -911,7 +962,7 @@ class API: NSObject {
         }
         
         for cookie in cookies {
-            if cookie.domain == Urls.domain {
+            if cookie.domain == UrlsManager.shared.domain {
                 HTTPCookieStorage.shared.deleteCookie(cookie)
             }
         }
@@ -924,6 +975,16 @@ class API: NSObject {
             method: "GetIdentities",
             parameters: [:],
             completionHandler: completionHandler)
+    }
+    
+    func cancelAllRequests() {
+        let tasks = [URLSessionTask](activeTasks.values)
+        
+        activeTasks.removeAll()
+        
+        tasks.forEach {
+            $0.cancel()
+        }
     }
     
     // region: MARK: - Api call helpers
@@ -962,12 +1023,20 @@ class API: NSObject {
                     dataOnError: T,
                     dataParser: @escaping (Data) throws -> T,
                     completionHandler: @escaping (_ result: T, _ error: Error?) -> Void) {
+        guard let baseUrl = UrlsManager.shared.baseUrl else {
+            completionHandler(dataOnError, NSError(domain: "APIBaseUrlIsNil", code: 0))
+            return
+        }
+        
         DispatchQueue.main.async {
             UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
         
-        if let request = generateRequest(module: module, method: method, parameters: parameters) {
-            URLSession.shared.dataTask(with: request) { (data, response, error) in
+        if let request = generateRequest(module: module, method: method, parameters: parameters, baseUrl: baseUrl) {
+            let taskUID = UUID()
+            let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                self.activeTasks.removeValue(forKey: taskUID)
+                
                 DispatchQueue.main.async {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
@@ -977,20 +1046,7 @@ class API: NSObject {
                     return
                 }
                 
-                guard var data = data else { return }
-                
-                #if DEBUG
-                if let dataString = String(data: data, encoding: .utf8),
-                   let jsonOpenIndex = dataString.range(of: "{\"")?.lowerBound {
-                    
-                    var jsonString = dataString[jsonOpenIndex...]
-                    data = jsonString.data(using: .utf8)!
-                    //data = try! JSONSerialization.data(withJSONObject: [
-                    //    "ErrorCode": 108,
-                    //    "ErrorMessage": "Mobile apps are not allowed in your billing plan."
-                    //])
-                }
-                #endif
+                guard let data = data else { return }
     
                 if let error = try? JSONDecoder().decode(APIError.self, from: data) {
                     
@@ -1021,7 +1077,10 @@ class API: NSObject {
                     
                 }
                 
-            }.resume()
+            }
+            
+            task.resume()
+            activeTasks[taskUID] = task
         } else {
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -1032,8 +1091,11 @@ class API: NSObject {
         
     }
     
-    func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
-        var request = URLRequest(url: URL(string: "\(Urls.baseURL)?/Api/")!)
+    func generateRequest(module: String,
+                         method: String,
+                         parameters: [String: Any],
+                         baseUrl: URL) -> URLRequest? {
+        var request = URLRequest(url: URL(string: "\(baseUrl)?/Api/")!)
         
         request.httpMethod = "POST"
         
