@@ -788,3 +788,22 @@ struct APIResponse<T: Decodable>: Decodable {
     }
     
 }
+
+struct AutodiscoverResult: Codable {
+    let url: String?
+    let error: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case url = "url"
+        case error = "error"
+    }
+}
+
+struct AutodiscoverError: Error, LocalizedError {
+    
+    let message: String
+    
+    var errorDescription: String? {
+        message
+    }
+}

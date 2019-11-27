@@ -31,6 +31,40 @@ class API: NSObject {
     
     // MARK: - API Methods
     
+    func autoDiscover(domain: String, completionHandler: @escaping (String?, Error?) -> Void) {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+        
+        let url = URL(string: "\(Config.standard.autodiscoverUrl)?domain=\(domain)")!
+        let request = URLRequest(url: url)
+    
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+        
+            guard let data = data, error == nil else {
+                completionHandler(nil, error ?? AutodiscoverError(message: "Autodiscover data is nil."))
+                return
+            }
+            
+            do {
+                let result = try JSONDecoder().decode(AutodiscoverResult.self, from: data)
+                
+                if let errorMessage = result.error, errorMessage.isNotEmpty {
+                    completionHandler(nil, AutodiscoverError(message: errorMessage))
+                } else if let url = result.url, url.isNotEmpty {
+                    completionHandler(url, nil)
+                } else {
+                    completionHandler(nil, AutodiscoverError(message: "Url is empty."))
+                }
+            } catch(let e){
+                completionHandler(nil, e)
+            }
+        }.resume()
+    }
+    
     func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
         let parameters = ["Login": login, "Password": password]
         removeCookies()
