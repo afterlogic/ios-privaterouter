@@ -1,4 +1,5 @@
 PODS:
+  - DropDown (2.3.12)
   - KeychainAccess (4.1.0)
   - ObjectivePGP (0.15.0)
   - Realm (4.1.1):
@@ -14,6 +15,7 @@ PODS:
   - SwiftTheme (0.4.7)
 
 DEPENDENCIES:
+  - DropDown (= 2.3.12)
   - KeychainAccess (~> 4.1.0)
   - ObjectivePGP (~> 0.15.0)
   - RealmSwift (~> 4.1.1)
@@ -24,6 +26,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - DropDown
     - KeychainAccess
     - ObjectivePGP
     - Realm
@@ -34,6 +37,7 @@ SPEC REPOS:
     - SwiftTheme
 
 SPEC CHECKSUMS:
+  DropDown: 0bcc278799ec11a3d34ce1aac9367fbbaf5423d9
   KeychainAccess: 445e28864fe6d3458b41fa211bcdc39890e8bd5a
   ObjectivePGP: 35a73ed3253e7e2982184ea86b1ff6c5773d1299
   Realm: 25f0a8244cbb1c2271c922963ea8666fc2d8104d
@@ -43,6 +47,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftTheme: 67bbb51f2ef69570164562376f441655a143399d
 
-PODFILE CHECKSUM: ada3141346262a229acd91bbdc5fe22a91fed64e
+PODFILE CHECKSUM: f27f7d5c93178bd746f1480706fa3b607b0561cf
 
 COCOAPODS: 1.8.4

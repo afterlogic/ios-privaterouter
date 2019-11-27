@@ -33,8 +33,8 @@ class PGPSettingsViewController: UIViewController {
    
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(cellClass: SettingsTableViewCell())
-        tableView.register(cellClass: SettingsButtonTableViewCell())
+        tableView.register(cellClass: SettingsTableViewCell.self)
+        tableView.register(cellClass: SettingsButtonTableViewCell.self)
         tableView.tableFooterView = UIView(frame: .zero)
     }
     

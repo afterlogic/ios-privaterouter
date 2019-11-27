@@ -11,6 +11,8 @@ import ObjectivePGP
 import SVProgressHUD
 import QuickLook
 import Contacts
+import DropDown
+import SwiftTheme
 
 class ComposeMailViewController: UIViewController {
     
@@ -34,8 +36,21 @@ class ComposeMailViewController: UIViewController {
     
     var shouldShowBcc = false
     
+    private var showFrom = false
+    
+    private var isFirstIdentityUpdate = true
+    
+    private let identitiesRepository = IdentitiesRepository.shared
+    private let modelController = ComposeMailModelController.shared
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupIdentities()
+        
         view.theme_backgroundColor = .surface
         encryptDialogView.theme_backgroundColor = .secondarySurface
         encryptDialogTitle.theme_textColor = .onSurfaceMajorText
@@ -52,14 +67,13 @@ class ComposeMailViewController: UIViewController {
         
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50.0
-        
-        tableView.register(cellClass: AddressTableViewCell())
-        tableView.register(cellClass: MailSubjectTableViewCell())
-        tableView.register(cellClass: MailBodyTableViewCell())
-        tableView.register(cellClass: MailHTMLBodyTableViewCell())
-        tableView.register(cellClass: MailAttachmentTableViewCell())
-        
-        tableView.tableFooterView = UIView(frame: CGRect.zero)
+    
+        tableView.register(cellClass: IdentityChooserTableViewCell.self)
+        tableView.register(cellClass: AddressTableViewCell.self)
+        tableView.register(cellClass: MailSubjectTableViewCell.self)
+        tableView.register(cellClass: MailBodyTableViewCell.self)
+        tableView.register(cellClass: MailHTMLBodyTableViewCell.self)
+        tableView.register(cellClass: MailAttachmentTableViewCell.self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,8 +89,8 @@ class ComposeMailViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
                 
-        if let fileURL = ComposeMailModelController.shared.attachmentFileURL {
-            ComposeMailModelController.shared.attachmentFileURL = nil
+        if let fileURL = modelController.attachmentFileURL {
+            modelController.attachmentFileURL = nil
             addAttachments(urls: [fileURL])
         }
     }
@@ -91,38 +105,30 @@ class ComposeMailViewController: UIViewController {
     // MARK: - Button actions
     
     @IBAction func sendAction(_ sender: Any) {
-        DispatchQueue.main.async {
-            if let to = ComposeMailModelController.shared.mail.to {
-                if to.count > 0 {
-                    SVProgressHUD.show()
-                    self.view.isUserInteractionEnabled = false
-                    
-                    let mail = ComposeMailModelController.shared.mail
-                    
-                    API.shared.sendMail(mail: mail) { (result, error) in
-                        DispatchQueue.main.async {
-                            SVProgressHUD.dismiss()
-                            self.view.isUserInteractionEnabled = true
-                            
-                            if let success = result {
-                                if success {
-                                    self.navigationController?.popViewController(animated: true)
-                                } else {
-                                    SVProgressHUD.showError(withStatus: NSLocalizedString("Message wasn't sent", comment: ""))
-                                }
-                            } else if let error = error {
-                                SVProgressHUD.showError(withStatus: error.localizedDescription)
-                                return
-                            }
-                            
-                        }
-                        
-                    }
-                    
+        guard let to = self.modelController.mail.to, to.count > 0 else  {
+            return
+        }
+    
+        let progressCompletion = ProgressHUD.showWithCompletion()
+    
+        self.view.isUserInteractionEnabled = false
+    
+        let mail = self.modelController.mail
+    
+        API.shared.sendMail(mail: mail, identity: self.modelController.selectedIdentity) { (result, error) in
+            DispatchQueue.main.async {
+                self.view.isUserInteractionEnabled = true
+            
+                if let error = error {
+                    progressCompletion(.error(error.localizedDescription))
+                } else if result != nil {
+                    progressCompletion(.dismiss)
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    progressCompletion(.error(NSLocalizedString("Message wasn't sent", comment: "")))
                 }
             }
         }
-        
     }
     
     @IBAction func optionsAction(_ sender: Any) {
@@ -147,7 +153,7 @@ class ComposeMailViewController: UIViewController {
     }
     
     @IBAction func signEncryptButtonAction(_ sender: Any) {
-        var mail = ComposeMailModelController.shared.mail
+        var mail = modelController.mail
         
         if let email = mail.to?.first {
             do {
@@ -178,7 +184,7 @@ class ComposeMailViewController: UIViewController {
                         let armoredResult = Armor.armored(encrypted, as: .message).replacingOccurrences(of: "\n", with: "<br>")
                         
                         mail.htmlBody = armoredResult
-                        ComposeMailModelController.shared.mail = mail
+                        modelController.mail = mail
                         tableView.reloadData()
                     }
                     #endif
@@ -213,7 +219,7 @@ class ComposeMailViewController: UIViewController {
     @IBAction func saveButtonAction(_ sender: Any) {
         SVProgressHUD.show()
         
-        API.shared.sendMail(mail: ComposeMailModelController.shared.mail, isSaving: true) { (result, error) in
+        API.shared.sendMail(mail: modelController.mail, identity: nil, isSaving: true) { (result, error) in
             DispatchQueue.main.async {
                 if result ?? false {
                     SVProgressHUD.showSuccess(withStatus: nil)
@@ -248,6 +254,45 @@ class ComposeMailViewController: UIViewController {
     }
     
     
+    // region: MARK: - Identities
+    
+    private func setupIdentities() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(updateContentByIdentities), name: .identitiesChanged, object: identitiesRepository)
+        
+        updateContentByIdentities()
+        updateIdentities()
+    }
+    
+    private func updateIdentities() {
+        let progressCompletion = ProgressHUD.showWithErrorCompletion()
+        identitiesRepository.updateIdentities(completionHandler: progressCompletion)
+    }
+    
+    @objc private func updateContentByIdentities() {
+        let identities = identitiesRepository.identities
+        
+        if identities.isNotEmpty && isFirstIdentityUpdate {
+            isFirstIdentityUpdate = false
+            selectDefaultIdentity()
+        }
+    
+        if let currentSelectedIdentity = modelController.selectedIdentity,
+           !identities.contains(currentSelectedIdentity) {
+            selectDefaultIdentity()
+        }
+        
+        showFrom = identities.isNotEmpty
+        reloadData()
+    }
+    
+    private func selectDefaultIdentity() {
+        modelController.selectedIdentity = identitiesRepository.identities
+            .first(where: { $0.isDefault })
+    }
+    
+    // endregion
+    
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -264,180 +309,156 @@ class ComposeMailViewController: UIViewController {
 
 
 extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    private var defaultIdentityText: String {
+        "\(API.shared.currentUser.firstName ?? "") <\(API.shared.currentUser.email ?? "")>"
+    }
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (shouldShowBcc ? 5 : 4) + (ComposeMailModelController.shared.mail.attachmentsToSend?.keys.count ?? 0)
+        (showFrom ? 1 : 0)
+            + (shouldShowBcc ? 5 : 4)
+            + (modelController.mail.attachmentsToSend?.keys.count ?? 0)
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let mail = ComposeMailModelController.shared.mail
+        let mail = modelController.mail
         
-        var result = UITableViewCell()
+        var result: UITableViewCell?
+        
+        let fromShift = showFrom ? 1 : 0
+        let bccShift = fromShift + (shouldShowBcc ? 1 : 0)
+    
+        switch true {
+        case showFrom && indexPath.row == 0:
+            let cell: IdentityChooserTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             
-        // Hot fix
-        if shouldShowBcc {
-            switch indexPath.row {
-            case 0:
-                let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
-                cell.style = .to
-                cell.setItems(ComposeMailModelController.shared.mail.to ?? [])
-                cell.delegate = self
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case 1:
-                let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
-                cell.style = .cc
-                cell.setItems(ComposeMailModelController.shared.mail.cc ?? [])
-                cell.delegate = self
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case 2:
-                let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
-                cell.style = .bcc
-                cell.setItems(ComposeMailModelController.shared.mail.bcc ?? [])
-                cell.delegate = self
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case 3:
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailSubjectTableViewCell.cellID(), for: indexPath) as! MailSubjectTableViewCell
-                cell.textField.text = mail.subject
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
-                
-                cell.isEditor = true
-                cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
-                cell.delegate = self
-                
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
-                result = cell
-                break
-                
-            default:
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
-                
-                cell.importKeyButton.isHidden = true
-                cell.importConstraint.isActive = false
-                
-                var tempNames: [String] = []
-                
-                for key in mail.attachmentsToSend!.keys {
-                    tempNames.append(key)
-                }
-                
-                tempNames.sort()
-                
-                let tempName = tempNames[indexPath.row - 4]
-                
-                if let attachment = mail.attachmentsToSend?[tempName] as? [String] {
-                    let fileName = attachment[0]
-                    
-                    cell.downloadLink = tempName
-                    cell.isComposer = true
-                    cell.titleLabel.text = fileName
-                    
-                    if (fileName as NSString).pathExtension == "asc" {
-                        cell.importKeyButton.isHidden = false
-                        cell.importConstraint.isActive = true
-                    }
-                    
-                } else {
-                    cell.titleLabel.text = ""
-                }
-                
-                cell.delegate = self
-                
-                result = cell
-                break
+            cell.valueText = modelController.selectedIdentity?.description
+                ?? defaultIdentityText
+            
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+            result = cell
+            break
+            
+        case indexPath.row == 0 + fromShift:
+            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            cell.style = .to
+            cell.setItems(modelController.mail.to ?? [])
+            cell.delegate = self
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+            result = cell
+            break
+    
+        case indexPath.row == 1 + fromShift:
+            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            cell.style = .cc
+            cell.setItems(modelController.mail.cc ?? [])
+            cell.delegate = self
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+            result = cell
+            break
+    
+        case shouldShowBcc && indexPath.row == 2 + fromShift:
+            let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
+            cell.style = .bcc
+            cell.setItems(modelController.mail.bcc ?? [])
+            cell.delegate = self
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+            result = cell
+            break
+    
+        case indexPath.row == 2 + bccShift:
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailSubjectTableViewCell.cellID(), for: indexPath) as! MailSubjectTableViewCell
+            cell.textField.text = mail.subject
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+            result = cell
+            break
+    
+        case indexPath.row == (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
+        
+            cell.isEditor = true
+            cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
+            cell.delegate = self
+        
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+            result = cell
+            break
+    
+        default:
+            let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
+        
+            cell.importKeyButton.isHidden = true
+            cell.importConstraint.isActive = false
+        
+            var tempNames: [String] = []
+        
+            for key in mail.attachmentsToSend!.keys {
+                tempNames.append(key)
             }
-        } else {
-            switch indexPath.row {
-            case 0:
-                let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
-                cell.style = .to
-                cell.setItems(ComposeMailModelController.shared.mail.to ?? [])
-                cell.delegate = self
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case 1:
-                let cell = tableView.dequeueReusableCell(withIdentifier: AddressTableViewCell.cellID(), for: indexPath) as! AddressTableViewCell
-                cell.style = .cc
-                cell.setItems(ComposeMailModelController.shared.mail.cc ?? [])
-                cell.delegate = self
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case 2:
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailSubjectTableViewCell.cellID(), for: indexPath) as! MailSubjectTableViewCell
-                cell.textField.text = mail.subject
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-                result = cell
-                break
-                
-            case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
-                
-                cell.isEditor = true
-                cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
-                cell.delegate = self
-                
-                cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
-                result = cell
-                break
-                
-            default:
-                let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
-                
-                cell.importKeyButton.isHidden = true
-                cell.importConstraint.isActive = false
-                
-                var tempNames: [String] = []
-                
-                for key in mail.attachmentsToSend!.keys {
-                    tempNames.append(key)
+        
+            tempNames.sort()
+            
+            let positionShift = bccShift + 3
+        
+            let tempName = tempNames[indexPath.row - positionShift]
+        
+            if let attachment = mail.attachmentsToSend?[tempName] as? [String] {
+                let fileName = attachment[0]
+            
+                cell.downloadLink = tempName
+                cell.isComposer = true
+                cell.titleLabel.text = fileName
+            
+                if (fileName as NSString).pathExtension == "asc" {
+                    cell.importKeyButton.isHidden = false
+                    cell.importConstraint.isActive = true
                 }
-                
-                tempNames.sort()
-                
-                let tempName = tempNames[indexPath.row - 3]
-                
-                if let attachment = mail.attachmentsToSend?[tempName] as? [String] {
-                    let fileName = attachment[0]
-                    
-                    cell.downloadLink = tempName
-                    cell.isComposer = true
-                    cell.titleLabel.text = fileName
-                    
-                    if (fileName as NSString).pathExtension == "asc" {
-                        cell.importKeyButton.isHidden = false
-                        cell.importConstraint.isActive = true
-                    }
-                    
-                } else {
-                    cell.titleLabel.text = ""
-                }
-                
-                cell.delegate = self
-                
-                result = cell
-                break
+            
+            } else {
+                cell.titleLabel.text = ""
             }
+        
+            cell.delegate = self
+        
+            result = cell
+            break
         }
-            
-        result.selectionStyle = .none
         
-        return result
+        let checkedResult = result ?? UITableViewCell()
+    
+        checkedResult.selectionStyle = .none
+        
+        return checkedResult
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard showFrom && indexPath.row == 0 else { return }
+        
+        let dropdown = DropDown()
+        dropdown.dataSource = [defaultIdentityText] + identitiesRepository.identities.map { $0.description }
+        dropdown.selectionAction = { [weak self] (i, _) in
+            guard let self = self else { return }
+            
+            if i == 0 {
+                self.modelController.selectedIdentity = nil
+            } else {
+                self.modelController.selectedIdentity = self.identitiesRepository.identities[i - 1]
+            }
+            
+            self.updateContentByIdentities()
+        }
+        
+        
+        dropdown.width = tableView.bounds.width - 48
+        dropdown.bottomOffset = CGPoint(x: 24, y: 40)
+        dropdown.anchorView = tableView.cellForRow(at: indexPath)
+    
+        dropdown.textColor = ThemeManager.color(.onSurfaceMajorText)
+        dropdown.backgroundColor = ThemeManager.color(.surface)
+        dropdown.selectedTextColor = ThemeManager.color(.onAccent)
+        dropdown.selectionBackgroundColor = ThemeManager.color(.accent)
+        
+        dropdown.show()
     }
 }
 
@@ -489,11 +510,11 @@ extension ComposeMailViewController: UIDocumentPickerDelegate {
                             let fileName = attachmentInfo["FileName"] as? String {
                             let attachment = [fileName, "", "0", "0", ""]
                             
-                            if ComposeMailModelController.shared.mail.attachmentsToSend == nil {
-                                ComposeMailModelController.shared.mail.attachmentsToSend = [:]
+                            if self.modelController.mail.attachmentsToSend == nil {
+                                self.modelController.mail.attachmentsToSend = [:]
                             }
                             
-                            ComposeMailModelController.shared.mail.attachmentsToSend?[tempName] = attachment
+                            self.modelController.mail.attachmentsToSend?[tempName] = attachment
                             self.tableView.reloadData()
                         } else {
                             SVProgressHUD.showError(withStatus: "Can't upload the file")
@@ -596,4 +617,12 @@ extension ComposeMailViewController: QLPreviewControllerDataSource {
             self.tableView.reloadData()
         }
     }
+}
+
+fileprivate extension APIIdentity {
+    
+    var description: String {
+        "\(friendlyName) <\(email)>"
+    }
+    
 }

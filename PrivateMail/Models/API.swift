@@ -35,7 +35,7 @@ class API: NSObject {
         let parameters = ["Login": login, "Password": password]
         removeCookies()
         
-        createTask(module: "Core", method: "Login", parameters: parameters) { (result, error) in
+        callAPI(module: "Core", method: "Login", parameters: parameters) { (result, error) in
             
             if let error = error {
                 completionHandler(false, error)
@@ -64,7 +64,7 @@ class API: NSObject {
         MenuModelController.shared.folders = []
         StorageProvider.shared.syncingFolders = []
         
-        createTask(module: "Core", method: "Logout", parameters: [:]) { (result, error) in
+        callAPI(module: "Core", method: "Logout", parameters: [:]) { (result, error) in
             keychain["AccessToken"] = nil
             
             if let success = result["Result"] as? Bool {
@@ -77,7 +77,7 @@ class API: NSObject {
     
     
     func getAccounts(completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
-        createTask(module: "Mail", method: "GetAccounts", parameters: [:]) { (result, error) in
+        callAPI(module: "Mail", method: "GetAccounts", parameters: [:]) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
                 self.currentUser = APIUser(input: result[0])
                 StorageProvider.shared.saveCurrentUser(user: result[0])
@@ -97,7 +97,7 @@ class API: NSObject {
             "AccountID": currentUser.id
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "GetFolders", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetFolders", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let folders = result["Folders"] as? [String: Any] {
                     if let collection = folders["@Collection"] as? [[String: Any]] {
@@ -132,7 +132,7 @@ class API: NSObject {
             "Folders": foldersName
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "GetRelevantFoldersInformation", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetRelevantFoldersInformation", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any],
                 let counts = result["Counts"] as? [String: [Any]] {
                 
@@ -286,7 +286,7 @@ class API: NSObject {
 //            "SortBy": "date"
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "GetMessagesInfo", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetMessagesInfo", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
                 var unthreaded: [[String: Any]] = []
                 
@@ -323,7 +323,7 @@ class API: NSObject {
             "UseThreading": true
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "GetMessages", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetMessages", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let mailsDict = result["@Collection"] as? [[String: Any]] {
                     var mails: [APIMail] = []
@@ -349,7 +349,7 @@ class API: NSObject {
             "Uid": mail.uid ?? -1
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "GetMessage", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetMessage", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 let mail = APIMail(input: result)
                 
@@ -373,7 +373,7 @@ class API: NSObject {
             return
         }
         
-        createTask(module: "Mail", method: "GetMessagesBodies", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "GetMessagesBodies", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
                 var mails: [APIMail] = []
                 
@@ -401,7 +401,7 @@ class API: NSObject {
             "GroupUUID": group
         ]
         
-        createTask(module: "Contacts", method: "GetContactsInfo", parameters: parameters) { (result, error) in
+        callAPI(module: "Contacts", method: "GetContactsInfo", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
                 if let cTag = result["CTag"] as? Int {
                     groupDB.cTag = cTag
@@ -437,7 +437,7 @@ class API: NSObject {
             "GroupUUID": group.uuid
             ] as [String : Any]
         
-        createTask(module: "Contacts", method: "GetContactsByUids", parameters: parameters) { (result, error) in
+        callAPI(module: "Contacts", method: "GetContactsByUids", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
                 var contacts: [APIContact] = []
                 
@@ -453,7 +453,7 @@ class API: NSObject {
     }
     
     func getContactGroups(completionHandler: @escaping ([ContactsGroupDB]?, Error?) -> Void) {
-        createTask(module: "Contacts", method: "GetGroups", parameters: [:]) { (result, error) in
+        callAPI(module: "Contacts", method: "GetGroups", parameters: [:]) { (result, error) in
             if let result = result["Result"] as? [[String: Any]] {
                 var groups: [ContactsGroupDB] = []
                 
@@ -530,11 +530,14 @@ class API: NSObject {
         }
     }
     
-    func sendMail(mail: APIMail, isSaving: Bool = false, completionHandler: @escaping (Bool?, Error?) -> Void) {
-        let parameters = [
+    func sendMail(mail: APIMail,
+                  identity: APIIdentity?,
+                  isSaving: Bool = false,
+                  completionHandler: @escaping (Bool?, Error?) -> Void) {
+        let parametersSource: [String : Any?] = [
             "AccountID": currentUser.id,
             "FetcherID": "",
-            "IdentityID": currentUser.id,
+            "IdentityID": identity?.entityID,
             "DraftInfo": [],
             "DraftUid": "",
             "To": mail.to?.first ?? "",
@@ -553,15 +556,17 @@ class API: NSObject {
             "DraftFolder": "Drafts",
             "ConfirmFolder": "",
             "ConfirmUid": ""
-            ] as [String : Any]
+            ]
         
-        createTask(module: "Mail", method: isSaving ? "SaveMessage" : "SendMessage", parameters: parameters) { (result, error) in
-            if let result = result["Result"] as? Bool {
-                completionHandler(result, nil)
-            } else {
-                completionHandler(false, error)
-            }
-        }
+        let parameters = parametersSource
+            .filter { (key, value) in value != nil }
+            .mapValues { $0! }
+        
+        callAPIForResult(
+            module: "Mail",
+            method: isSaving ? "SaveMessage" : "SendMessage",
+            parameters: parameters,
+            completionHandler: completionHandler)
     }
     
     func setMailSeen(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
@@ -572,7 +577,7 @@ class API: NSObject {
             "SetAction": true
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "SetMessagesSeen", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "SetMessagesSeen", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, error)
             } else {
@@ -589,7 +594,7 @@ class API: NSObject {
             "SetAction": flagged
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "SetMessageFlagged", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "SetMessageFlagged", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, error)
             } else {
@@ -622,7 +627,7 @@ class API: NSObject {
             "Uids": uids.joined(separator: ", "),
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "MoveMessages", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "MoveMessages", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, error)
             } else {
@@ -637,7 +642,7 @@ class API: NSObject {
             "Email": mail.from?.first ?? ""
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "SetEmailSafety", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "SetEmailSafety", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, error)
             } else {
@@ -676,7 +681,7 @@ class API: NSObject {
         
         let method = edit ? "UpdateContact" : "CreateContact"
         
-        createTask(module: "Contacts", method: method, parameters: parameters) { (result, error) in
+        callAPI(module: "Contacts", method: method, parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: String] {
                 completionHandler(result, error)
             } else {
@@ -692,7 +697,7 @@ class API: NSObject {
         
         let method = edit ? "UpdateGroup" : "CreateGroup"
         
-        createTask(module: "Contacts", method: method, parameters: parameters) { (result, error) in
+        callAPI(module: "Contacts", method: method, parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: String] {
                 completionHandler(result, error)
             } else {
@@ -724,7 +729,7 @@ class API: NSObject {
             "Uids": uids.joined(separator: ", "),
             ] as [String : Any]
         
-        createTask(module: "Mail", method: "DeleteMessages", parameters: parameters) { (result, error) in
+        callAPI(module: "Mail", method: "DeleteMessages", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? Bool {
                 completionHandler(result, error)
             } else {
@@ -738,7 +743,7 @@ class API: NSObject {
             "UUID": group.uuid
             ] as [String : Any]
                 
-        createTask(module: "Contacts", method: "DeleteGroup", parameters: parameters) { (result, error) in
+        callAPI(module: "Contacts", method: "DeleteGroup", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: String] {
                 completionHandler(result, error)
             } else {
@@ -910,6 +915,121 @@ class API: NSObject {
                 HTTPCookieStorage.shared.deleteCookie(cookie)
             }
         }
+        
+    }
+    
+    func getIdentities(completionHandler: @escaping (_ identities: [APIIdentity]?, _ error: Error?) -> Void) {
+        callAPIForResult(
+            module: "Mail",
+            method: "GetIdentities",
+            parameters: [:],
+            completionHandler: completionHandler)
+    }
+    
+    // region: MARK: - Api call helpers
+    
+    func callAPIForResult<T: Decodable>(module: String,
+                                        method: String,
+                                        parameters: [String: Any],
+                                        completionHandler: @escaping (_ result: T?, _ error: Error?) -> Void) {
+        rawCallAPI(
+            module: module,
+            method: method,
+            parameters: parameters,
+            dataOnError: nil as T?,
+            dataParser: { try JSONDecoder().decode(APIResponse<T>.self, from: $0).result },
+            completionHandler: completionHandler)
+    }
+    
+    // TODO: I think it's better to use callAPIForResult with statical types
+    @available(*, deprecated, message: "Use callAPIForResult instead.")
+    func callAPI(module: String,
+                 method: String,
+                 parameters: [String: Any],
+                 completionHandler: @escaping ([String: Any], Error?) -> Void) {
+        rawCallAPI(
+            module: module,
+            method: method,
+            parameters: parameters,
+            dataOnError: [:],
+            dataParser: { try JSONSerialization.jsonObject(with: $0, options: .fragmentsAllowed) as! [String: Any] },
+            completionHandler: completionHandler)
+    }
+    
+    func rawCallAPI<T>(module: String,
+                    method: String,
+                    parameters: [String: Any],
+                    dataOnError: T,
+                    dataParser: @escaping (Data) throws -> T,
+                    completionHandler: @escaping (_ result: T, _ error: Error?) -> Void) {
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+        
+        if let request = generateRequest(module: module, method: method, parameters: parameters) {
+            URLSession.shared.dataTask(with: request) { (data, response, error) in
+                DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                }
+                
+                if let error = error {
+                    completionHandler(dataOnError, error)
+                    return
+                }
+                
+                guard var data = data else { return }
+                
+                #if DEBUG
+                if let dataString = String(data: data, encoding: .utf8),
+                   let jsonOpenIndex = dataString.range(of: "{\"")?.lowerBound {
+                    
+                    var jsonString = dataString[jsonOpenIndex...]
+                    data = jsonString.data(using: .utf8)!
+                    //data = try! JSONSerialization.data(withJSONObject: [
+                    //    "ErrorCode": 108,
+                    //    "ErrorMessage": "Mobile apps are not allowed in your billing plan."
+                    //])
+                }
+                #endif
+    
+                if let error = try? JSONDecoder().decode(APIError.self, from: data) {
+                    
+                    if error.code == 101 || error.code == 102 {
+                        keychain["AccessToken"] = nil
+                        NotificationCenter.default.post(name: .failedToLogin, object: nil)
+                    }
+        
+                    completionHandler(dataOnError, error)
+                    
+                } else {
+    
+                    do {
+        
+                        let result = try dataParser(data)
+                        completionHandler(result, nil)
+        
+                    } catch let error as NSError {
+        
+                        #if DEBUG
+                        if let rawDataString = String(data: data, encoding: .utf8) {
+                            print("Response parsing failed. Response:\n\(rawDataString)")
+                        }
+                        #endif
+                        completionHandler(dataOnError, error)
+        
+                    }
+                    
+                }
+                
+            }.resume()
+        } else {
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+            
+            completionHandler(dataOnError, nil)
+        }
+        
     }
     
     func generateRequest(module: String, method: String, parameters: [String: Any]) -> URLRequest? {
@@ -944,77 +1064,6 @@ class API: NSObject {
         return nil
     }
     
-    func createTask(module: String, method: String, parameters: [String: Any], completionHandler: @escaping ([String: Any], Error?) -> Void) {
-        DispatchQueue.main.async {
-            UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        }
-        
-        if let request = generateRequest(module: module, method: method, parameters: parameters) {
-            URLSession.shared.dataTask(with: request) { (data, response, error) in
-                DispatchQueue.main.async {
-                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                }
-                
-                if let error = error {
-                    completionHandler([:], error)
-                    return
-                }
-                
-                guard var data = data else { return }
-                
-                #if DEBUG
-                if let dataString = String(data: data, encoding: .utf8),
-                   let jsonOpenIndex = dataString.range(of: "{\"")?.lowerBound {
-                    
-                    var jsonString = dataString[jsonOpenIndex...]
-                    data = jsonString.data(using: .utf8)!
-                    //data = try! JSONSerialization.data(withJSONObject: [
-                    //    "ErrorCode": 108,
-                    //    "ErrorMessage": "Mobile apps are not allowed in your billing plan."
-                    //])
-                }
-                #endif
-                
-                do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: Any]
-        
-                    if let errorCode = json["ErrorCode"] as? Int {
-            
-                        if errorCode == 101 || errorCode == 102 {
-                            keychain["AccessToken"] = nil
-                            NotificationCenter.default.post(name: .failedToLogin, object: nil)
-                        }
-                        
-                        let errorMessage = json["ErrorMessage"] as? String
-                        
-                        let error = APIError(code: errorCode, message: errorMessage)
-                        
-                        completionHandler([:], error)
-                        return
-                    } else {
-                        completionHandler(json, nil)
-                    }
-        
-                } catch let error as NSError {
-                    #if DEBUG
-                    if let rawDataString = String(data: data, encoding: .utf8) {
-                        print("Response parsing failed. Response:\n\(rawDataString)")
-                    }
-                    #endif
-                    completionHandler([:], error)
-                }
-                
-            }.resume()
-        } else {
-            DispatchQueue.main.async {
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            }
-            
-            completionHandler([:], nil)
-        }
-        
-    }
-    
     func createBody(data: String, mimeType: String, filename: String) -> Data {
         let body = NSMutableData()
         
@@ -1030,6 +1079,9 @@ class API: NSObject {
         
         return body as Data
     }
+    
+    // endregion
+    
 }
 
 
@@ -1038,15 +1090,4 @@ extension NSMutableData {
         let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false)
         append(data!)
     }
-}
-
-struct APIError: Error, LocalizedError {
-    
-    let code: Int
-    let message: String?
-    
-    var errorDescription: String? {
-        message ?? "\(code) Error has occurred."
-    }
-    
 }

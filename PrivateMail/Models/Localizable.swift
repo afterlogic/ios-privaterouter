@@ -34,7 +34,7 @@ struct Strings {
     static var cantDeleteMessage: String { .localized("cantDeleteMessage") }
     
     static var error: String { .localized("error") }
-    
+
 }
 
 extension String {
