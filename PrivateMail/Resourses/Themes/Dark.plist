@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>PrimaryColor</key>
-	<string>#4A0C40</string>
+	<string>#6A0C40</string>
 	<key>PrimaryDarkColor</key>
-	<string>#1D0826</string>
+	<string>#3D0826</string>
 	<key>OnPrimaryColor</key>
-	<string>#DFFFFF</string>
+	<string>#FFF</string>
 	<key>AccentColor</key>
-	<string>#9C4799</string>
+	<string>#BC4799</string>
 	<key>OnAccentColor</key>
-	<string>#DFFFFF</string>
+	<string>#FFF</string>
     <key>AccentFavoriteColor</key>
     <string>#DEBF40</string>
 	<key>SurfaceColor</key>

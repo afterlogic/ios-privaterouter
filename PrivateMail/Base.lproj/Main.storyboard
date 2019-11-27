@@ -24,14 +24,14 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NoMessagesCell" id="SlR-oV-lbn">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="43.333332061767578"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SlR-oV-lbn" id="UEA-61-tFI">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.333332061767578"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" text="No messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bku-4o-qyE">
-                                                    <rect key="frame" x="20" y="10.999999999999998" width="374" height="21.333333333333329"/>
+                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="21.666666666666671"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -49,14 +49,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
-                                        <rect key="frame" x="0.0" y="71.333332061767578" width="414" height="42.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="71.666667938232422" width="414" height="43"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="42.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
-                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="20.666666666666671"/>
+                                                    <rect key="frame" x="20" y="11" width="374" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -1365,44 +1365,18 @@
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow" translatesAutoresizingMaskIntoConstraints="NO" id="7fQ-E4-1aO">
-                                                <rect key="frame" x="224.66666666666666" y="54" width="10" height="5"/>
-                                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="10" id="LQ5-Ty-gqf"/>
-                                                    <constraint firstAttribute="width" secondItem="7fQ-E4-1aO" secondAttribute="height" multiplier="2:1" id="vp6-jM-0lU"/>
-                                                </constraints>
-                                            </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="soO-Fc-cVd">
-                                                <rect key="frame" x="0.0" y="0.0" width="364" height="80"/>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Maz-Xv-tUN">
-                                                <rect key="frame" x="374" y="16.666666666666664" width="25" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="25" id="8ss-To-E6J"/>
-                                                    <constraint firstAttribute="width" secondItem="Maz-Xv-tUN" secondAttribute="height" multiplier="1:1" id="Jq0-EI-tay"/>
-                                                </constraints>
-                                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <state key="normal" image="settings"/>
-                                                <connections>
-                                                    <action selector="settingsButtonAction:" destination="wK1-LR-dxt" eventType="touchUpInside" id="dxm-dr-Qr6"/>
-                                                </connections>
+                                                <rect key="frame" x="0.0" y="0.0" width="30" height="80"/>
                                             </button>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstItem="7fQ-E4-1aO" firstAttribute="leading" secondItem="eLm-QA-Cct" secondAttribute="trailing" constant="5" id="1lW-QK-2Z2"/>
-                                            <constraint firstItem="Maz-Xv-tUN" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="CKD-cV-2RP" secondAttribute="trailing" constant="10" id="5xh-1d-FMH"/>
                                             <constraint firstItem="CKD-cV-2RP" firstAttribute="leading" secondItem="tOb-f8-sig" secondAttribute="trailing" constant="15" id="A4O-t1-HRN"/>
                                             <constraint firstItem="tOb-f8-sig" firstAttribute="centerY" secondItem="3n0-Gl-vr3" secondAttribute="centerY" id="ASF-Kq-RLq"/>
-                                            <constraint firstItem="7fQ-E4-1aO" firstAttribute="centerY" secondItem="eLm-QA-Cct" secondAttribute="centerY" constant="2" id="IIR-fD-zV3"/>
                                             <constraint firstItem="eLm-QA-Cct" firstAttribute="bottom" secondItem="tOb-f8-sig" secondAttribute="bottom" constant="-2" id="IxP-lA-zsA"/>
-                                            <constraint firstItem="Maz-Xv-tUN" firstAttribute="leading" secondItem="soO-Fc-cVd" secondAttribute="trailing" constant="10" id="Lxv-NO-iYD"/>
-                                            <constraint firstAttribute="trailing" secondItem="Maz-Xv-tUN" secondAttribute="trailing" constant="15" id="NE9-bc-eEV"/>
                                             <constraint firstItem="tOb-f8-sig" firstAttribute="leading" secondItem="3n0-Gl-vr3" secondAttribute="leading" constant="20" id="YaL-EY-XVu"/>
                                             <constraint firstItem="CKD-cV-2RP" firstAttribute="top" secondItem="tOb-f8-sig" secondAttribute="top" constant="2" id="c1g-a3-Tdv"/>
                                             <constraint firstItem="soO-Fc-cVd" firstAttribute="leading" secondItem="3n0-Gl-vr3" secondAttribute="leading" id="cKE-yg-BkT"/>
-                                            <constraint firstItem="Maz-Xv-tUN" firstAttribute="centerY" secondItem="CKD-cV-2RP" secondAttribute="centerY" id="lPA-zf-R3b"/>
                                             <constraint firstItem="eLm-QA-Cct" firstAttribute="leading" secondItem="tOb-f8-sig" secondAttribute="trailing" constant="15" id="lR7-8f-3A6"/>
                                             <constraint firstAttribute="height" constant="80" id="sVO-Uk-mnO"/>
                                             <constraint firstItem="soO-Fc-cVd" firstAttribute="top" secondItem="3n0-Gl-vr3" secondAttribute="top" id="tzN-jD-onO"/>
@@ -1434,9 +1408,7 @@
                     <connections>
                         <outlet property="avatarImageView" destination="tOb-f8-sig" id="LDn-DF-HpO"/>
                         <outlet property="emailLabel" destination="eLm-QA-Cct" id="ofP-dK-HYs"/>
-                        <outlet property="expandImageView" destination="7fQ-E4-1aO" id="VGo-vw-uMh"/>
                         <outlet property="nameLabel" destination="CKD-cV-2RP" id="fen-yH-sUy"/>
-                        <outlet property="settingsButton" destination="Maz-Xv-tUN" id="LQ1-Rh-rAQ"/>
                         <outlet property="tableView" destination="wzU-oJ-YND" id="6Ka-pg-Oc3"/>
                         <outlet property="topBarContainer" destination="raK-Kk-r5T" id="7hu-xV-O6P"/>
                     </connections>
@@ -1701,7 +1673,6 @@
     <resources>
         <image name="add_group" width="30" height="30"/>
         <image name="add_person" width="30" height="30"/>
-        <image name="arrow" width="10" height="5"/>
         <image name="avatar_placeholder" width="50" height="50"/>
         <image name="background" width="320" height="569"/>
         <image name="clip" width="25" height="25"/>
@@ -1714,7 +1685,6 @@
         <image name="menu" width="20" height="20"/>
         <image name="password_eye_closed" width="22" height="16.666666030883789"/>
         <image name="password_eye_opened" width="22" height="14.333333015441895"/>
-        <image name="settings" width="20" height="20"/>
         <image name="side_menu" width="20" height="40"/>
         <image name="spam" width="19.333333969116211" height="25"/>
         <image name="trash" width="20.333333969116211" height="25"/>

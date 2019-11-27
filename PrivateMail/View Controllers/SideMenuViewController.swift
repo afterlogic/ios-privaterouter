@@ -22,9 +22,7 @@ class SideMenuViewController: UIViewController {
     @IBOutlet var tableView: UITableView!
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet var emailLabel: UILabel!
-    @IBOutlet var settingsButton: UIButton!
     @IBOutlet var avatarImageView: UIImageView!
-    @IBOutlet var expandImageView: UIImageView!
     
     let refreshControl = UIRefreshControl()
     
@@ -41,7 +39,6 @@ class SideMenuViewController: UIViewController {
         topBarContainer.theme_backgroundColor = .primary
         nameLabel.theme_textColor = .onPrimary
         emailLabel.theme_textColor = .onPrimary
-        settingsButton.theme_tintColor = .onPrimary
         
         avatarImageView.layer.cornerRadius = avatarImageView.frame.size.height / 2.0
         
@@ -66,10 +63,6 @@ class SideMenuViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        expandImageView.tintColor = .black
-        expandImageView.tintColor = .white
-        
         currentUser = API.shared.currentUser
         nameLabel.text = (currentUser?.firstName ?? "") + " " + (currentUser?.lastName ?? "")
         
@@ -139,27 +132,6 @@ class SideMenuViewController: UIViewController {
     
     // MARK: - Buttons
     
-    @IBAction func settingsButtonAction(_ sender: Any) {
-//        var server = "production"
-//
-//        if let test = UserDefaults.standard.object(forKey: "Test") as? Bool {
-//            UserDefaults.standard.set(!test, forKey: "Test")
-//            server = !test ? "test" : "production"
-//        } else {
-//            UserDefaults.standard.set(true, forKey: "Test")
-//            server = "test"
-//        }
-//
-//        let alert = UIAlertController.init(title: NSLocalizedString("Served was changed to \(server)", comment: ""), message: nil, preferredStyle: .alert)
-//
-//        let okButton = UIAlertAction.init(title: NSLocalizedString("Ok", comment: ""), style: .cancel) { (alert: UIAlertAction!) in
-//        }
-//
-//        alert.addAction(okButton)
-//
-//        self.present(alert, animated: true, completion: nil)
-    }
-    
     
     // MARK: - Other
     
@@ -168,7 +140,7 @@ class SideMenuViewController: UIViewController {
         tableView.dataSource = self
         tableView.allowsSelection = true
         tableView.tableFooterView = UIView(frame: CGRect.zero)
-        tableView.register(cellClass: FolderTableViewCell())
+        tableView.register(cellClass: FolderTableViewCell.self)
         tableView.separatorStyle = .none
 
         refreshControl.addTarget(self, action: #selector(refreshControlAction), for: .valueChanged)

@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         emailTextField.placeholder = Strings.login
         passwordTextField.placeholder = Strings.password
         hostTextField.placeholder = Strings.host
-        loginButton.setTitle(Strings.login, for: .normal)
+        loginButton.setTitle(Strings.login.uppercased(), for: .normal)
         
         loginButton.layer.cornerRadius = loginButton.frame.size.height / 2.0
         loginView.layer.cornerRadius = loginView.frame.size.height / 2.0
@@ -88,18 +88,11 @@ class LoginViewController: UIViewController {
     }
     
     private func proceedLogin(login: String, password: String) {
-        guard let domain = extractDomainFromLogin(login) else {
-            SVProgressHUD.showInfo(withStatus: Strings.specifyYourServerUrl)
-            hostView.isHidden = false
-            hostConstraint.isActive = true
-            return
-        }
-        
         setIsUserInteractionEnabled(false)
         
         let progressCompletion = ProgressHUD.showWithCompletion()
         
-        API.shared.autoDiscover(domain: domain) { (url, error) in
+        API.shared.autoDiscover(email: login) { (url, error) in
             guard let url = url, error == nil else {
                 self.autoDiscoverFailed(withError: error, progressCompletion: progressCompletion)
                 return
