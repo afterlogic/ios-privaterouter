@@ -53,16 +53,16 @@ class MailAttachmentTableViewCell: UITableViewCell {
             if isComposer {
                 ComposeMailModelController.shared.mail.attachmentsToSend?[downloadLink] = nil
                 delegate?.reloadData()
-            } else {
-                let url = URL(string: "\(Urls.baseURL)\(downloadLink)")
+            } else if let baseUrl = UrlsManager.shared.baseUrl {
+                let url = URL(string: "\(baseUrl)\(downloadLink)")
                 delegate?.shouldPreviewAttachment(url: url, fileName: titleLabel.text ?? "file.txt")
             }
         }
     }
     
     @IBAction func importKeyButtonAction(_ sender: Any) {
-        if let downloadLink = downloadLink {
-            let url = URL(string: "\(Urls.baseURL)\(downloadLink)")
+        if let baseUrl = UrlsManager.shared.baseUrl, let downloadLink = downloadLink {
+            let url = URL(string: "\(baseUrl)\(downloadLink)")
             delegate?.shouldOpenImportScreen(url: url, fileName: titleLabel.text ?? "file.txt")
         }
     }

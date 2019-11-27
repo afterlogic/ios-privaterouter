@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(presentLoginViewController(notification:)), name: .failedToLogin, object: nil)
         
-        if keychain["AccessToken"] == nil {
+        if keychain["AccessToken"] == nil || UrlsManager.shared.baseUrl == nil {
             NotificationCenter.default.post(name: .failedToLogin, object: false)
         } else {
             if let currentUser = StorageProvider.shared.getCurrentUser() {
