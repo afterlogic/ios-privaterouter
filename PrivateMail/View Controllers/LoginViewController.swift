@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         emailTextField.placeholder = Strings.login
         passwordTextField.placeholder = Strings.password
         hostTextField.placeholder = Strings.host
-        loginButton.setTitle(Strings.login, for: .normal)
+        loginButton.setTitle(Strings.login.uppercased(), for: .normal)
         
         loginButton.layer.cornerRadius = loginButton.frame.size.height / 2.0
         loginView.layer.cornerRadius = loginView.frame.size.height / 2.0

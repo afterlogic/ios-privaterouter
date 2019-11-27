@@ -9,7 +9,7 @@
 "email" = "Email";
 "password" = "Password";
 "host" = "Host";
-"login" = "LOGIN";
+"login" = "Login";
 "pleaseEnterPassword" = "Please enter password";
 "pleaseEnterEmail" = "Please enter email";
 "pleaseEnterHost" = "Please enter host";
