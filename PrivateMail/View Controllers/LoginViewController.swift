@@ -16,23 +16,31 @@ class LoginViewController: UIViewController {
     @IBOutlet var loginButton: UIButton!
     @IBOutlet var loginView: UIView!
     @IBOutlet var passwordView: UIView!
+    @IBOutlet var hostView: UIView!
+    @IBOutlet var hostTextField: UITextField!
+    @IBOutlet var hostConstraint: NSLayoutConstraint!
     
     @IBOutlet var bottomConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        hostConstraint.isActive = false
+        hostView.isHidden = true
+        
         navigationController?.isNavigationBarHidden = true
         
         emailTextField.delegate = self
         passwordTextField.delegate = self
         
-        emailTextField.placeholder = NSLocalizedString("Email", comment: "")
-        passwordTextField.placeholder = NSLocalizedString("Password", comment: "")
-        loginButton.setTitle(NSLocalizedString("LOGIN", comment: ""), for: .normal)
+        emailTextField.placeholder = Strings.login
+        passwordTextField.placeholder = Strings.password
+        hostTextField.placeholder = Strings.host
+        loginButton.setTitle(Strings.login, for: .normal)
         
         loginButton.layer.cornerRadius = loginButton.frame.size.height / 2.0
         loginView.layer.cornerRadius = loginView.frame.size.height / 2.0
         passwordView.layer.cornerRadius = passwordView.frame.size.height / 2.0
+        hostView.layer.cornerRadius = passwordView.frame.size.height / 2.0
         
         #if DEBUG
         emailTextField.text = "test@afterlogic.com"
@@ -57,78 +65,131 @@ class LoginViewController: UIViewController {
     // MARK: - Buttons
     
     @IBAction func loginButtonAction(_ sender: Any) {
-        if let login = emailTextField.text {
-            if login.count > 0 {
-                if let password = passwordTextField.text {
-                    if password.count > 0 {
-                        view.isUserInteractionEnabled = false
-                        proceedLogin(login: login, password: password)
-                    } else {
-                        SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter password", comment: ""))
-                    }
-                }
-            } else {
-                SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter email", comment: ""))
+        guard let login = emailTextField.text, login.isNotEmpty else {
+            SVProgressHUD.showInfo(withStatus: Strings.pleaseEnterEmail)
+            return
+        }
+        
+        guard let password = passwordTextField.text, password.isNotEmpty else {
+            SVProgressHUD.showInfo(withStatus: Strings.pleaseEnterPassword)
+            return
+        }
+        
+        if hostView.isHidden {
+            proceedLogin(login: login, password: password)
+        } else {
+            guard let urlString = hostTextField.text, let url = URL(string: urlString) else {
+                SVProgressHUD.showInfo(withStatus: Strings.specifyYourServerUrl)
+                return
             }
+            
+            proceedLogin(login: login, password: password, baseUrl: url)
         }
     }
     
     private func proceedLogin(login: String, password: String) {
         guard let domain = extractDomainFromLogin(login) else {
+            SVProgressHUD.showInfo(withStatus: Strings.specifyYourServerUrl)
+            hostView.isHidden = false
+            hostConstraint.isActive = true
             return
         }
-    
+        
+        setIsUserInteractionEnabled(false)
+        
         let progressCompletion = ProgressHUD.showWithCompletion()
         
         API.shared.autoDiscover(domain: domain) { (url, error) in
             guard let url = url, error == nil else {
+                self.autoDiscoverFailed(withError: error, progressCompletion: progressCompletion)
+                return
+            }
+            
+            self.proceedLogin(login: login, password: password, baseUrl: url, progressCompletion: progressCompletion)
+        }
+    }
+    
+    private func autoDiscoverFailed(withError error: Error?,
+                                    progressCompletion: @escaping ProgressHUD.CompletionHandler) {
+        UrlsManager.shared.baseUrl = nil
+    
+        self.setIsUserInteractionEnabled(true)
+    
+        if let error = error {
+            if error is AutodiscoverError {
+                progressCompletion(.error(Strings.specifyYourServerUrl))
+                DispatchQueue.main.async {
+                    self.hostView.isHidden = false
+                    self.hostConstraint.isActive = true
+                }
+            } else {
+                progressCompletion(.error(error.localizedDescription))
+            }
+        } else {
+            progressCompletion(.dismiss)
+        }
+    }
+    
+    private func proceedLogin(login: String,
+                              password: String,
+                              baseUrl: URL,
+                              progressCompletion: ProgressHUD.CompletionHandler? = nil) {
+        let progressCompletion = progressCompletion ?? ProgressHUD.showWithCompletion()
+    
+        setIsUserInteractionEnabled(false)
+        
+        UrlsManager.shared.baseUrl = baseUrl
+    
+        API.shared.login(login: login, password: password) { (success, error) in
+            self.setIsUserInteractionEnabled(true)
+        
+            guard success, error == nil else {
+                self.loginDidFailed(withError: error, progressCompletion: progressCompletion)
+                return
+            }
+        
+            API.shared.getAccounts { (result, error) in
                 if let error = error {
                     progressCompletion(.error(error.localizedDescription))
                 } else {
                     progressCompletion(.dismiss)
                 }
-                DispatchQueue.main.async {
-                    self.view.isUserInteractionEnabled = true
-                }
-                return
-            }
             
-            Urls.baseURL = url
-            API.shared.cancelAllRequests()
-            API.shared.removeCookies()
-    
-            API.shared.login(login: login, password: password) { (success, error) in
                 DispatchQueue.main.async {
-                    self.view.isUserInteractionEnabled = true
+                    self.dismiss(animated: true, completion: nil)
                 }
-                
-                guard success, error == nil else {
-                    if let error = error {
-                        if let apiError = error as? APIError, apiError.code == 108 {
-                            progressCompletion(.dismiss)
-                            DispatchQueue.main.async {
-                                self.performSegue(withIdentifier: "showUserLimits", sender: nil)
-                            }
-                        } else {
-                            progressCompletion(.error(error.localizedDescription))
-                        }
-                    } else {
-                        progressCompletion(.dismiss)
-                    }
-                    return
-                }
+            }
+        }
+    }
     
-                API.shared.getAccounts { (result, error) in
-                    if let error = error {
-                        progressCompletion(.error(error.localizedDescription))
-                    } else {
-                        progressCompletion(.dismiss)
-                    }
-                    
+    private func loginDidFailed(withError error: Error?, progressCompletion: @escaping ProgressHUD.CompletionHandler) {
+        if let error = error {
+            if let apiError = error as? APIError {
+                switch apiError.code {
+                case 101, 102:
+                    progressCompletion(.error(Strings.loginFailedInvalidCredentials))
+                case 108: // User limits
+                    progressCompletion(.dismiss)
                     DispatchQueue.main.async {
-                        self.dismiss(animated: true, completion: nil)
+                        self.performSegue(withIdentifier: "showUserLimits", sender: nil)
                     }
+                default:
+                    progressCompletion(.error(error.localizedDescription))
                 }
+            } else {
+                progressCompletion(.error(error.localizedDescription))
+            }
+        } else {
+            progressCompletion(.dismiss)
+        }
+    }
+    
+    private func setIsUserInteractionEnabled(_ isEnabled: Bool) {
+        if Thread.isMainThread {
+            view.isUserInteractionEnabled = isEnabled
+        } else {
+            DispatchQueue.main.async {
+                self.view.isUserInteractionEnabled = isEnabled
             }
         }
     }
@@ -157,6 +218,16 @@ class LoginViewController: UIViewController {
         sender.text = sender.text?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
+    @IBAction func hostEditingDidBegin(_ sender: UITextField) {
+        if sender.text?.isEmpty ?? true {
+            let initialText = "https://"
+            sender.text = initialText
+            
+            if let position = sender.position(from: sender.beginningOfDocument, offset: initialText.count) {
+                sender.selectedTextRange = sender.textRange(from: position, to: position)
+            }
+        }
+    }
     
     // MARK: - Keyboard
     

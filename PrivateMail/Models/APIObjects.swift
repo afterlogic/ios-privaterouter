@@ -263,7 +263,7 @@ struct APIMail {
             
 //            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
             
-            if let attachments = attachments {
+            if let baseUrl = UrlsManager.shared.baseUrl, let attachments = attachments {
                 for attachment in attachments {
                     if let isInline = attachment["IsInline"] as? Bool,
                         let cid = attachment["CID"] as? String,
@@ -271,7 +271,7 @@ struct APIMail {
                         let url = actions["view"]?["url"] {
                         
                         if isInline {
-                            body = body.replacingOccurrences(of: "data-x-src-cid=\"\(cid)\"", with: "width=\"100%\" src=\"\(Urls.baseURL)\(url)\"")
+                            body = body.replacingOccurrences(of: "data-x-src-cid=\"\(cid)\"", with: "width=\"100%\" src=\"\(baseUrl)\(url)\"")
                         }
                     }
                 }

@@ -179,7 +179,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
             
-            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: Urls.baseURL)
+            cell.webView.loadHTMLString(mail.body(showSafe), baseURL: UrlsManager.shared.baseUrl)
             cell.delegate = self
             
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)

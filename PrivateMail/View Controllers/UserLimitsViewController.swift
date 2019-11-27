@@ -22,10 +22,14 @@ class UserLimitsViewController: UIViewController {
     }
     
     @IBAction func upgradeTapped(_ sender: Any) {
+        guard let url = UrlsManager.shared.upgradePlan else {
+            return
+        }
+        
         if #available(iOS 10.0, *) {
-            UIApplication.shared.open(Urls.upgradePlan)
+            UIApplication.shared.open(url)
         } else {
-            UIApplication.shared.openURL(Urls.upgradePlan)
+            UIApplication.shared.openURL(url)
         }
     }
     

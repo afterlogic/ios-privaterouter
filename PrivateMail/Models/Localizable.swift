@@ -34,6 +34,24 @@ struct Strings {
     static var cantDeleteMessage: String { .localized("cantDeleteMessage") }
     
     static var error: String { .localized("error") }
+    
+    static var specifyYourServerUrl: String { .localized("specifyYourServerUrl") }
+
+    static var email: String { .localized("email") }
+    
+    static var password: String { .localized("password") }
+    
+    static var host: String { .localized("host") }
+    
+    static var login: String { .localized("login") }
+    
+    static var pleaseEnterPassword: String { .localized("pleaseEnterPassword") }
+    
+    static var pleaseEnterEmail: String { .localized("pleaseEnterEmail") }
+    
+    static var pleaseEnterHost: String { .localized("pleaseEnterHost") }
+    
+    static var loginFailedInvalidCredentials: String { .localized("loginFailedInvalidCredentials") }
 
 }
 
