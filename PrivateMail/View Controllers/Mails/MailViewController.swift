@@ -43,9 +43,9 @@ class MailViewController: UIViewController {
         tableView.dataSource = self
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         
-        tableView.register(cellClass: MailHeaderTableViewCell())
-        tableView.register(cellClass: MailAttachmentTableViewCell())
-        tableView.register(cellClass: MailHTMLBodyTableViewCell())
+        tableView.register(cellClass: MailHeaderTableViewCell.self)
+        tableView.register(cellClass: MailAttachmentTableViewCell.self)
+        tableView.register(cellClass: MailHTMLBodyTableViewCell.self)
         
         StorageProvider.shared.containsMail(mail: mail) { (contains) in
             if contains == nil {
@@ -157,7 +157,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
         
         switch indexPath.row {
         case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailHeaderTableViewCell.cellID(), for: indexPath) as! MailHeaderTableViewCell
+            let cell: MailHeaderTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.subjectLabel.text = mail.subject
             cell.delegate = self
             
@@ -177,8 +177,9 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
             break
             
         case (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailHTMLBodyTableViewCell.cellID(), for: indexPath) as! MailHTMLBodyTableViewCell
-            
+            let cell: MailHTMLBodyTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+    
+            cell.isAllowTheming = false
             cell.webView.loadHTMLString(mail.body(showSafe), baseURL: UrlsManager.shared.baseUrl)
             cell.delegate = self
             
@@ -187,7 +188,7 @@ extension MailViewController: UITableViewDelegate, UITableViewDataSource {
             break
             
         default:
-            let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
+            let cell: MailAttachmentTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             
             cell.importKeyButton.isHidden = true
             cell.importConstraint.isActive = false
