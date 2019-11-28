@@ -33,6 +33,27 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         }
     }
     
+    var isAllowTheming: Bool = true {
+        didSet {
+            guard oldValue != isAllowTheming, webView != nil else {
+                return
+            }
+            
+            if isAllowTheming {
+                theme_backgroundColor = .surface
+            } else {
+                theme_backgroundColor = nil
+                backgroundColor = .white
+            }
+            
+            webView.loadHTMLString(wrapTextWithHtml(text: htmlText), baseURL: nil)
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         theme_backgroundColor = .surface
@@ -40,7 +61,7 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         
-        webView.scrollView.alwaysBounceVertical = false
+        webView.scrollView.bounces = false
         webView.delegate = self
         
         webView.loadHTMLString(wrapTextWithHtml(text: ""), baseURL: nil)
@@ -56,7 +77,7 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
     func updateHeight(withAction: Bool) {
         let height = webView.stringByEvaluatingJavaScript(from: "document.body.offsetHeight;") ?? "100"
         
-        heightConstraint.constant = max(CGFloat((height as NSString).floatValue) + 25.0, 200.0)
+        heightConstraint.constant = max(CGFloat((height as NSString).floatValue), 200.0)
         
         if isEditor {
             ComposeMailModelController.shared.mail.htmlBody = getTextFromWebView()
@@ -93,7 +114,7 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         #editor {
             font-family: -apple-system;
             font-size: 14pt;
-            color: \(ThemeManager.string(for: "OnSurfaceMajorTextColor") ?? "#888");
+            color: \(textColorHex());
             
             .element:read-write:focus {
                 outline: none;
@@ -102,6 +123,12 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         </style>
         <body id="editor" contenteditable="true">\(text)</body>
         """
+    }
+    
+    private func textColorHex() -> String {
+        isAllowTheming
+            ? ThemeManager.string(for: "OnSurfaceMajorTextColor") ?? "#000"
+            : "#000"
     }
 }
 
@@ -116,7 +143,7 @@ extension MailHTMLBodyTableViewCell: UITableViewCellExtensionProtocol {
 extension MailHTMLBodyTableViewCell: UIWebViewDelegate {
     func webViewDidFinishLoad(_ webView: UIWebView) {
         updateStyle([
-            "color": "#\(ThemeManager.currentTheme?["OnSurfaceMajorTextColor"] ?? "000")",
+            "color": textColorHex(),
             "fontFamily": "-apple-system",
             "fontSize": 14
         ])
