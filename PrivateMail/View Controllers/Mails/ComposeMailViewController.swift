@@ -377,6 +377,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             let cell: MailHTMLBodyTableViewCell = tableView.dequeueReusableCell(for: indexPath)
         
             cell.isEditor = true
+            cell.isAllowTheming = false
             cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
             cell.delegate = self
         
