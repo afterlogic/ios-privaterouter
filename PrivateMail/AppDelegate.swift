@@ -9,7 +9,6 @@
 import UIKit
 import KeychainAccess
 import SVProgressHUD
-import ObjectivePGP
 import SwiftTheme
 import BouncyCastle_ObjC
 
