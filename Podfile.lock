@@ -1,29 +1,38 @@
 PODS:
+  - BouncyCastle-ObjC (0.1.1)
+  - DMSOpenPGP (0.1.4):
+    - BouncyCastle-ObjC (~> 0.1.0)
+    - OpenSSL-Universal (~> 1.0.2.17)
   - KeychainAccess (3.1.2)
-  - ObjectivePGP (0.13.0)
-  - Realm (3.16.2):
-    - Realm/Headers (= 3.16.2)
-  - Realm/Headers (3.16.2)
-  - RealmSwift (3.16.2):
-    - Realm (= 3.16.2)
-  - SDWebImage (4.4.5):
-    - SDWebImage/Core (= 4.4.5)
-  - SDWebImage/Core (4.4.5)
-  - SideMenu (4.0.0)
+  - OpenSSL-Universal (1.0.2.19):
+    - OpenSSL-Universal/Static (= 1.0.2.19)
+  - OpenSSL-Universal/Static (1.0.2.19)
+  - Realm (4.1.1):
+    - Realm/Headers (= 4.1.1)
+  - Realm/Headers (4.1.1)
+  - RealmSwift (4.1.1):
+    - Realm (= 4.1.1)
+  - SDWebImage (4.4.7):
+    - SDWebImage/Core (= 4.4.7)
+  - SDWebImage/Core (4.4.7)
+  - SideMenu (5.0.3)
   - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
+  - BouncyCastle-ObjC (~> 0.1.0)
+  - DMSOpenPGP (~> 0.1.4)
   - KeychainAccess (~> 3.1.2)
-  - ObjectivePGP (~> 0.13.0)
-  - RealmSwift (~> 3.16.2)
+  - RealmSwift (~> 4.1.1)
   - SDWebImage (~> 4.4.5)
-  - SideMenu (~> 4.0.0)
+  - SideMenu (~> 5.0.1)
   - SVProgressHUD (~> 2.2.5)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
+    - BouncyCastle-ObjC
+    - DMSOpenPGP
     - KeychainAccess
-    - ObjectivePGP
+    - OpenSSL-Universal
     - Realm
     - RealmSwift
     - SDWebImage
@@ -31,14 +40,16 @@ SPEC REPOS:
     - SVProgressHUD
 
 SPEC CHECKSUMS:
+  BouncyCastle-ObjC: bf0db0fe9fe11ae5e2515d2e6816ef86454b9cc6
+  DMSOpenPGP: 3c667b775e705abef816582f320bbadb972bd8ce
   KeychainAccess: b3816fddcf28aa29d94b10ec305cd52be14c472b
-  ObjectivePGP: a99461bc871424bdbb8fb6fd80dcd20cbeeee9ec
-  Realm: 0e73b4edeb5b6a90da3d83206883b2e34e00eb38
-  RealmSwift: a81e650171ef0a5f999df1ed8d39ba8d6fce88a4
-  SDWebImage: ecc03494e973b93b80213649d32175f8d2d17d4d
-  SideMenu: 70ee5657df63ec3382660ec4ef470bf1cf5db07d
+  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
+  Realm: 25f0a8244cbb1c2271c922963ea8666fc2d8104d
+  RealmSwift: 9e2657b33764f80e4a4dffd6d440e24715782052
+  SDWebImage: c10d14a8883ebd89664f02a422006f66a85c0c5d
+  SideMenu: 1dcaabce84538c53325c287f7fe62999379a641c
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 435062882013cbe8dcfcea70fd30b7732dc68eb0
+PODFILE CHECKSUM: c930bbc00ed770dd5bc0de7af5a85f89792aaed8
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.8.4

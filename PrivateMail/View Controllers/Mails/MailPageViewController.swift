@@ -8,7 +8,7 @@
 
 import UIKit
 import SVProgressHUD
-import ObjectivePGP
+import DMSOpenPGP
 
 class MailPageViewController: UIPageViewController {
 
@@ -87,33 +87,53 @@ class MailPageViewController: UIPageViewController {
                 SVProgressHUD.show()
                 
                 do {
+                     
                     #if !targetEnvironment(simulator)
-                    if let privateKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
+                    if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
                         let body = mail.plainedBody(false)
-                        let data = try Armor.readArmored(body)
-                        var keys = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
-                        
-                        if let publicKey = StorageProvider.shared.getPGPKey(mail.from?.first, isPrivate: false)?.armoredKey {
+                        let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
+                        var publicKeyRing : DMSPGPKeyRing? = nil
+                        if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from?.first, isPrivate: false)?.armoredKey {
                             do {
-                               let publicKeys = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
-                                keys.append(contentsOf: publicKeys)
+                                publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
                             } catch {
                                 
                             }
                         }
                         
-                        let decrypted = try ObjectivePGP.decrypt(data, andVerifySignature: true, using: keys, passphraseForKey: { (key) -> String? in
-                            return password
-                        })
                         
-                        let result = String(data: decrypted, encoding: .utf8)
-                        mail.htmlBody = result
-                        self.mail = mail
                         
-                        if let mailVC = self.viewControllers?.last as? MailViewController {
-                            mailVC.mail = mail
-                            mailVC.tableView.reloadData()
+                        
+                        do {
+                            let decryptor = try DMSPGPDecryptor(armoredMessage: body)
+                             
+                            let decryptKey = decryptor.encryptingKeyIDs.compactMap { keyID in
+                                return secretKeyRing.secretKeyRing?.getDecryptingSecretKey(keyID: keyID)
+                            }.first
+                            
+                            guard let secretKey = decryptKey else {
+                                return ;
+                            }
+
+                            let message = try decryptor.decrypt(secretKey: secretKey, password: password)
+                            
+                            let signatureVerifier = DMSPGPSignatureVerifier(message: message, onePassSignatureList: decryptor.onePassSignatureList, signatureList: decryptor.signatureList)
+                            let verifyResult = signatureVerifier.verifySignature(use: publicKeyRing!.publicKeyRing)
+                             
+                            mail.htmlBody = message
+                            self.mail = mail
+                            
+                            if let mailVC = self.viewControllers?.last as? MailViewController {
+                                mailVC.mail = mail
+                                mailVC.tableView.reloadData()
+                            }
+                        } catch {
+                          
                         }
+                        
+                      
+                        
+                        
                     }
                     #endif
                     

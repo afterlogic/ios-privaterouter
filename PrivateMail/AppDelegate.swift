@@ -9,7 +9,7 @@
 import UIKit
 import KeychainAccess
 import SVProgressHUD
-import ObjectivePGP
+import BouncyCastle_ObjC
 
 let keychain = Keychain(service: "com.PrivateRouter.PrivateMail")
 
@@ -24,6 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         StorageProvider.migrateIfNeeded()
         
         NotificationCenter.default.addObserver(self, selector: #selector(presentLoginViewController(notification:)), name: .failedToLogin, object: nil)
+        
+        JavaSecuritySecurity.addProvider(with: BCJceProviderBouncyCastleProvider())
         
         if keychain["AccessToken"] == nil {
             NotificationCenter.default.post(name: .failedToLogin, object: false)
