@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import ObjectivePGP
+import DMSOpenPGP
 
 class ImportKeysListViewController: UIViewController {
 
@@ -19,41 +19,91 @@ class ImportKeysListViewController: UIViewController {
     var keyString: String? {
         didSet {
             do {
-                let keyString = self.keyString ?? ""
-                let keys = try ObjectivePGP.readKeys(from: keyString.data(using: .utf8)!)
-                self.keys = []
                 
-                for key in keys {
-                    if key.isPublic {
+                var keyString = self.keyString ?? ""
+                 
+                self.keys = []
+                         
+                           
+                var hasKey = true;
+                while (hasKey) {
+                    var hasPrivateKey = false;
+                    var hasPublicKey = false;
+                    
+                    let range1 = (keyString as NSString).range(of: "-----BEGIN PGP PUBLIC KEY BLOCK-----")
+                    let range2 = (keyString as NSString).range(of:  "-----END PGP PUBLIC KEY BLOCK-----")
+                    
+                    if  range1.length>0 && range2.length>0 {
+        
+                        let lowerBound = String.Index.init(encodedOffset:range1.location)
+                        let upperBound = String.Index.init(encodedOffset: range2.location + range2.length-1)
+                        let key: Substring = keyString[lowerBound...upperBound]
+                        let keyRing = try DMSPGPKeyRing(armoredKey: String(key)  );
+                        print(keyRing.publicKeyRing.armored())
+                        keyString = keyString.replacingOccurrences(of: key, with: "")
+                        hasPublicKey = true;
+                        
                         let newKey = PGPKey()
-                        let publicKey = try key.export(keyType: .public)
-                        let armoredPublicKey = Armor.armored(publicKey, as: .publicKey)
+                        let publicKey = try keyRing.publicKeyRing
+                        let armoredPublicKey = publicKey.armored()
                         newKey.isPrivate = false
                         newKey.armoredKey = armoredPublicKey
-                        newKey.email = key.publicKey?.primaryUser?.userID ?? NSLocalizedString("(email undefined)", comment: "")
+                       
+                        let publicKeyRing = keyRing.publicKeyRing;
+                        let userIds = publicKeyRing.getPublicKey()?.getUserIDs()
+                        newKey.email =  NSLocalizedString("(email undefined)", comment: "")
+                        while (userIds?.hasNext())! {
+                            let userId = userIds!.next()
+                            newKey.email = userId.debugDescription
+                        }
+                         
                         
                         if StorageProvider.shared.getPGPKey(newKey.email, isPrivate: newKey.isPrivate) != nil {
                             newKey.accountID = 0
                         }
                         
                         self.keys.append(newKey)
+                    
                     }
                     
-                    if key.isSecret {
+                    let rangePrivate1 = (keyString as NSString).range(of: "-----BEGIN PGP PRIVATE KEY BLOCK-----")
+                    let rangePrivate2 = (keyString as NSString).range(of:  "-----END PGP PRIVATE KEY BLOCK-----")
+                                
+                    if  rangePrivate1.length>0 && rangePrivate2.length>0 {
+         
+                         let lowerBound = String.Index.init(encodedOffset:rangePrivate1.location)
+                         let upperBound = String.Index.init(encodedOffset: rangePrivate2.location + rangePrivate2.length-1)
+                         let key: Substring = keyString[lowerBound...upperBound]
+                         let keyRing = try DMSPGPKeyRing(armoredKey: String(key)  );
+                         keyString = keyString.replacingOccurrences(of: key, with: "")
+                         hasPrivateKey = true;
+                        
                         let newKey = PGPKey()
-                        let secretKey = try key.export(keyType: .secret)
-                        let armoredPrivateKey = Armor.armored(secretKey, as: .secretKey)
+                        let secretKey = try keyRing.secretKeyRing
                         newKey.isPrivate = true
-                        newKey.armoredKey = armoredPrivateKey
-                        newKey.email = key.secretKey?.primaryUser?.userID ?? NSLocalizedString("(email undefined)", comment: "")
+                        newKey.armoredKey = (secretKey?.armored())!
+                        
+                        let publicKeyRing = keyRing.secretKeyRing;
+                        let userIds = publicKeyRing?.getSecretKey()?.getUserIDs()
+                        newKey.email =  NSLocalizedString("(email undefined)", comment: "")
+                        while (userIds?.hasNext())! {
+                            let userId = userIds!.next()
+                            newKey.email = userId.debugDescription
+                        }
                         
                         if StorageProvider.shared.getPGPKey(newKey.email, isPrivate: newKey.isPrivate) != nil {
                             newKey.accountID = 0
                         }
                         
                         self.keys.append(newKey)
-                    }
+                     
+                     }
+                    hasKey = hasPrivateKey || hasPublicKey;
+                    
                 }
+                
+                 
+ 
             } catch {
                 
             }

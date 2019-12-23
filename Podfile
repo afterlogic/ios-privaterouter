@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '8.0'
+platform :ios, '11.0'
 
 target 'PrivateMail' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
@@ -8,7 +8,6 @@ target 'PrivateMail' do
   
   # Pods for PrivateMail
 
-  pod 'ObjectivePGP', '~> 0.15.0'
   pod 'SideMenu', '~> 5.0.1'
   pod 'SVProgressHUD', '~> 2.2.5'
   pod 'SDWebImage', '~> 5.3.1'
@@ -16,6 +15,8 @@ target 'PrivateMail' do
   pod 'RealmSwift', '~> 4.1.1'
   pod 'SwiftTheme', '~> 0.4.7'
   pod 'DropDown', '2.3.12'
+  pod 'BouncyCastle-ObjC', '~> 0.1.0'
+  pod 'DMSOpenPGP', '~> 0.1.4'
 
   target 'PrivateMailTests' do
     inherit! :search_paths
@@ -30,7 +31,7 @@ target 'PrivateMail' do
   post_install do |installer|
 
     #region: MARK: - Pods swift version
-    
+
     DEFAULT_SWIFT_VERSION = '5.1'
     POD_SWIFT_VERSION_MAP = {
 

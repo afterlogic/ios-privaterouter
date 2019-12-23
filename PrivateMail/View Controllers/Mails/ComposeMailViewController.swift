@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import ObjectivePGP
+import DMSOpenPGP
 import SVProgressHUD
 import QuickLook
 import Contacts
@@ -157,16 +157,18 @@ class ComposeMailViewController: UIViewController {
         
         if let email = mail.to?.first {
             do {
-                if let publicKey = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
+                if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
                     #if !targetEnvironment(simulator)
+                    let publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
+                    
                     if let body = mail.htmlBody, encryptSwitch.isOn {
                         let data = body.data(using: .utf8)!
-                        var keys = try ObjectivePGP.readKeys(from: publicKey.data(using: .utf8)!)
-                        
-                        if let privateKey = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
+                        let message = mail.htmlBody;
+                       
+                        var secretKeyRing : DMSPGPKeyRing? = nil;
+                        if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
                             do {
-                               let privateKeys = try ObjectivePGP.readKeys(from: privateKey.data(using: .utf8)!)
-                                keys.append(contentsOf: privateKeys)
+                                secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
                             } catch {
                                 
                             }
@@ -177,16 +179,29 @@ class ComposeMailViewController: UIViewController {
                             return
                         }
                         
-                        let encrypted = try ObjectivePGP.encrypt(data, addSignature: signSwitch.isOn, using: keys, passphraseForKey: { (key) -> String? in
-                            return passwordTextField.text
-                        })
+                        var encryptedMessage = "";
+                        if (signSwitch.isOn){
+                         
+                            let pass : String = passwordTextField.text ?? ""
+                            let encryptorWithSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing.publicKeyRing],
+                                                                             secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
+                                                            password:  pass)
+                            encryptedMessage = try encryptorWithSignature.encrypt(message: message!)
+                        }
+                        else {
+                            let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing.publicKeyRing ])
+                            
+                            encryptedMessage = try encryptorWithoutSignature.encrypt(message: message!)
+                        }
                         
-                        let armoredResult = Armor.armored(encrypted, as: .message).replacingOccurrences(of: "\n", with: "<br>")
+    
+                        let armoredResult =  encryptedMessage.replacingOccurrences(of: "\n", with: "<br>")
                         
                         mail.htmlBody = armoredResult
                         modelController.mail = mail
                         tableView.reloadData()
                     }
+ 
                     #endif
                 } else {
                     SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import ObjectivePGP
+import DMSOpenPGP
 import KeychainAccess
 import SVProgressHUD
 
@@ -74,34 +74,39 @@ class PGPSettingsViewController: UIViewController {
                     email = "<\(email)>"
                     
                     DispatchQueue.global(qos: .userInitiated).async {
-                        let generator = KeyGenerator()
-                        generator.keyBitsLength = 2048
+                         
+                        let keyData = GenerateKeyData(name: email, email: email, password: password, masterKey: KeyData(), subkey: KeyData())
                         
-                        let key = generator.generate(for: email, passphrase: password)
-                        
-                        DispatchQueue.main.async {
-                            do {
-                                let publicKey = try key.export(keyType: .public)
-                                let secretKey = try key.export(keyType: .secret)
-                                
-                                let armoredPublicKey = Armor.armored(publicKey, as: .publicKey)
-                                let armoredPrivateKey = Armor.armored(secretKey, as: .secretKey)
-
-                                StorageProvider.shared.savePGPKey(email, isPrivate: true, armoredKey: armoredPrivateKey)
-                                StorageProvider.shared.savePGPKey(email, isPrivate: false, armoredKey: armoredPublicKey)
-                                
-                                self.publicKeys = StorageProvider.shared.getPGPKeys(false)
-                                self.privateKeys = StorageProvider.shared.getPGPKeys(true)
-                                
-                                self.tableView.reloadData()
-                                
-                                SVProgressHUD.dismiss()
-                            } catch {
-                                SVProgressHUD.showError(withStatus: NSLocalizedString("Can't generate keys", comment: ""))
-                            }
+                        do {
+                            let keyRing = try DMSPGPKeyRingFactory(generateKeyData: keyData).keyRing
+                                 
                             
-                            self.view.isUserInteractionEnabled = true
-                        }
+                            DispatchQueue.main.async {
+                                do {
+                                     
+                                    let armoredPublicKey = keyRing.publicKeyRing.armored()
+                                    let armoredPrivateKey = keyRing.secretKeyRing!.armored()
+
+                                    StorageProvider.shared.savePGPKey(email, isPrivate: true, armoredKey: armoredPrivateKey)
+                                    StorageProvider.shared.savePGPKey(email, isPrivate: false, armoredKey: armoredPublicKey)
+                                    
+                                    self.publicKeys = StorageProvider.shared.getPGPKeys(false)
+                                    self.privateKeys = StorageProvider.shared.getPGPKeys(true)
+                                    
+                                    self.tableView.reloadData()
+                                    
+                                    SVProgressHUD.dismiss()
+                                } catch {
+                                    SVProgressHUD.showError(withStatus: NSLocalizedString("Can't generate keys", comment: ""))
+                                }
+
+                                
+                                self.view.isUserInteractionEnabled = true
+                            }
+                        
+                        } catch {
+                                  print(error.localizedDescription)
+                              }
                     }
                 } else {
                     SVProgressHUD.showError(withStatus: NSLocalizedString("Can't generate keys", comment: ""))
