@@ -158,7 +158,7 @@ class ComposeMailViewController: UIViewController {
         if let email = mail.to?.first {
             do {
                 if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
-                    #if !targetEnvironment(simulator)
+                  
                     let publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
                     
                     if let body = mail.htmlBody, encryptSwitch.isOn {
@@ -166,7 +166,7 @@ class ComposeMailViewController: UIViewController {
                         let message = mail.htmlBody;
                        
                         var secretKeyRing : DMSPGPKeyRing? = nil;
-                        if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
+                        if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
                             do {
                                 secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
                             } catch {
@@ -199,10 +199,11 @@ class ComposeMailViewController: UIViewController {
                         
                         mail.htmlBody = armoredResult
                         modelController.mail = mail
+                        ComposeMailModelController.shared.mail = mail
                         tableView.reloadData()
                     }
  
-                    #endif
+         
                 } else {
                     SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
                 }

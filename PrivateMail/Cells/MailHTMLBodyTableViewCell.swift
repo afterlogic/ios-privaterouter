@@ -10,7 +10,7 @@ import UIKit
 import SwiftTheme
 
 class MailHTMLBodyTableViewCell: UITableViewCell {
-
+    
     @IBOutlet var webView: UIWebView!
     @IBOutlet var heightConstraint: NSLayoutConstraint!
     
@@ -79,10 +79,10 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         
         heightConstraint.constant = max(CGFloat((height as NSString).floatValue), 200.0)
         
-        if isEditor {
+        if isEditor && ComposeMailModelController.shared.mail.htmlBody==nil {
             ComposeMailModelController.shared.mail.htmlBody = getTextFromWebView()
         }
-            
+
         if withAction {
             delegate?.cellSizeDidChanged()
         }
@@ -115,7 +115,7 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
             font-family: -apple-system;
             font-size: 14pt;
             color: \(textColorHex());
-            
+
             .element:read-write:focus {
                 outline: none;
             }

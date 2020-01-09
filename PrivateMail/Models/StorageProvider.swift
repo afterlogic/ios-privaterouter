@@ -206,7 +206,7 @@ class StorageProvider: NSObject {
         
         let progress = NSLocalizedString("Syncing...", comment: "")
         delegate?.updateHeaderWith(progress: progress, folder: folder)
-                
+
         API.shared.getMailsInfo(folder: folder) { (result, error) in
             if let result = result {
                 var mails: [APIMail] = []
@@ -241,7 +241,7 @@ class StorageProvider: NSObject {
                             let threadUIDText = item["threadUID"] as? String
                             threadUID = Int(threadUIDText ?? "")
                         }
-                                                
+
                         mail.threadUID = threadUID
                         
                         mails.append(mail)
@@ -361,7 +361,7 @@ class StorageProvider: NSObject {
                             isFound = true
                         }
                     }
-                
+
                     isEqual = isEqual && isFound
                 }
                 
@@ -425,7 +425,7 @@ class StorageProvider: NSObject {
                         uids = []
                     }
                 }
-                                
+
                 DispatchQueue.global(qos: .default).async {
                     var progress: String?
                     var totalCount = mailsDB.count
@@ -715,25 +715,27 @@ class StorageProvider: NSObject {
         return result
     }
     
-    func getPGPKey(_ email: String?, isPrivate: Bool) -> PGPKey? {
-        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"<\(email ?? "")>\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+    func getPGPKey(_ email: String, isPrivate: Bool) -> PGPKey? {
+        let keys = self.realm.objects(PGPKeyDB.self).filter("isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+        if let key = keys.first(where: { (key:PGPKeyDB) -> Bool in
+            return key.email.contains(email)
+        })
+        {
+      
+        let newKey = PGPKey()
+        newKey.accountID = key.accountID
+        newKey.email = key.email
+        newKey.isPrivate = key.isPrivate
         
-        if let key = keys.first {
-            let newKey = PGPKey()
-            newKey.accountID = key.accountID
-            newKey.email = key.email
-            newKey.isPrivate = key.isPrivate
-            
-            if newKey.isPrivate {
-                newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
-            } else {
-                newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
-            }
-            
-            return newKey
+        if newKey.isPrivate {
+            newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+        } else {
+            newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
         }
         
-        return nil
+        return newKey
+        }
+         return nil
     }
     
     func getContactGroups() -> [ContactsGroupDB] {
@@ -754,7 +756,7 @@ class StorageProvider: NSObject {
     
     func getContacts(_ group: String? = nil, search: String? = nil) -> [APIContact] {
         var predicate = "(accountID = \(API.shared.currentUser.id)) "
-                
+
         if let search = search, search.count > 0 {
             predicate += """
             AND (fullName CONTAINS[cd] \"\(search)\"
@@ -1017,7 +1019,7 @@ class StorageProvider: NSObject {
                 let data = NSKeyedArchiver.archivedData(withRootObject: input)
                 contactDB.data = NSData(data: data)
             }
-                
+
             contactsDB.append(contactDB)
         }
         
