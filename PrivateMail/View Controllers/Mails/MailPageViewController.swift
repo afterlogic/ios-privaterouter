@@ -92,11 +92,11 @@ class MailPageViewController: UIPageViewController {
                 do {
 
                     #if !targetEnvironment(simulator)
-                    if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email, isPrivate: true)?.armoredKey {
+                    if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
                         let body = mail.plainedBody(false)
                         let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
                         var publicKeyRing : DMSPGPKeyRing? = nil
-                        if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from?.first, isPrivate: false)?.armoredKey {
+                        if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
                             do {
                                 publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
                             } catch {
