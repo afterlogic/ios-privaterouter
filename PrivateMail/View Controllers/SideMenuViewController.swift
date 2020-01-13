@@ -231,9 +231,9 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
                 cell.unreadCount = folder.unreadCount ?? 0
             }
     
-            cell.subFoldersCount = 0 //folder.subFoldersCount ?? 0
+            cell.subFoldersCount = 0//folder.subFoldersCount ?? 0
             cell.titleLabel.text = folder.name
-    
+            
             cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
     
             switch folder.type {

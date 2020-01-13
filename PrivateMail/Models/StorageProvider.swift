@@ -653,7 +653,7 @@ class StorageProvider: NSObject {
                 let input = NSKeyedUnarchiver.unarchiveObject(with: Data(referencing: object.data))
                 
                 if let input = input as? [String : Any] {
-                    var folder = APIFolder(input: input)
+                    var folder = APIFolder(input: input,namespace: nil)
                     folder.subFolders = nil
                     
                     folder.subFoldersCount = object.subFoldersCount
@@ -663,12 +663,20 @@ class StorageProvider: NSObject {
                     folder.depth = object.depth
                     
                     folders.append(folder)
+            
+                    folder.subFolders?.forEach({ (fodler:APIFolder) in
+                        
+                    })
+                
                 }
             }
             
             completionHandler(folders)
         }
     }
+    
+    
+    
     
     func getCurrentUser() -> APIUser? {
         if let currentUser = UserDefaults.standard.object(forKey: "currentUser") as? [String: Any] {
@@ -1150,7 +1158,7 @@ class StorageProvider: NSObject {
     }
     
     func removeCurrentUserInfo() {
-        UserDefaults.standard.removeObject(forKey: "currentUser")
+//        UserDefaults.standard.removeObject(forKey: "currentUser")
         UserDefaults.standard.removeObject(forKey: "folders")
     }
     

@@ -88,7 +88,7 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         }
     }
     
-    private func getTextFromWebView() -> String {
+     func getTextFromWebView() -> String {
         let script = "document.body.innerHTML;"
         let text = webView.stringByEvaluatingJavaScript(from: script) ?? ""
         return text

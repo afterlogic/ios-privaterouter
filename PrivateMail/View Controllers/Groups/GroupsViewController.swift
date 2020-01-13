@@ -10,20 +10,21 @@ import UIKit
 
 class GroupsModelController: NSObject {
     static let shared = GroupsModelController()
-    
+    var selectedStorage = ApiStorage("personal")
     var selectedItem = ContactsGroupDB()
     var group = ContactsGroupDB()
 }
 
 class GroupsViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     
-    var content: [ContactsGroupDB] = []
+    var groups: [ContactsGroupDB] = []
+    var storage: [ApiStorage]=[]
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+  
         navigationItem.title = NSLocalizedString("Groups", comment: "")
         navigationController?.navigationBar.barTintColor = UIColor(rgb: 0x6A0C40)
         navigationController?.navigationBar.barStyle = .black
@@ -34,15 +35,17 @@ class GroupsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableFooterView = UIView(frame: .zero)
-                
-        API.shared.getContactGroups { (result, error) in
-            DispatchQueue.main.async {
-                if let result = result {
-//                    StorageProvider.shared.deleteGroups()
-//                    StorageProvider.shared.saveContactsGroups(groups: result)
-                    
-                    self.content = result //StorageProvider.shared.getContactGroups()
-                    self.tableView.reloadData()
+        
+        API.shared.getContactStorage { (result, error) in
+            if let result = result {
+                self.storage = result
+            }
+            API.shared.getContactGroups { (result, error) in
+                DispatchQueue.main.async {
+                    if let result = result {
+                        self.groups = result
+                        self.tableView.reloadData()
+                    }
                 }
             }
         }
@@ -52,6 +55,7 @@ class GroupsViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    
 }
 
 
@@ -59,35 +63,36 @@ extension GroupsViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
-    
+   
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 1 : content.count
+        return section == 0 ? storage.count : groups.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: GroupTableViewCell.cellID(), for: indexPath) as! GroupTableViewCell
         var group: ContactsGroupDB?
-        
         if indexPath.section == 0 {
+            let item = storage[indexPath.row]
             group = ContactsGroupDB()
-            group?.name = "Personal"
+            group?.name = item.id!
+            cell.isSelected = item.id == GroupsModelController.shared.selectedStorage.id
         } else {
-            group = content[indexPath.row]
+            group = groups[indexPath.row]
+            cell.isSelected = group?.uuid == GroupsModelController.shared.selectedItem.uuid
         }
-        
+       
         cell.titleLabel.text = group?.name
-        cell.isSelected = group?.uuid == GroupsModelController.shared.selectedItem.uuid
-        
+       
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
+            GroupsModelController.shared.selectedStorage = storage[indexPath.row]
             GroupsModelController.shared.selectedItem = ContactsGroupDB()
         } else {
-            GroupsModelController.shared.selectedItem = content[indexPath.row]
+            GroupsModelController.shared.selectedItem = groups[indexPath.row]
         }
-        
         tableView.reloadData()
         
         NotificationCenter.default.post(name: .contactsViewShouldUpdate, object: nil)

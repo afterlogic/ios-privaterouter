@@ -83,7 +83,7 @@ struct APIMail {
         self.uid = mail.uid
         self.folder = mail.folder
         self.subject = mail.subject
-//        self.htmlBody = mail.body
+        //        self.htmlBody = mail.body
         self.senders = [mail.sender]
         self.isSeen = mail.isSeen
         self.isFlagged = mail.isFlagged
@@ -261,7 +261,7 @@ struct APIMail {
                 body = body.replacingOccurrences(of: "data-x-src=", with: "width=\"100%\" src=")
             }
             
-//            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
+            //            body = body.replacingOccurrences(of: "<blockquote>", with: "<blockquote style=\"border-left: solid 2px #000000; margin: 4px 2px; padding-left: 6px;\">")
             
             if let baseUrl = UrlsManager.shared.baseUrl, let attachments = attachments {
                 for attachment in attachments {
@@ -294,11 +294,11 @@ struct APIMail {
     
     func attachmentsToShow() -> [[String: Any]] {
         var attachmentsToShow: [[String: Any]] = []
-
+        
         guard let attachments = self.attachments else {
             return attachmentsToShow
         }
-
+        
         for attachment in attachments {
             if let isInline = attachment["IsInline"] as? Bool,
                 let cid = attachment["CID"] as? String {
@@ -319,7 +319,7 @@ struct APIMail {
                 }
             }
         }
-
+        
         return attachmentsToShow
     }
     
@@ -356,9 +356,9 @@ struct APIFolder {
     var type: Int?
     var name: String?
     var fullName: String?
+    var delimiter: String?
     var fullNameRaw: String?
     var fullNameHash: String?
-    var delimiter: String?
     var isSubscribed: Bool?
     var isSelectable: Bool?
     var exists: Bool?
@@ -370,24 +370,30 @@ struct APIFolder {
     var unreadCount: Int?
     var mails: [APIMail] = []
     var depth: Int = 0
-    
+    var namespace:String?
     var input: [String: Any]?
     
     init() {
     }
     
-    init(input: [String: Any]) {
+    init(input: [String: Any],namespace:String?) {
+        
+        
         self = APIFolder()
         self.input = input
         
         if let type = input["Type"] as? Int {
             self.type = type
         }
-        
+        self.namespace = namespace ?? input["Namespace"] as? String ?? ""
         if let name = input["Name"] as? String {
             self.name = name
         }
-    
+        
+        if let delimiter = input["Delimiter"] as? String {
+            self.delimiter = delimiter
+        }
+        
         if let fullName = input["FullName"] as? String {
             self.fullName = fullName
         }
@@ -405,7 +411,7 @@ struct APIFolder {
             
             if let folders = subfolders["@Collection"] as? [[String: Any]] {
                 for folderDict in folders {
-                    let folder = APIFolder(input: folderDict)
+                    let folder = APIFolder(input: folderDict,namespace: self.namespace)
                     subFolders?.append(folder)
                 }
             }
@@ -414,7 +420,21 @@ struct APIFolder {
         }
     }
 }
-
+struct ApiStorage {
+    var id:String?
+    var cTag:Int?
+    var display:Bool?
+    
+    init(_ name: String) {
+        id = name
+    }
+    
+    init(_ input: [String: Any]) {
+        id = input["Id"] as? String
+        cTag = input["CTag"] as? Int
+        display = input["Display"] as? Bool
+    }
+}
 struct APIContact {
     var uuid: String?
     var storage: String?
@@ -614,11 +634,11 @@ struct APIContact {
         if let facebook = input["Facebook"] as? String {
             self.facebook = facebook
         }
-
+        
         if let personalMobile = input["PersonalMobile"] as? String {
             self.personalMobile = personalMobile
         }
-
+        
         if let address = input["PersonalAddress"] as? String {
             self.personalAddress = address
         }
@@ -638,7 +658,7 @@ struct APIContact {
         if let phone = input["PersonalPhone"] as? String {
             self.personalPhone = phone
         }
-
+        
         if let groups = input["GroupUUIDs"] as? [String] {
             self.groupUUIDs = groups
         }

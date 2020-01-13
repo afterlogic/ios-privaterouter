@@ -42,10 +42,7 @@ class LoginViewController: UIViewController {
         passwordView.layer.cornerRadius = passwordView.frame.size.height / 2.0
         hostView.layer.cornerRadius = passwordView.frame.size.height / 2.0
         
-        #if DEBUG
-        emailTextField.text = "test@afterlogic.com"
-        passwordTextField.text = "p12345q"
-        #endif
+        emailTextField.text = StorageProvider.shared.getCurrentUser()?.email ?? ""
     }
     
     override func viewWillAppear(_ animated: Bool) {

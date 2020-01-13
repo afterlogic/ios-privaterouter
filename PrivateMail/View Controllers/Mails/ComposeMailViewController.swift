@@ -33,7 +33,7 @@ class ComposeMailViewController: UIViewController {
     @IBOutlet var cancelEncryptButton: UIButton!
     
     var attachementPreviewURL: URL?
-    
+    var mailInput: MailHTMLBodyTableViewCell?
     private var shouldShowBcc = false
     
     private var shouldShowFrom = false
@@ -108,7 +108,7 @@ class ComposeMailViewController: UIViewController {
         guard let to = self.modelController.mail.to, to.count > 0 else  {
             return
         }
-    
+        self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         let progressCompletion = ProgressHUD.showWithCompletion()
     
         self.view.isUserInteractionEnabled = false
@@ -390,15 +390,15 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             break
     
         case indexPath.row == (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-            let cell: MailHTMLBodyTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            mailInput = tableView.dequeueReusableCell(for: indexPath)
         
-            cell.isEditor = true
-            cell.isAllowTheming = false
-            cell.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
-            cell.delegate = self
+            mailInput!.isEditor = true
+            mailInput!.isAllowTheming = false
+            mailInput!.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
+            mailInput!.delegate = self
         
-            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
-            result = cell
+            mailInput!.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+            result = mailInput
             break
     
         default:

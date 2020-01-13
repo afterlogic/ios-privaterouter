@@ -15,7 +15,7 @@ extension Notification.Name {
 }
 
 class ContactsViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     
     @IBOutlet var searchButton: UIBarButtonItem!
@@ -41,7 +41,7 @@ class ContactsViewController: UIViewController {
     
     var isSelection: Bool = false
     var selectionStyle: AddressTableViewCellStyle? = nil
-    
+    var storage: [ApiStorage] = []
     var selectedCells: [APIContact] = [
         ] {
         didSet {
@@ -55,7 +55,7 @@ class ContactsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.title = NSLocalizedString("Contacts", comment: "")
         
         tableView.delegate = self
@@ -71,7 +71,7 @@ class ContactsViewController: UIViewController {
         } else {
             tableView.addSubview(refreshControl)
         }
-            
+        
         addContactButton.layer.cornerRadius = addContactButton.frame.width / 2.0
         addGroupButton.layer.cornerRadius = addGroupButton.frame.width / 2.0
         
@@ -108,7 +108,9 @@ class ContactsViewController: UIViewController {
             navigationItem.leftBarButtonItems = nil
             navigationItem.rightBarButtonItems = [addButton, searchButton]
         } else {
-            navigationItem.titleView = setTitle(title: NSLocalizedString("Contacts", comment: ""), subtitle: GroupsModelController.shared.selectedItem.name)
+            let subtitle=GroupsModelController.shared.selectedItem.name.isEmpty ? GroupsModelController.shared.selectedStorage.id!
+                : GroupsModelController.shared.selectedItem.name
+            navigationItem.titleView = setTitle(title: NSLocalizedString("Contacts", comment: ""), subtitle: subtitle)
             
             navigationItem.hidesBackButton = true
             navigationItem.leftBarButtonItem = sideMenuAction
@@ -133,19 +135,19 @@ class ContactsViewController: UIViewController {
         titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
         titleLabel.text = title
         titleLabel.sizeToFit()
-
+        
         let subtitleLabel = UILabel(frame: CGRect(x: 0, y: 18, width: 0, height: 0))
         subtitleLabel.textColor = .init(white: 1.0, alpha: 0.9)
         subtitleLabel.font = UIFont.systemFont(ofSize: 12)
         subtitleLabel.text = subtitle
         subtitleLabel.sizeToFit()
-
+        
         let titleView = UIView(frame: CGRect(x: 0, y: 0, width: max(titleLabel.frame.size.width, subtitleLabel.frame.size.width), height: 30))
         titleView.addSubview(titleLabel)
         titleView.addSubview(subtitleLabel)
-
+        
         let widthDiff = subtitleLabel.frame.size.width - titleLabel.frame.size.width
-
+        
         if widthDiff < 0 {
             let newX = widthDiff / 2
             subtitleLabel.frame.origin.x = abs(newX)
@@ -153,7 +155,7 @@ class ContactsViewController: UIViewController {
             let newX = widthDiff / 2
             titleLabel.frame.origin.x = newX
         }
-
+        
         return titleView
     }
     
@@ -172,15 +174,15 @@ class ContactsViewController: UIViewController {
             self.refreshControl.beginRefreshing(in: self.tableView)
             
             let oldCTag = StorageProvider.shared.getContactsGroup()?.cTag ?? -1
-            
+            let selectedStorage = GroupsModelController.shared.selectedStorage
             let selectedGroup = GroupsModelController.shared.selectedItem
             self.contacts = StorageProvider.shared.getContacts(selectedGroup.uuid)
             
-            API.shared.getContactsInfo(group: selectedGroup.uuid) { (result, group, error) in
+            API.shared.getContactsInfo(storage:selectedStorage.id!,group: selectedGroup.uuid) { (result, group, error) in
                 if let contacts = result,
                     oldCTag != group?.cTag {
                     DispatchQueue.main.async {
-                        API.shared.getContacts(contacts: contacts, group: selectedGroup, completionHandler: { (result, error) in
+                        API.shared.getContacts(storage:selectedStorage.id!,contacts: contacts, group: selectedGroup, completionHandler: { (result, error) in
                             DispatchQueue.main.async {
                                 if let contacts = result {
                                     StorageProvider.shared.deleteAllContacts()
@@ -330,7 +332,7 @@ class ContactsViewController: UIViewController {
     
     
     // MARK: - Navigation
-
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "AddContactSegue" {
             ContactsModelController.shared.contact = APIContact()
@@ -346,7 +348,7 @@ class ContactsViewController: UIViewController {
             
         }
     }
-
+    
 }
 
 

@@ -54,12 +54,12 @@ class API: NSObject {
         
         let url = URL(string: "\(Config.standard.autodiscoverUrl)?email=\(email)")!
         let request = URLRequest(url: url)
-    
+        
         URLSession.shared.dataTask(with: request) { (data, response, error) in
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
-        
+            
             guard let data = data, error == nil else {
                 completionHandler(nil, error ?? AutodiscoverError(message: "Autodiscover data is nil."))
                 return
@@ -108,9 +108,10 @@ class API: NSObject {
     
     func logout(completionHandler: @escaping (Bool?, Error?) -> Void) {
         removeCookies()
-
+        
         StorageProvider.shared.deleteAllFolders(completionHandler: {})
         StorageProvider.shared.removeCurrentUserInfo()
+        
         MenuModelController.shared.folders = []
         StorageProvider.shared.syncingFolders = []
         
@@ -150,12 +151,16 @@ class API: NSObject {
         
         callAPI(module: "Mail", method: "GetFolders", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: Any] {
+                let namespace = result["Namespace"] as! String
                 if let folders = result["Folders"] as? [String: Any] {
                     if let collection = folders["@Collection"] as? [[String: Any]] {
                         var folders: [APIFolder] = []
                         
                         for item in collection {
-                            let folder = APIFolder(input: item)
+                            let folder = APIFolder(input: item,namespace:namespace)
+                            self.extractSubFolder(folder).forEach { (folder: APIFolder) in
+                                folders.append(folder)
+                            }
                             folders.append(folder)
                         }
                         
@@ -167,6 +172,16 @@ class API: NSObject {
             
             completionHandler(nil, error)
         }
+    }
+    func extractSubFolder(_ folder:APIFolder)->[APIFolder] {
+        var folders:[APIFolder] = []
+        folder.subFolders?.forEach{ (folder:APIFolder) in
+            folders.append(folder)
+            extractSubFolder(folder).forEach { (folder:APIFolder) in
+                folders.append(folder)
+            }
+        }
+        return folders
     }
     
     func getFoldersInfo(folders: [APIFolder], completionHandler: @escaping ([APIFolder]?, Error?) -> Void) {
@@ -233,7 +248,7 @@ class API: NSObject {
                                             
                                             for item in sortedResult {
                                                 var uid = item["uid"] as? Int
-
+                                                
                                                 if uid == nil {
                                                     if let uidText = item["uid"] as? String {
                                                         uid = Int(uidText)
@@ -259,7 +274,7 @@ class API: NSObject {
                                                                 let threadUIDText = item["threadUID"] as? String
                                                                 threadUID = Int(threadUIDText ?? "")
                                                             }
-
+                                                            
                                                             if mails[i].isSeen != isSeen
                                                                 || mails[i].isFlagged != isFlagged
                                                                 || mails[i].threadUID != threadUID
@@ -287,7 +302,7 @@ class API: NSObject {
                                                                 
                                                                 group.wait()
                                                             }
-                                                                
+                                                            
                                                             index = i + 1
                                                             break
                                                         } else if mails[i].uid ?? -1 > uid ?? -1 {
@@ -296,7 +311,7 @@ class API: NSObject {
                                                     }
                                                 }
                                             }
-                                                                                        
+                                            
                                             MenuModelController.shared.setMailsForFolder(mails: mails, folder: folderName)
                                             
                                             NotificationCenter.default.post(name: .mainViewControllerShouldRefreshData, object: nil)
@@ -325,7 +340,7 @@ class API: NSObject {
             dateFormatter.dateFormat = "yyyy.MM.dd"
             
             let date = Date(timeIntervalSinceNow: -syncingPeriod * 60.0 * SettingsModelController.shared.currentSyncingPeriodMultiplier)
-
+            
             searchString = "date:\(dateFormatter.string(from: date))/"
         }
         
@@ -334,7 +349,7 @@ class API: NSObject {
             "Folder": folder,
             "Search": searchString,
             "UseThreading": true,
-//            "SortBy": "date"
+            //            "SortBy": "date"
             ] as [String : Any]
         
         callAPI(module: "Mail", method: "GetMessagesInfo", parameters: parameters) { (result, error) in
@@ -363,7 +378,7 @@ class API: NSObject {
     }
     
     func getMailsList(text: String, folder: String, limit: Int, offset: Int, completionHandler: @escaping ([APIMail]?, Error?) -> Void) {
- 
+        
         let parameters = [
             "AccountID": currentUser.id,
             "Folder": folder,
@@ -442,13 +457,13 @@ class API: NSObject {
         }
     }
     
-    func getContactsInfo(group: String = "", completionHandler: @escaping ([APIContact]?, ContactsGroupDB?, Error?) -> Void) {
+    func getContactsInfo(storage: String,group: String = "", completionHandler: @escaping ([APIContact]?, ContactsGroupDB?, Error?) -> Void) {
         let groupDB = ContactsGroupDB()
         groupDB.accountID = currentUser.id
         groupDB.uuid = group
         
         let parameters = [
-            "Storage": "Personal",
+            "Storage": storage,
             "GroupUUID": group
         ]
         
@@ -473,7 +488,7 @@ class API: NSObject {
         }
     }
     
-    func getContacts(contacts: [APIContact], group: ContactsGroupDB, completionHandler: @escaping ([APIContact]?, Error?) -> Void) {
+    func getContacts(storage:String,contacts: [APIContact], group: ContactsGroupDB, completionHandler: @escaping ([APIContact]?, Error?) -> Void) {
         var uids: [String] = []
         
         for contact in contacts {
@@ -483,7 +498,7 @@ class API: NSObject {
         }
         
         let parameters = [
-            "Storage": "Personal",
+            "Storage": storage,
             "Uids": uids,
             "GroupUUID": group.uuid
             ] as [String : Any]
@@ -497,6 +512,22 @@ class API: NSObject {
                 }
                 
                 completionHandler(contacts, nil)
+            } else {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    func getContactStorage(completionHandler: @escaping ([ApiStorage]?, Error?) -> Void) {
+        callAPI(module: "Contacts", method: "getContactStorages", parameters: [:]){ (result, error) in
+            if let result = result["Result"] as? [[String: Any]] {
+                let storages: [ApiStorage] = result.map { (item:[String : Any]) -> ApiStorage in
+                    return ApiStorage(item)
+                }.filter { (item:ApiStorage) -> Bool in
+                    return item.display == true
+                }
+                
+                completionHandler(storages, error)
             } else {
                 completionHandler(nil, error)
             }
@@ -566,7 +597,7 @@ class API: NSObject {
                     if let value = item["Fax"] as? String {
                         group.fax = value
                     }
-
+                    
                     if let value = item["Web"] as? String {
                         group.web = value
                     }
@@ -585,39 +616,44 @@ class API: NSObject {
                   identity: APIIdentity?,
                   isSaving: Bool = false,
                   completionHandler: @escaping (Bool?, Error?) -> Void) {
-        let parametersSource: [String : Any?] = [
-            "AccountID": currentUser.id,
-            "FetcherID": "",
-            "IdentityID": identity?.entityID,
-            "DraftInfo": [],
-            "DraftUid": "",
-            "To": mail.to?.first ?? "",
-            "Cc": mail.cc?.first ?? "",
-            "Bcc": mail.bcc?.first ?? "",
-            "Subject": mail.subject ?? "",
-            "Text": mail.htmlBody ?? "",
-            "IsHtml": true,
-            "Importance": 3,
-            "SendReadingConfirmation": false,
-            "Attachments": mail.attachmentsToSend ?? [:],
-            "InReplyTo": "",
-            "References": "",
-            "Sensitivity": 0,
-            "SentFolder": "Sent",
-            "DraftFolder": "Drafts",
-            "ConfirmFolder": "",
-            "ConfirmUid": ""
+        getFolders { (folders:[APIFolder]?, error:Error?) in
+            let sent=folders?.first(where: { (folder:APIFolder) -> Bool in
+                return folder.type==2
+            })
+            let parametersSource: [String : Any?] = [
+                "AccountID": self.currentUser.id,
+                "FetcherID": "",
+                "IdentityID": identity?.entityID,
+                "DraftInfo": [],
+                "DraftUid": "",
+                "To": mail.to?.first ?? "",
+                "Cc": mail.cc?.first ?? "",
+                "Bcc": mail.bcc?.first ?? "",
+                "Subject": mail.subject ?? "",
+                "Text": mail.htmlBody ?? "",
+                "IsHtml": true,
+                "Importance": 3,
+                "SendReadingConfirmation": false,
+                "Attachments": mail.attachmentsToSend ?? [:],
+                "InReplyTo": "",
+                "References": "",
+                "Sensitivity": 0,
+                "SentFolder": sent?.fullName ?? "Sent",
+                "DraftFolder": "Drafts",
+                "ConfirmFolder": "",
+                "ConfirmUid": ""
             ]
-        
-        let parameters = parametersSource
-            .filter { (key, value) in value != nil }
-            .mapValues { $0! }
-        
-        callAPIForResult(
-            module: "Mail",
-            method: isSaving ? "SaveMessage" : "SendMessage",
-            parameters: parameters,
-            completionHandler: completionHandler)
+            
+            let parameters = parametersSource
+                .filter { (key, value) in value != nil }
+                .mapValues { $0! }
+            
+            self.callAPIForResult(
+                module: "Mail",
+                method: isSaving ? "SaveMessage" : "SendMessage",
+                parameters: parameters,
+                completionHandler: completionHandler)
+        }
     }
     
     func setMailSeen(mail: APIMail, completionHandler: @escaping (Bool?, Error?) -> Void) {
@@ -657,7 +693,7 @@ class API: NSObject {
     func moveMessage(mail: APIMail, toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
         moveMessages(mails: [mail], toFolder: toFolder, completionHandler: completionHandler)
     }
-
+    
     func moveMessages(mails: [APIMail], toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
         if mails.count == 0 {
             completionHandler(false, nil)
@@ -722,7 +758,7 @@ class API: NSObject {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
             completionHandler(data, error)
-            }.resume()
+        }.resume()
     }
     
     func saveContact(contact: APIContact, edit: Bool, completionHandler: @escaping ([String: String]?, Error?) -> Void) {
@@ -788,12 +824,12 @@ class API: NSObject {
             }
         }
     }
-
+    
     func deleteGroup(group: ContactsGroupDB, completionHandler: @escaping ([String: String]?, Error?) -> Void) {
         let parameters = [
             "UUID": group.uuid
             ] as [String : Any]
-                
+        
         callAPI(module: "Contacts", method: "DeleteGroup", parameters: parameters) { (result, error) in
             if let result = result["Result"] as? [String: String] {
                 completionHandler(result, error)
@@ -843,7 +879,7 @@ class API: NSObject {
                     let contentType = param["content-type"]!
                     
                     let fileContent = try Data(contentsOf: URL(string: fileName)!)
-
+                    
                     body.appendString("; filename=\"\(filename)\"\r\n")
                     body.appendString("Content-Type: \(contentType)\r\n\r\n")
                     body.append(fileContent)
@@ -1018,11 +1054,11 @@ class API: NSObject {
     }
     
     func rawCallAPI<T>(module: String,
-                    method: String,
-                    parameters: [String: Any],
-                    dataOnError: T,
-                    dataParser: @escaping (Data) throws -> T,
-                    completionHandler: @escaping (_ result: T, _ error: Error?) -> Void) {
+                       method: String,
+                       parameters: [String: Any],
+                       dataOnError: T,
+                       dataParser: @escaping (Data) throws -> T,
+                       completionHandler: @escaping (_ result: T, _ error: Error?) -> Void) {
         guard let baseUrl = UrlsManager.shared.baseUrl else {
             completionHandler(dataOnError, NSError(domain: "APIBaseUrlIsNil", code: 0))
             return
@@ -1047,32 +1083,32 @@ class API: NSObject {
                 }
                 
                 guard let data = data else { return }
-    
+                
                 if let error = try? JSONDecoder().decode(APIError.self, from: data) {
                     
                     if error.code == 101 || error.code == 102 {
                         keychain["AccessToken"] = nil
                         NotificationCenter.default.post(name: .failedToLogin, object: nil)
                     }
-        
+                    
                     completionHandler(dataOnError, error)
                     
                 } else {
-    
+                    
                     do {
-        
+                        
                         let result = try dataParser(data)
                         completionHandler(result, nil)
-        
+                        
                     } catch let error as NSError {
-        
+                        
                         #if DEBUG
                         if let rawDataString = String(data: data, encoding: .utf8) {
                             print("Response parsing failed. Response:\n\(rawDataString)")
                         }
                         #endif
                         completionHandler(dataOnError, error)
-        
+                        
                     }
                     
                 }
@@ -1135,7 +1171,7 @@ class API: NSObject {
         body.appendString(boundaryPrefix)
         body.appendString("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n")
         body.appendString("Content-Type: \(mimeType)\r\n\r\n")
-//        body.append(data)
+        //        body.append(data)
         body.appendString("\r\n")
         body.appendString("--".appending(boundary.appending("--")))
         
