@@ -67,15 +67,15 @@ class PGPSettingsViewController: UIViewController {
             if let password = textField?.text {
                 SVProgressHUD.show()
                 
-                #if !targetEnvironment(simulator)
+              
                 self.view.isUserInteractionEnabled = false
                 
                 if var email = API.shared.currentUser.email {
-                    email = "<\(email)>"
-                    
+            
+                    let name = API.shared.currentUser.firstName ?? ""
                     DispatchQueue.global(qos: .userInitiated).async {
                          
-                        let keyData = GenerateKeyData(name: email, email: email, password: password, masterKey: KeyData(), subkey: KeyData())
+                        let keyData = GenerateKeyData(name: name, email: email, password: password, masterKey: KeyData(), subkey: KeyData())
                         
                         do {
                             let keyRing = try DMSPGPKeyRingFactory(generateKeyData: keyData).keyRing
@@ -112,7 +112,7 @@ class PGPSettingsViewController: UIViewController {
                     SVProgressHUD.showError(withStatus: NSLocalizedString("Can't generate keys", comment: ""))
                     self.view.isUserInteractionEnabled = true
                 }
-                #endif
+            
                 
             }
         }))

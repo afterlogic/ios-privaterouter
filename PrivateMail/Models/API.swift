@@ -631,7 +631,7 @@ class API: NSObject {
                 "Bcc": mail.bcc?.first ?? "",
                 "Subject": mail.subject ?? "",
                 "Text": mail.htmlBody ?? "",
-                "IsHtml": true,
+                "IsHtml": mail.isHtml,
                 "Importance": 3,
                 "SendReadingConfirmation": false,
                 "Attachments": mail.attachmentsToSend ?? [:],

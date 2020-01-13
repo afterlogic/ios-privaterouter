@@ -98,10 +98,25 @@ class ImportKeysListViewController: UIViewController {
                         
                         let publicKeyRing = keyRing.secretKeyRing;
                         let userIds = publicKeyRing?.getSecretKey()?.getUserIDs()
+                        
+                        
                         newKey.email =  NSLocalizedString("(email undefined)", comment: "")
                         while (userIds?.hasNext())! {
                             let userId = userIds!.next()
-                            newKey.email = userId.debugDescription
+                            print(userId.debugDescription)
+                            let regex = try! NSRegularExpression(pattern: "\\([\\w\\W]* <[\\w\\W]*>\\)")
+                            var range=regex.firstMatch(
+                                in: userId.debugDescription,
+                                options: [],
+                                range:NSRange(location: 0, length: userId.debugDescription.utf16.count
+                                ))?.range
+                            if(range==nil){
+                                 newKey.email = userId.debugDescription
+                            }else{
+                                range =  NSRange(location: range!.location+1, length: range!.length-2)
+                            
+                                newKey.email =  String(userId.debugDescription[Range(range!, in: userId.debugDescription)!])
+                            }
                         }
                         
                         if StorageProvider.shared.getPGPKey(newKey.email, isPrivate: newKey.isPrivate) != nil {

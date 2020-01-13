@@ -153,7 +153,9 @@ class ComposeMailViewController: UIViewController {
     }
     
     @IBAction func signEncryptButtonAction(_ sender: Any) {
+        modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         var mail = modelController.mail
+        mail.isHtml=false
         
         if let email = mail.to?.first {
             do {
@@ -194,10 +196,8 @@ class ComposeMailViewController: UIViewController {
                             encryptedMessage = try encryptorWithoutSignature.encrypt(message: message!)
                         }
                         
-    
-                        let armoredResult =  encryptedMessage.replacingOccurrences(of: "\n", with: "<br>")
-                        
-                        mail.htmlBody = armoredResult
+
+                        mail.htmlBody = encryptedMessage
                         modelController.mail = mail
                         ComposeMailModelController.shared.mail = mail
                         tableView.reloadData()
