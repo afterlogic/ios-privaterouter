@@ -61,19 +61,20 @@ class ComposeMailViewController: UIViewController {
         
         passwordTextField.delegate = self
         dialogView.alpha = 0.0
-                
+        
         tableView.delegate = self
         tableView.dataSource = self
         
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50.0
-    
+        
         tableView.register(cellClass: IdentityChooserTableViewCell.self)
         tableView.register(cellClass: AddressTableViewCell.self)
         tableView.register(cellClass: MailSubjectTableViewCell.self)
         tableView.register(cellClass: MailBodyTableViewCell.self)
         tableView.register(cellClass: MailHTMLBodyTableViewCell.self)
         tableView.register(cellClass: MailAttachmentTableViewCell.self)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -88,7 +89,7 @@ class ComposeMailViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
-                
+        
         if let fileURL = modelController.attachmentFileURL {
             modelController.attachmentFileURL = nil
             addAttachments(urls: [fileURL])
@@ -108,17 +109,21 @@ class ComposeMailViewController: UIViewController {
         guard let to = self.modelController.mail.to, to.count > 0 else  {
             return
         }
-        self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
+        if(self.modelController.mail.encrypted){
+            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView().removingRegexMatches(pattern:"<br>", replaceWith: "\n")
+        }else{
+            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
+        }
         let progressCompletion = ProgressHUD.showWithCompletion()
-    
+        
         self.view.isUserInteractionEnabled = false
-    
+        
         let mail = self.modelController.mail
-    
+        
         API.shared.sendMail(mail: mail, identity: self.modelController.selectedIdentity) { (result, error) in
             DispatchQueue.main.async {
                 self.view.isUserInteractionEnabled = true
-            
+                
                 if let error = error {
                     progressCompletion(.error(error.localizedDescription))
                 } else if result != nil {
@@ -156,17 +161,18 @@ class ComposeMailViewController: UIViewController {
         modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         var mail = modelController.mail
         mail.isHtml=false
+        mail.encrypted=true
         
         if let email = mail.to?.first {
             do {
                 if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
-                  
+                    
                     let publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
                     
                     if let body = mail.htmlBody, encryptSwitch.isOn {
                         let data = body.data(using: .utf8)!
                         let message = mail.htmlBody;
-                       
+                        
                         var secretKeyRing : DMSPGPKeyRing? = nil;
                         if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
                             do {
@@ -183,11 +189,11 @@ class ComposeMailViewController: UIViewController {
                         
                         var encryptedMessage = "";
                         if (signSwitch.isOn){
-                         
+                            
                             let pass : String = passwordTextField.text ?? ""
                             let encryptorWithSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing.publicKeyRing],
                                                                              secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
-                                                            password:  pass)
+                                                                             password:  pass)
                             encryptedMessage = try encryptorWithSignature.encrypt(message: message!)
                         }
                         else {
@@ -196,14 +202,13 @@ class ComposeMailViewController: UIViewController {
                             encryptedMessage = try encryptorWithoutSignature.encrypt(message: message!)
                         }
                         
-
-                        mail.htmlBody = encryptedMessage
+                        
+                        mail.htmlBody = encryptedMessage.removingRegexMatches(pattern: "\n", replaceWith: "<br>")
                         modelController.mail = mail
                         ComposeMailModelController.shared.mail = mail
-                        tableView.reloadData()
+                        mailInput!.isEditor = false
+                        mailInput!.htmlText = mail.htmlBody!
                     }
- 
-         
                 } else {
                     SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
                 }
@@ -266,7 +271,7 @@ class ComposeMailViewController: UIViewController {
             self.view.layoutIfNeeded()
         }, completion: nil)
         
-//        tableView.reloadData()
+        //        tableView.reloadData()
     }
     
     
@@ -292,9 +297,9 @@ class ComposeMailViewController: UIViewController {
             isFirstIdentityUpdate = false
             selectDefaultIdentity()
         }
-    
+        
         if let currentSelectedIdentity = modelController.selectedIdentity,
-           !identities.contains(currentSelectedIdentity) {
+            !identities.contains(currentSelectedIdentity) {
             selectDefaultIdentity()
         }
         
@@ -343,7 +348,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         
         let fromShift = shouldShowFrom ? 1 : 0
         let bccShift = fromShift + (shouldShowBcc ? 1 : 0)
-    
+        
         switch true {
         case shouldShowFrom && indexPath.row == 0:
             let cell: IdentityChooserTableViewCell = tableView.dequeueReusableCell(for: indexPath)
@@ -363,7 +368,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
             break
-    
+            
         case indexPath.row == 1 + fromShift:
             let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.style = .cc
@@ -372,7 +377,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
             break
-    
+            
         case shouldShowBcc && indexPath.row == 2 + fromShift:
             let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.style = .bcc
@@ -381,68 +386,71 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
             break
-    
+            
         case indexPath.row == 2 + bccShift:
             let cell: MailSubjectTableViewCell = tableView.dequeueReusableCell(for: indexPath)
             cell.textField.text = mail.subject
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
             break
-    
+            
         case indexPath.row == (self.tableView(tableView, numberOfRowsInSection: 0) - 1):
-            mailInput = tableView.dequeueReusableCell(for: indexPath)
-        
-            mailInput!.isEditor = true
-            mailInput!.isAllowTheming = false
-            mailInput!.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
-            mailInput!.delegate = self
-        
-            mailInput!.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+            if(mailInput==nil){
+                mailInput = tableView.dequeueReusableCell(for: indexPath)
+                
+                mailInput!.isEditor = true
+                mailInput!.isAllowTheming = false
+                mailInput!.htmlText = mail.htmlBody ?? mail.plainBody ?? ""
+                mailInput!.delegate = self
+                
+                mailInput!.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: .greatestFiniteMagnitude)
+            }
             result = mailInput
+            
             break
-    
+            
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: MailAttachmentTableViewCell.cellID(), for: indexPath) as! MailAttachmentTableViewCell
-        
+            
             cell.importKeyButton.isHidden = true
             cell.importConstraint.isActive = false
-        
+            
             var tempNames: [String] = []
-        
+            
             for key in mail.attachmentsToSend!.keys {
                 tempNames.append(key)
             }
-        
+            
             tempNames.sort()
             
             let positionShift = bccShift + 3
-        
+            
             let tempName = tempNames[indexPath.row - positionShift]
-        
+            
             if let attachment = mail.attachmentsToSend?[tempName] as? [String] {
                 let fileName = attachment[0]
-            
+                
                 cell.downloadLink = tempName
                 cell.isComposer = true
                 cell.titleLabel.text = fileName
-            
+                
                 if (fileName as NSString).pathExtension == "asc" {
                     cell.importKeyButton.isHidden = false
                     cell.importConstraint.isActive = true
                 }
-            
+                
             } else {
                 cell.titleLabel.text = ""
             }
-        
+            
             cell.delegate = self
-        
+            
             result = cell
             break
         }
         
         let checkedResult = result ?? UITableViewCell()
-    
+        
         checkedResult.selectionStyle = .none
         
         return checkedResult
@@ -469,7 +477,7 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
         dropdown.width = tableView.bounds.width - 48
         dropdown.bottomOffset = CGPoint(x: 24, y: 40)
         dropdown.anchorView = tableView.cellForRow(at: indexPath)
-    
+        
         dropdown.textColor = ThemeManager.color(.onSurfaceMajorText)
         dropdown.backgroundColor = ThemeManager.color(.secondarySurface)
         dropdown.selectedTextColor = ThemeManager.color(.onAccent)
@@ -504,13 +512,13 @@ extension ComposeMailViewController: AddressTableViewCellDelegate {
 extension ComposeMailViewController: UITextViewDelegateExtensionProtocol {
     
     func textViewDidChanged(textView: UITextView) {
-//        let caret = textView.caretRect(for: textView.selectedTextRange!.start)
-//        let convertedCaret = textView.convert(caret, to: tableView)
-//        let diffY = convertedCaret.origin.y - tableView.contentOffset.y + convertedCaret.height + 7.0 - tableView.frame.size.height
-//
-//        if diffY > 0.0 {
-//            self.tableView.setContentOffset(CGPoint.init(x: 0.0, y: self.tableView.contentOffset.y + diffY), animated: true)
-//        }
+        //        let caret = textView.caretRect(for: textView.selectedTextRange!.start)
+        //        let convertedCaret = textView.convert(caret, to: tableView)
+        //        let diffY = convertedCaret.origin.y - tableView.contentOffset.y + convertedCaret.height + 7.0 - tableView.frame.size.height
+        //
+        //        if diffY > 0.0 {
+        //            self.tableView.setContentOffset(CGPoint.init(x: 0.0, y: self.tableView.contentOffset.y + diffY), animated: true)
+        //        }
     }
     
 }

@@ -60,10 +60,10 @@ class MainViewController: UIViewController {
                 
             if searchBar.text?.count ?? 0 > 0
                    || foldersWithoutThreading.contains(MenuModelController.shared.currentFolder()?.name ?? "")
-                   || MenuModelController.shared.selectedMenuItem.isStarred {
+                   || MenuModelController.shared.selectedMenuItem.custom {
                 showThreads = false
                 
-                if MenuModelController.shared.selectedMenuItem.isStarred {
+                if MenuModelController.shared.selectedMenuItem.custom {
                     mails = mails.filter { $0.isFlagged ?? false }
                 }
                 return
@@ -103,7 +103,8 @@ class MainViewController: UIViewController {
     
     var selectedMail: APIMail?
     var selectedFolder = "Mail"
-    var lastSelectedMenuItem: MenuItem?
+    var selectedFolderTitle = "Mail"
+    var lastSelectedMenuItem: FolderMenuItem?
     
     var unfoldedThreads: [Int] = []
     
@@ -119,7 +120,7 @@ class MainViewController: UIViewController {
                 self.composeMailButton.isHidden = self.isSelection
                 
                 if !self.isSelection {
-                    self.title = self.selectedFolder
+                    self.title = self.selectedFolderTitle
                     self.navigationItem.rightBarButtonItems = [self.optionsButton, self.searchButton]
                     self.navigationItem.leftBarButtonItem = self.menuButton
                     
@@ -331,23 +332,23 @@ class MainViewController: UIViewController {
         
         let selectedMenuItem = MenuModelController.shared.selectedMenuItem
         
-        guard lastSelectedMenuItem != selectedMenuItem else {
+        guard lastSelectedMenuItem?.fullName != selectedMenuItem.fullName else {
             return
         }
         lastSelectedMenuItem = selectedMenuItem
         
-        switch selectedMenuItem {
-        case .custom(.starred):
+        switch true {
+        case selectedMenuItem.custom:
             title = Strings.starred
-        case .folder(let fullName):
-            title = fullName
+        default :
+            title = selectedMenuItem.name
         }
         
         if selectedFolder != MenuModelController.shared.selectedFolder {
             SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
             
             selectedFolder = MenuModelController.shared.selectedFolder
-            
+            selectedFolderTitle = MenuModelController.shared.selectedMenuItem.name
             mails = MenuModelController.shared.mailsForCurrentFolder()
             
             var needsSyncing = true
@@ -932,14 +933,4 @@ extension MainViewController: MailTableViewCellDelegate {
     }
 }
 
-fileprivate extension MenuItem {
-    
-    var isStarred: Bool {
-        if case .custom(.starred) = self {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-}
+

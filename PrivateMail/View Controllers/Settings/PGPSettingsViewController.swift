@@ -87,8 +87,8 @@ class PGPSettingsViewController: UIViewController {
                                     let armoredPublicKey = keyRing.publicKeyRing.armored()
                                     let armoredPrivateKey = keyRing.secretKeyRing!.armored()
 
-                                    StorageProvider.shared.savePGPKey(email, isPrivate: true, armoredKey: armoredPrivateKey)
-                                    StorageProvider.shared.savePGPKey(email, isPrivate: false, armoredKey: armoredPublicKey)
+                                    StorageProvider.shared.savePGPKey(name,email, isPrivate: true, armoredKey: armoredPrivateKey)
+                                    StorageProvider.shared.savePGPKey(name,email, isPrivate: false, armoredKey: armoredPublicKey)
                                     
                                     self.publicKeys = StorageProvider.shared.getPGPKeys(false)
                                     self.privateKeys = StorageProvider.shared.getPGPKeys(true)

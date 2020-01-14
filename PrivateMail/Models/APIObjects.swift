@@ -62,6 +62,7 @@ struct APIMail {
     var attachmentsToSend: [String: Any]?
     var to: [String]?
     var isHtml: Bool=true
+    var encrypted: Bool=true
     var from: [String]?
     var cc: [String]?
     var bcc: [String]?

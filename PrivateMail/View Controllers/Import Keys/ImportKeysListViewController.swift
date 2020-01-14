@@ -186,7 +186,7 @@ class ImportKeysListViewController: UIViewController {
     @IBAction func importKeysButtonAction(_ sender: Any) {
         for indexPath in selectedIndexPaths {
             let key = keys[indexPath.row]
-            StorageProvider.shared.savePGPKey(key.email, isPrivate: key.isPrivate, armoredKey: key.armoredKey)
+            StorageProvider.shared.savePGPKey("",key.email, isPrivate: key.isPrivate, armoredKey: key.armoredKey)
         }
         
         cancelButtonAction(sender)

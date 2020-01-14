@@ -82,12 +82,6 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
             iconImageView.theme_tintColor = theme_iconTintColor
             expandImageView.theme_tintColor = .onSurfaceMajorText
         }
-        
-        #if DEBUG
-        if StorageProvider.shared.syncingFolders.contains(folder?.fullName ?? "") {
-            backgroundColor = .blue
-        }
-        #endif
     }
     
 }

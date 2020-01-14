@@ -142,7 +142,7 @@ class SideMenuViewController: UIViewController {
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.register(cellClass: FolderTableViewCell.self)
         tableView.separatorStyle = .none
-
+        
         refreshControl.addTarget(self, action: #selector(refreshControlAction), for: .valueChanged)
         
         if #available(iOS 10.0, *) {
@@ -150,7 +150,7 @@ class SideMenuViewController: UIViewController {
         } else {
             tableView.addSubview(refreshControl)
         }
-
+        
     }
     
     func selectCurrentFolder(withAction: Bool) {
@@ -159,9 +159,9 @@ class SideMenuViewController: UIViewController {
             else { return }
         
         let indexPath = IndexPath(row: selectedIndex, section: 0)
-    
+        
         self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
-    
+        
         if withAction {
             self.tableView(tableView, didSelectRowAt: indexPath)
         }
@@ -170,7 +170,7 @@ class SideMenuViewController: UIViewController {
     private func getSelectedItemIndex() -> Int? {
         MenuModelController.shared.menuItems()
             .firstIndex(where: {
-                $0 == MenuModelController.shared.selectedMenuItem
+                $0.fullName == MenuModelController.shared.selectedMenuItem.fullName
             })
     }
     
@@ -203,11 +203,11 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         let item = MenuModelController.shared.menuItems()[indexPath.row]
         
         defer {
-            cell.setSelected(item == MenuModelController.shared.selectedMenuItem)
+            cell.setSelected(item.fullName == MenuModelController.shared.selectedMenuItem.fullName)
         }
         
-        switch item {
-        case .custom(.starred):
+        switch true {
+        case item.custom:
             cell.subFoldersCount = 0
             cell.unreadCount = 0
             cell.sideConstraint.constant = 15.0
@@ -217,69 +217,77 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             cell.theme_iconTintColor = .accentFavorite
             return cell
             
-        case .folder(let folderName):
-            guard let folder = MenuModelController.shared.folder(byFullName: folderName) else {
+        default :
+            guard let folder = MenuModelController.shared.folder(byFullName: item.fullName) else {
                 return cell
             }
-    
+            
             cell.folder = folder
             cell.theme_iconTintColor = .onSurfaceMajorText
-    
+            
             if folder.type == 3 {
                 cell.unreadCount = folder.messagesCount ?? 0
             } else {
                 cell.unreadCount = folder.unreadCount ?? 0
             }
-    
+            
             cell.subFoldersCount = 0//folder.subFoldersCount ?? 0
             cell.titleLabel.text = folder.name
+          
+            var fullName=folder.fullName!
+            let namespaceLength=folder.namespace!.lengthOfBytes(using: .utf8)
+            if(namespaceLength < fullName.lengthOfBytes(using: .utf8)
+                && fullName[0...namespaceLength] == folder.namespace!){
+                fullName = fullName[namespaceLength...fullName.lengthOfBytes(using: .utf8)]
+            }
             
-            cell.sideConstraint.constant = 15.0 * CGFloat(folder.depth + 1)
-    
+            let depth=fullName.components(separatedBy: folder.delimiter!) .count
+            
+            cell.sideConstraint.constant = 15.0 * CGFloat(depth)
+            
             switch folder.type {
             case 1:
                 cell.iconImageView.image = UIImage(named: "folder_inbox")
-    
+                
             case 2:
                 cell.iconImageView.image = UIImage(named: "folder_sent")
-    
+                
             case 3:
                 cell.iconImageView.image = UIImage(named: "folder_drafts")
-    
+                
             case 4:
                 cell.iconImageView.image = UIImage(named: "folder_spam")
-    
+                
             case 5:
                 cell.iconImageView.image = UIImage(named: "folder_trash")
-    
+                
             default:
                 cell.iconImageView.image = nil //UIImage(named: "folder_default")
             }
-    
+            
             return cell
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = MenuModelController.shared.menuItems()[indexPath.row]
-    
+        
         MenuModelController.shared.selectedMenuItem = item
         
-        switch item {
-        case .folder(let folderName):
-            if let folder = MenuModelController.shared.folder(byFullName: folderName),
-               folder.isSelectable ?? true {
+        if !item.custom {
+            
+            if let folder = MenuModelController.shared.folder(byFullName: item.fullName),
+                folder.isSelectable ?? true {
                 
                 let systemFolders = ["INBOX", "Sent", "Drafts"]
-        
+                
                 if !systemFolders.contains(MenuModelController.shared.selectedFolder) {
                     StorageProvider.shared.stopSyncingFolder(MenuModelController.shared.selectedFolder)
                 }
             }
             
-        default: break
         }
-    
+        
         NotificationCenter.default.post(name: .didSelectFolder, object: nil)
         tableView.reloadData()
         dismiss(animated: true, completion: nil)
@@ -291,4 +299,17 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+}
+extension String {
+    subscript (bounds: CountableClosedRange<Int>) -> String {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return String(self[start...end])
+    }
+
+    subscript (bounds: CountableRange<Int>) -> String {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return String(self[start..<end])
+    }
 }

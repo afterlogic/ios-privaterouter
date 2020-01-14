@@ -190,7 +190,7 @@ class StorageProvider: NSObject {
         let config = Realm.Configuration(deleteRealmIfMigrationNeeded: true)
         Realm.Configuration.defaultConfiguration = config
     }
-
+    
     
     //MARK: - Syncing
     
@@ -206,7 +206,7 @@ class StorageProvider: NSObject {
         
         let progress = NSLocalizedString("Syncing...", comment: "")
         delegate?.updateHeaderWith(progress: progress, folder: folder)
-
+        
         API.shared.getMailsInfo(folder: folder) { (result, error) in
             if let result = result {
                 var mails: [APIMail] = []
@@ -241,7 +241,7 @@ class StorageProvider: NSObject {
                             let threadUIDText = item["threadUID"] as? String
                             threadUID = Int(threadUIDText ?? "")
                         }
-
+                        
                         mail.threadUID = threadUID
                         
                         mails.append(mail)
@@ -287,7 +287,7 @@ class StorageProvider: NSObject {
                 for i in 0 ..< mails.count {
                     let mail = mails[i]
                     var isFound = false
-
+                    
                     if c < newMails.count {
                         
                         while mail.uid ?? -1 < newMails[c].uid ?? -1 {
@@ -361,7 +361,7 @@ class StorageProvider: NSObject {
                             isFound = true
                         }
                     }
-
+                    
                     isEqual = isEqual && isFound
                 }
                 
@@ -396,7 +396,7 @@ class StorageProvider: NSObject {
                 self.delegate?.updateTableView(mails: newMails, folder: folder)
                 
                 var parts: [[Int]] = []
-
+                
                 var oldUIDS: [Int] = []
                 
                 for mail in mailsDB {
@@ -404,7 +404,7 @@ class StorageProvider: NSObject {
                 }
                 
                 var newUIDS: [Int] = []
-
+                
                 for mail in mails {
                     newUIDS.append(mail.uid ?? -1)
                 }
@@ -425,7 +425,7 @@ class StorageProvider: NSObject {
                         uids = []
                     }
                 }
-
+                
                 DispatchQueue.global(qos: .default).async {
                     var progress: String?
                     var totalCount = mailsDB.count
@@ -488,7 +488,7 @@ class StorageProvider: NSObject {
                     
                     if let index = self.syncingFolders.firstIndex(of: folder) {
                         self.syncingFolders.remove(at: index)
-
+                        
                         if success {
                             MenuModelController.shared.updateFolder(folder: folder, hash: expectedHash)
                         }
@@ -586,11 +586,11 @@ class StorageProvider: NSObject {
     // MARK: - Fetching
     
     func getMails(text: String, folder: String, limit: Int?, additionalPredicate: String?, completionHandler: @escaping ([APIMail]) -> Void) {
-//        let referenceDate = Date()
-//        let fetchID = fetchingID
-//        fetchingID += 1
+        //        let referenceDate = Date()
+        //        let fetchID = fetchingID
+        //        fetchingID += 1
         
-//        print("Fetching began: ID\(fetchID)")
+        //        print("Fetching began: ID\(fetchID)")
         
         isFetching = true
         var mails: [APIMail] = []
@@ -639,7 +639,7 @@ class StorageProvider: NSObject {
             self.isFetching = false
             
             completionHandler(mails)
-//            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
+            //            print("Fetching ID\(fetchID) time: \(Date().timeIntervalSince(referenceDate))")
         }
     }
     
@@ -663,11 +663,11 @@ class StorageProvider: NSObject {
                     folder.depth = object.depth
                     
                     folders.append(folder)
-            
+                    
                     folder.subFolders?.forEach({ (fodler:APIFolder) in
                         
                     })
-                
+                    
                 }
             }
             
@@ -729,21 +729,21 @@ class StorageProvider: NSObject {
             return key.email.contains(email)
         })
         {
-      
-        let newKey = PGPKey()
-        newKey.accountID = key.accountID
-        newKey.email = key.email
-        newKey.isPrivate = key.isPrivate
-        
-        if newKey.isPrivate {
-            newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
-        } else {
-            newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            
+            let newKey = PGPKey()
+            newKey.accountID = key.accountID
+            newKey.email = key.email
+            newKey.isPrivate = key.isPrivate
+            
+            if newKey.isPrivate {
+                newKey.armoredKey = keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            } else {
+                newKey.armoredKey = keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] ?? ""
+            }
+            
+            return newKey
         }
-        
-        return newKey
-        }
-         return nil
+        return nil
     }
     
     func getContactGroups() -> [ContactsGroupDB] {
@@ -764,7 +764,7 @@ class StorageProvider: NSObject {
     
     func getContacts(_ group: String? = nil, search: String? = nil) -> [APIContact] {
         var predicate = "(accountID = \(API.shared.currentUser.id)) "
-
+        
         if let search = search, search.count > 0 {
             predicate += """
             AND (fullName CONTAINS[cd] \"\(search)\"
@@ -879,11 +879,11 @@ class StorageProvider: NSObject {
                     let fullName = folder.fullName,
                     let isSubscribed = folder.isSubscribed,
                     let isSelectable = folder.isSelectable,
-//                    let hashString = folder.hash,
+                    //                    let hashString = folder.hash,
                     let messagesCount = folder.messagesCount,
                     let unreadCount = folder.unreadCount,
                     let input = folder.input {
-
+                    
                     let subFoldersCount = folder.subFoldersCount ?? 0
                     
                     let folderDB = FolderDB()
@@ -912,22 +912,28 @@ class StorageProvider: NSObject {
         }
     }
     
-    func savePGPKey(_ email: String, isPrivate: Bool, armoredKey: String) {
+    func savePGPKey(_ name:String, _ email: String, isPrivate: Bool, armoredKey: String) {
+        deletePGPKey(email, isPrivate: isPrivate)
         let key = PGPKeyDB()
         key.accountID = API.shared.currentUser.id
-        key.email = email
+        if(name.isEmpty){
+            key.email = email
+        }else{
+            key.email = "\(name) <\(email)>".removingRegexMatches(pattern: " +", replaceWith: " ")
+        }
         key.isPrivate = isPrivate
         
         if isPrivate {
-            keychain["PrivateKey\(API.shared.currentUser.id)-\(email)"] = armoredKey
+            keychain["PrivateKey\(API.shared.currentUser.id)-\(key.email)"] = armoredKey
         } else {
-            keychain["PublicKey\(API.shared.currentUser.id)-\(email)"] = armoredKey
+            keychain["PublicKey\(API.shared.currentUser.id)-\(key.email)"] = armoredKey
         }
         
         try! realm.write {
             realm.add(key)
         }
     }
+    
     
     func updateMailFlags(mail: APIMail, completionHandler: @escaping () -> Void) {
         if let uid = mail.uid, let folder = mail.folder {
@@ -1027,7 +1033,7 @@ class StorageProvider: NSObject {
                 let data = NSKeyedArchiver.archivedData(withRootObject: input)
                 contactDB.data = NSData(data: data)
             }
-
+            
             contactsDB.append(contactDB)
         }
         
@@ -1070,7 +1076,7 @@ class StorageProvider: NSObject {
             })
         }
     }
-
+    
     func deleteAllMails() {
         DispatchQueue.main.async {
             let result = self.realm.objects(MailDB.self)
@@ -1085,11 +1091,11 @@ class StorageProvider: NSObject {
     
     func deleteAllContacts() {
         let contacts = self.realm.objects(ContactDB.self)
-//        let groups = self.realm.objects(ContactsGroupDB.self)
+        //        let groups = self.realm.objects(ContactsGroupDB.self)
         
         try! self.realm.write {
             self.realm.delete(contacts)
-//            self.realm.delete(groups)
+            //            self.realm.delete(groups)
         }
     }
     
@@ -1118,16 +1124,22 @@ class StorageProvider: NSObject {
     }
     
     func deletePGPKey(_ email: String, isPrivate: Bool) {
-        let keys = self.realm.objects(PGPKeyDB.self).filter("email = \"\(email)\" AND isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
-        
+        let key = self.realm.objects(PGPKeyDB.self)
+            .filter("isPrivate = \(isPrivate) AND accountID = \(API.shared.currentUser.id)")
+            .first{(item)in
+                return item.email.contains(email)
+        }
+        if(key==nil){
+            return
+        }
         if isPrivate {
-            keychain["PrivateKey\(API.shared.currentUser.id)-\(email)"] = nil
+            keychain["PrivateKey\(API.shared.currentUser.id)-\(key!.email)"] = nil
         } else {
-            keychain["PublicKey\(API.shared.currentUser.id)-\(email)"] = nil
+            keychain["PublicKey\(API.shared.currentUser.id)-\(key!.email)"] = nil
         }
         
         try! realm.write {
-            realm.delete(keys)
+            realm.delete(key!)
         }
     }
     
@@ -1158,7 +1170,7 @@ class StorageProvider: NSObject {
     }
     
     func removeCurrentUserInfo() {
-//        UserDefaults.standard.removeObject(forKey: "currentUser")
+        //        UserDefaults.standard.removeObject(forKey: "currentUser")
         UserDefaults.standard.removeObject(forKey: "folders")
     }
     
@@ -1172,8 +1184,8 @@ class StorageProvider: NSObject {
         
         let result = self.realm.objects(MailDB.self).filter(predicate).sorted(byKeyPath: "uid", ascending: false)
         
-//        var deletedUids: [Int] = []
-//        var lastIndex = 0
+        //        var deletedUids: [Int] = []
+        //        var lastIndex = 0
         
         var oldUIDS: [Int] = []
         
@@ -1182,7 +1194,7 @@ class StorageProvider: NSObject {
         }
         
         var newUIDS: [Int] = []
-
+        
         for mail in mails {
             newUIDS.append(mail.uid ?? -1)
         }
@@ -1210,4 +1222,15 @@ class StorageProvider: NSObject {
         completionHandler(deletedUids)
     }
     
+}
+extension String {
+     func removingRegexMatches(pattern: String, replaceWith: String = "")->String {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: NSRegularExpression.Options.caseInsensitive)
+            let range = NSMakeRange(0, self.count)
+            return regex.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: replaceWith)
+        } catch {
+            return ""
+        }
+    }
 }

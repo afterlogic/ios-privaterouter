@@ -158,12 +158,14 @@ class API: NSObject {
                         
                         for item in collection {
                             let folder = APIFolder(input: item,namespace:namespace)
+                               folders.append(folder)
                             self.extractSubFolder(folder).forEach { (folder: APIFolder) in
                                 folders.append(folder)
                             }
-                            folders.append(folder)
                         }
-                        
+                        folders.forEach { (folder:APIFolder) in
+                            print(folder.fullName)
+                        }
                         completionHandler(folders, nil)
                         return
                     }
@@ -176,7 +178,7 @@ class API: NSObject {
     func extractSubFolder(_ folder:APIFolder)->[APIFolder] {
         var folders:[APIFolder] = []
         folder.subFolders?.forEach{ (folder:APIFolder) in
-            folders.append(folder)
+               folders.append(folder)
             extractSubFolder(folder).forEach { (folder:APIFolder) in
                 folders.append(folder)
             }
