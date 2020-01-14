@@ -163,62 +163,82 @@ class ComposeMailViewController: UIViewController {
         mail.isHtml=false
         mail.encrypted=true
         
-        if let email = mail.to?.first {
-            do {
-                if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(email, isPrivate: false)?.armoredKey {
-                    
-                    let publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
-                    
-                    if let body = mail.htmlBody, encryptSwitch.isOn {
-                        let data = body.data(using: .utf8)!
-                        let message = mail.htmlBody;
-                        
-                        var secretKeyRing : DMSPGPKeyRing? = nil;
-                        if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
-                            do {
-                                secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
-                            } catch {
-                                
-                            }
-                        }
-                        
-                        if signSwitch.isOn && passwordTextField.text?.count ?? 0 == 0 {
-                            SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter password for signing", comment: ""))
-                            return
-                        }
-                        
-                        var encryptedMessage = "";
-                        if (signSwitch.isOn){
-                            
-                            let pass : String = passwordTextField.text ?? ""
-                            let encryptorWithSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing.publicKeyRing],
-                                                                             secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
-                                                                             password:  pass)
-                            encryptedMessage = try encryptorWithSignature.encrypt(message: message!)
-                        }
-                        else {
-                            let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing.publicKeyRing ])
-                            
-                            encryptedMessage = try encryptorWithoutSignature.encrypt(message: message!)
-                        }
-                        
-                        
-                        mail.htmlBody = encryptedMessage.removingRegexMatches(pattern: "\n", replaceWith: "<br>")
-                        modelController.mail = mail
-                        ComposeMailModelController.shared.mail = mail
-                        mailInput!.isEditor = false
-                        mailInput!.htmlText = mail.htmlBody!
-                    }
-                } else {
-                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
-                }
-            } catch {
-                SVProgressHUD.showInfo(withStatus: error.localizedDescription)
-            }
-        } else {
-            SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please add mail recipient", comment: ""))
-        }
         
+        do {
+            var email:String?
+            var publicKeyRing:DMSPGPKeyRing?
+            if(encryptSwitch.isOn){
+                email = mail.to?.first
+                if(email==nil){
+                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please add mail recipient", comment: ""))
+                    cancelButtonAction(sender)
+                    return
+                }
+                let publicArmoredKeyString = StorageProvider.shared.getPGPKey(email!, isPrivate: false)?.armoredKey
+                
+                if(publicArmoredKeyString==nil){
+                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter public key in settings", comment: ""))
+                    cancelButtonAction(sender)
+                    return
+                }
+                publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString!) );
+            }
+            
+            let message = mail.htmlBody ?? ""
+            
+            var secretKeyRing : DMSPGPKeyRing? = nil;
+            
+            if signSwitch.isOn {
+                if  passwordTextField.text?.count ?? 0 == 0 {
+                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter password for signing", comment: ""))
+                    cancelButtonAction(sender)
+                    return
+                }
+                let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey
+                if(secretArmoredKeyString==nil){
+                    SVProgressHUD.showInfo(withStatus: NSLocalizedString("Please enter private key in settings", comment: ""))
+                    cancelButtonAction(sender)
+                    return
+                }
+                secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString!)  );
+                
+            }
+            
+            var encryptedMessage = message
+            if (signSwitch.isOn){
+                
+                let pass : String = passwordTextField.text ?? ""
+                
+                let encryptorWithSignature = publicKeyRing != nil ?
+                    try DMSPGPEncryptor(
+                        publicKeyRings: [publicKeyRing!.publicKeyRing],
+                        secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
+                        password:  pass) :
+                    try DMSPGPEncryptor(
+                        secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
+                        password:  pass)
+                
+                encryptedMessage = try encryptorWithSignature.encrypt(message: message)
+                
+            } else if(encryptSwitch.isOn) {
+                let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing!.publicKeyRing ])
+                
+                encryptedMessage = try encryptorWithoutSignature.encrypt(message: message)
+            }else{
+                cancelButtonAction(sender)
+                return
+            }
+            
+            
+            mail.htmlBody = encryptedMessage.removingRegexMatches(pattern: "\n", replaceWith: "<br>")
+            modelController.mail = mail
+            ComposeMailModelController.shared.mail = mail
+            mailInput!.isEditor = false
+            mailInput!.htmlText = mail.htmlBody!
+            
+        } catch {
+            SVProgressHUD.showInfo(withStatus: error.localizedDescription)
+        }
         cancelButtonAction(sender)
     }
     

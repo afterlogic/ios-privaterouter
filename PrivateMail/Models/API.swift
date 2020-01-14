@@ -163,9 +163,6 @@ class API: NSObject {
                                 folders.append(folder)
                             }
                         }
-                        folders.forEach { (folder:APIFolder) in
-                            print(folder.fullName)
-                        }
                         completionHandler(folders, nil)
                         return
                     }
