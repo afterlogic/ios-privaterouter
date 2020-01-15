@@ -259,10 +259,15 @@ class ComposeMailViewController: UIViewController {
     
     @IBAction func saveButtonAction(_ sender: Any) {
         SVProgressHUD.show()
-        
+        if(self.modelController.mail.encrypted){
+            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView().removingRegexMatches(pattern:"<br>", replaceWith: "\n")
+        }else{
+            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
+        }
         API.shared.sendMail(mail: modelController.mail, identity: nil, isSaving: true) { (result, error) in
             DispatchQueue.main.async {
-                if result ?? false {
+                SVProgressHUD.dismiss()
+                if error == nil {
                     SVProgressHUD.showSuccess(withStatus: nil)
                 } else {
                     SVProgressHUD.showError(withStatus: error?.localizedDescription)

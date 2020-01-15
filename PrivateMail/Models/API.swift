@@ -158,7 +158,7 @@ class API: NSObject {
                         
                         for item in collection {
                             let folder = APIFolder(input: item,namespace:namespace)
-                               folders.append(folder)
+                            folders.append(folder)
                             self.extractSubFolder(folder).forEach { (folder: APIFolder) in
                                 folders.append(folder)
                             }
@@ -175,7 +175,7 @@ class API: NSObject {
     func extractSubFolder(_ folder:APIFolder)->[APIFolder] {
         var folders:[APIFolder] = []
         folder.subFolders?.forEach{ (folder:APIFolder) in
-               folders.append(folder)
+            folders.append(folder)
             extractSubFolder(folder).forEach { (folder:APIFolder) in
                 folders.append(folder)
             }
@@ -620,8 +620,8 @@ class API: NSObject {
                 return folder.type==2
             })
             let draft=folders?.first(where: { (folder:APIFolder) -> Bool in
-                           return folder.type==3
-                       })
+                return folder.type==3
+            })
             let parametersSource: [String : Any?] = [
                 "AccountID": self.currentUser.id,
                 "FetcherID": "",
@@ -650,11 +650,17 @@ class API: NSObject {
                 .filter { (key, value) in value != nil }
                 .mapValues { $0! }
             
-            self.callAPIForResult(
+            self.callAPI(
                 module: "Mail",
                 method: isSaving ? "SaveMessage" : "SendMessage",
-                parameters: parameters,
-                completionHandler: completionHandler)
+                parameters: parameters){ (result, error) in
+                    if let result = result["Result"] as? Bool {
+                        completionHandler(result, error)
+                    } else {
+                        completionHandler(nil, error)
+                    }
+            }
+            
         }
     }
     
