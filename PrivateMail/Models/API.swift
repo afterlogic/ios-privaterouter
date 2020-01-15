@@ -619,6 +619,9 @@ class API: NSObject {
             let sent=folders?.first(where: { (folder:APIFolder) -> Bool in
                 return folder.type==2
             })
+            let draft=folders?.first(where: { (folder:APIFolder) -> Bool in
+                           return folder.type==3
+                       })
             let parametersSource: [String : Any?] = [
                 "AccountID": self.currentUser.id,
                 "FetcherID": "",
@@ -638,7 +641,7 @@ class API: NSObject {
                 "References": "",
                 "Sensitivity": 0,
                 "SentFolder": sent?.fullName ?? "Sent",
-                "DraftFolder": "Drafts",
+                "DraftFolder": draft?.fullName ?? "Drafts",
                 "ConfirmFolder": "",
                 "ConfirmUid": ""
             ]

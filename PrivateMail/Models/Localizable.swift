@@ -53,6 +53,11 @@ struct Strings {
     
     static var loginFailedInvalidCredentials: String { .localized("loginFailedInvalidCredentials") }
 
+    static var invalidSignature: String { .localized("Invalid signature") }
+    
+    static var validSignature: String { .localized("Message was successfully verified") }
+    
+    static var decryptedAndVerified: String { .localized("Message was successfully decrypted and verified") }
 }
 
 extension String {

@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         applyTheme()
 
-        SVProgressHUD.setMaximumDismissTimeInterval(1)
+        SVProgressHUD.setMaximumDismissTimeInterval(5)
         StorageProvider.migrateIfNeeded()
         
         NotificationCenter.default.addObserver(self, selector: #selector(presentLoginViewController(notification:)), name: .failedToLogin, object: nil)

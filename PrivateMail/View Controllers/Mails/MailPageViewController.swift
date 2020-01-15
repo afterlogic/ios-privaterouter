@@ -10,13 +10,17 @@ import UIKit
 import SVProgressHUD
 import DMSOpenPGP
 import SwiftTheme
+import BouncyCastle_ObjC
 
 class MailPageViewController: UIPageViewController {
-
+    
+    let beginPgpMessage = "-----BEGIN PGP MESSAGE-----"
+    let beginPgpSignedMessage = "-----BEGIN PGP SIGNED MESSAGE-----"
+    
     var folder: APIFolder = APIFolder() {
         didSet {
             let hideSpamFolders = [2, 3]
-
+            
             let notASpam = (folder.type ?? -1) == 4
             spamButton.image = UIImage(named: notASpam ? "not_spam" : "spam")
             
@@ -34,6 +38,8 @@ class MailPageViewController: UIPageViewController {
         }
     }
     
+    var signed=false
+    var encrypted=false
     var mail: APIMail = APIMail()
     var keysToImport: String?
     
@@ -45,9 +51,9 @@ class MailPageViewController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.theme_backgroundColor = .surface
-
+        
         dataSource = self
-        delegate = self
+        delegate = self 
         
         let mailVC = storyboard?.instantiateViewController(withIdentifier: "MailVC") as! MailViewController
         mailVC.mail = mail
@@ -68,88 +74,134 @@ class MailPageViewController: UIPageViewController {
             }
         }
     }
-
+    
     
     // MARK: - Buttons Actions
     
     @IBAction func decryptButtonAction(_ sender: Any) {
         guard let mailVC = viewControllers?.first as? MailViewController else { return }
-        var mail = mailVC.mail
+        let mail = mailVC.mail
         
-        let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
-        
-        alert.addTextField { (textField) in
-            textField.placeholder = NSLocalizedString("Enter password", comment: "")
-            textField.isSecureTextEntry = true
-        }
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
-            let textField = alert?.textFields![0]
+        let encrypted = mail.plainBody?.contains(beginPgpMessage) ?? false
+        let signed = mail.plainBody?.contains(beginPgpSignedMessage) ?? false
+        if(encrypted){
+            let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
             
-            if let password = textField?.text {
-                SVProgressHUD.show()
-                
-                do {
-
-                    #if !targetEnvironment(simulator)
-                    if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
-                        let body = mail.plainedBody(false)
-                        let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
-                        var publicKeyRing : DMSPGPKeyRing? = nil
-                        if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
-                            do {
-                                publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
-                            } catch {
-                                
-                            }
-                        }
-
+            alert.addTextField { (textField) in
+                textField.placeholder = NSLocalizedString("Enter password", comment: "")
+                textField.isSecureTextEntry = true
+            }
+            
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
+                let textField = alert!.textFields![0]
+                let password = textField.text!
+                self.decryptAndCheckSign(password,mail)
+            }))
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+            
+        }else if(signed){
+            checkSign(mail)
+        }
+    }
+    
+    func decryptAndCheckSign(_ password:String, _ mail:APIMail){
+        var mail=mail
+        SVProgressHUD.show()
+        
+        do {
+            
+            if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
+                let body = mail.plainedBody(false)
+                let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
+                var publicKeyRing : DMSPGPKeyRing? = nil
+                if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
+                    do {
+                        publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
+                    } catch {
                         
-
-
-                        do {
-                            let decryptor = try DMSPGPDecryptor(armoredMessage: body)
-
-                            let decryptKey = decryptor.encryptingKeyIDs.compactMap { keyID in
-                                return secretKeyRing.secretKeyRing?.getDecryptingSecretKey(keyID: keyID)
-                            }.first
-
-                            guard let secretKey = decryptKey else {
-                                return ;
-                            }
-
-                            let message = try decryptor.decrypt(secretKey: secretKey, password: password)
-
-                            let signatureVerifier = DMSPGPSignatureVerifier(message: message, onePassSignatureList: decryptor.onePassSignatureList, signatureList: decryptor.signatureList)
-                            let verifyResult = signatureVerifier.verifySignature(use: publicKeyRing!.publicKeyRing)
-
-                            mail.htmlBody = message
-                            self.mail = mail
-
-                            if let mailVC = self.viewControllers?.last as? MailViewController {
-                                mailVC.mail = mail
-                                mailVC.tableView.reloadData()
-                            }
-                        } catch {
-
-                        }
-
-
-
-
                     }
-                    #endif
+                }
+                do {
+                    let decryptor = try ValidDMSPGPDecryptor(armoredMessage: body)
                     
-                    SVProgressHUD.dismiss()
+                    let decryptKey = decryptor.encryptingKeyIDs.compactMap { keyID in
+                        return secretKeyRing.secretKeyRing?.getDecryptingSecretKey(keyID: keyID)
+                    }.first
+                    
+                    guard let secretKey = decryptKey else {
+                        return ;
+                    }
+                    
+                    let message = try decryptor.decrypt(secretKey: secretKey, password: password)
+                    
+                    let signatureVerifier = DMSPGPSignatureVerifier(message: message, onePassSignatureList: decryptor.onePassSignatureList, signatureList: decryptor.signatureList)
+                    let verifyResult = signatureVerifier.verifySignature(message:message,use: publicKeyRing!.publicKeyRing)
+                    
+                    switch verifyResult {
+                    case .invalid:
+                        SVProgressHUD.showError(withStatus: Strings.invalidSignature)
+                        return
+                    default:
+                        
+                        break
+                    }
+                    
+                    mail.htmlBody = message
+                    self.mail = mail
+                    
+                    if let mailVC = self.viewControllers?.last as? MailViewController {
+                        mailVC.mail = mail
+                        mailVC.tableView.reloadData()
+                    }
                 } catch {
-                    SVProgressHUD.showError(withStatus: error.localizedDescription)
+                    
+                }
+                
+            }
+            
+            SVProgressHUD.dismiss()
+            SVProgressHUD.showSuccess(withStatus: Strings.decryptedAndVerified)
+        } catch {
+            SVProgressHUD.showError(withStatus: error.localizedDescription)
+        }
+    }
+    func checkSign(_ mail:APIMail){
+        do{
+            var mail = mail
+            let message = mail.plainedBody(false)
+            var publicKeyRing : DMSPGPKeyRing? = nil
+            if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
+                do {
+                    publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
+                } catch {
+                    
                 }
             }
-        }))
-        
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        
-        self.present(alert, animated: true, completion: nil)
+            let verifier=try ValidDMSPGPClearTextVerifier(cleartext: message)
+            let signatureVerifier = verifier.signatureVerifier
+           
+            let verifyResult=signatureVerifier.verifySignature(message:verifier.message,use: publicKeyRing!.publicKeyRing)
+            
+            mail.htmlBody = signatureVerifier.message
+            self.mail = mail
+            
+            if let mailVC = self.viewControllers?.last as? MailViewController {
+                mailVC.mail = mail
+                mailVC.tableView.reloadData()
+            }
+            
+            switch verifyResult {
+            case .invalid:
+                SVProgressHUD.showError(withStatus: Strings.invalidSignature)
+                return
+            default:
+                SVProgressHUD.showSuccess(withStatus: Strings.validSignature)
+                break
+            }
+        }catch{
+            SVProgressHUD.showError(withStatus: error.localizedDescription)
+        }
     }
     
     @IBAction func trashButtonAction(_ sender: Any) {
@@ -164,7 +216,7 @@ class MailPageViewController: UIPageViewController {
                 API.shared.moveMessage(mail: self.mail, toFolder: "Trash") { (result, error) in
                     DispatchQueue.main.async {
                         SVProgressHUD.dismiss()
-
+                        
                         if let success = result {
                             if success {
                                 StorageProvider.shared.deleteMail(mail: self.mail)
@@ -184,7 +236,7 @@ class MailPageViewController: UIPageViewController {
                 API.shared.deleteMessage(mail: self.mail) { (result, error) in
                     DispatchQueue.main.async {
                         SVProgressHUD.dismiss()
-
+                        
                         if let success = result {
                             if success {
                                 StorageProvider.shared.deleteMail(mail: self.mail)
@@ -223,7 +275,7 @@ class MailPageViewController: UIPageViewController {
             API.shared.moveMessage(mail: self.mail, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
                 DispatchQueue.main.async {
                     SVProgressHUD.dismiss()
-
+                    
                     if let success = result {
                         if success {
                             StorageProvider.shared.deleteMail(mail: self.mail)
@@ -312,17 +364,17 @@ class MailPageViewController: UIPageViewController {
         mail = mailVC.mail
         
         if segue.identifier == "ReplySegue" || segue.identifier == "ReplyAllSegue" {
-//            if segue.identifier == "ReplySegue" {
-//                if let sender = mail.from?.first {
-//                    newMail.to = [sender]
-//                }
-//            } else {
+            //            if segue.identifier == "ReplySegue" {
+            //                if let sender = mail.from?.first {
+            //                    newMail.to = [sender]
+            //                }
+            //            } else {
             if let replyTo = mail.replyTo, replyTo.count > 0 {
                 newMail.to = replyTo
             } else {
                 newMail.to = mail.from
             }
-//            }
+            //            }
             
             if segue.identifier == "ReplyAllSegue" {
                 var emails: [String] = []
@@ -356,7 +408,7 @@ class MailPageViewController: UIPageViewController {
             From: \(mail.from?.joined(separator: ", ") ?? "")<br/>
             To: \(mail.to?.joined(separator: ", ") ?? "")<br/>\n
             """
-           
+            
             if let cc = mail.cc, cc.count > 0 {
                 body += "CC: \(cc.joined(separator: ", "))<br/>\n"
             }
@@ -371,7 +423,7 @@ class MailPageViewController: UIPageViewController {
             
             newMail.htmlBody = body
         }
-                
+        
         ComposeMailModelController.shared.mail = newMail
     }
 }
