@@ -531,6 +531,7 @@ struct APIContact {
                 "LastName": (lastName ?? ""),
                 "NickName": (nickName ?? ""),
                 "GroupUUIDs": (groupUUIDs ?? []),
+                "PersonalEmail": (personalEmail ?? ""),
                 "PersonalPhone": (personalPhone ?? ""),
                 "PersonalCity" : (city ?? ""),
                 "PersonalState" : (state ?? ""),
