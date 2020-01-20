@@ -102,9 +102,9 @@ class LoginViewController: UIViewController {
     private func autoDiscoverFailed(withError error: Error?,
                                     progressCompletion: @escaping ProgressHUD.CompletionHandler) {
         UrlsManager.shared.baseUrl = nil
-    
+        
         self.setIsUserInteractionEnabled(true)
-    
+        
         if let error = error {
             if error is AutodiscoverError {
                 progressCompletion(.error(Strings.specifyYourServerUrl))
@@ -125,29 +125,34 @@ class LoginViewController: UIViewController {
                               baseUrl: URL,
                               progressCompletion: ProgressHUD.CompletionHandler? = nil) {
         let progressCompletion = progressCompletion ?? ProgressHUD.showWithCompletion()
-    
+        
         setIsUserInteractionEnabled(false)
         
         UrlsManager.shared.baseUrl = baseUrl
-    
-        API.shared.login(login: login, password: password) { (success, error) in
+        API.shared.login(login: login, password: password, completionHandler: { (success, error) in
             self.setIsUserInteractionEnabled(true)
-        
+            
             guard success, error == nil else {
                 self.loginDidFailed(withError: error, progressCompletion: progressCompletion)
                 return
             }
-        
+            
             API.shared.getAccounts { (result, error) in
                 if let error = error {
                     progressCompletion(.error(error.localizedDescription))
                 } else {
                     progressCompletion(.dismiss)
                 }
-            
+                
                 DispatchQueue.main.async {
                     self.dismiss(animated: true, completion: nil)
                 }
+            }
+        }) { (key, value) in
+            progressCompletion(.dismiss)
+            self.setIsUserInteractionEnabled(true)
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "TwoFactorAuth", sender: [login,password,key,value])
             }
         }
     }
@@ -246,7 +251,15 @@ class LoginViewController: UIViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
+        let controller = segue.destination as! TwoFactorAuthConroller
+        let list = sender as! [Any]
+        controller.login=list[0] as? String
+        controller.password=list[1] as? String
+        controller.userKey=list[2] as? String
+        controller.userValue=list[3]
+        controller.complete={
+            self.dismiss(animated: false, completion:nil)
+        }
     }
     
 }

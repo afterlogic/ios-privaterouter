@@ -26,6 +26,7 @@
 		A343D6F0238D576A00EF8BD9 /* IdentityChooserTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A343D6EF238D576A00EF8BD9 /* IdentityChooserTableViewCell.xib */; };
 		A343D6F2238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343D6F1238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift */; };
 		A3EF513D238521C300B2D9C1 /* UserLimitsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3EF513C238521C300B2D9C1 /* UserLimitsViewController.swift */; };
+		DB21C1D923D5A0700016BD3A /* TwoFactorAuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */; };
 		DB4736A323CF2D2700D1AD06 /* ValidSignVerify.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */; };
 		E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50122662288981D00CC7477 /* MailPageViewController.swift */; };
 		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
@@ -135,6 +136,7 @@
 		BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMail.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorAuthController.swift; sourceTree = "<group>"; };
 		DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidSignVerify.swift; sourceTree = "<group>"; };
 		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
 		E50122662288981D00CC7477 /* MailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailPageViewController.swift; sourceTree = "<group>"; };
@@ -270,6 +272,14 @@
 				BD6D5FDE03D0B8B4873CF537 /* Pods_PrivateMailUITests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DB21C1D723D59F730016BD3A /* ThoFactorAuth */ = {
+			isa = PBXGroup;
+			children = (
+				DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */,
+			);
+			path = ThoFactorAuth;
 			sourceTree = "<group>";
 		};
 		DB4736A123CF2CEB00D1AD06 /* Pgp */ = {
@@ -412,6 +422,7 @@
 		E5F28A93223843E9002721ED /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				DB21C1D723D59F730016BD3A /* ThoFactorAuth */,
 				E5F28A9C223856DD002721ED /* LoginViewController.swift */,
 				E567B4672236D51C00FA9945 /* MainViewController.swift */,
 				E5F28AA222387ACB002721ED /* SideMenuViewController.swift */,
@@ -741,6 +752,7 @@
 				A3EF513D238521C300B2D9C1 /* UserLimitsViewController.swift in Sources */,
 				E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */,
 				E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */,
+				DB21C1D923D5A0700016BD3A /* TwoFactorAuthController.swift in Sources */,
 				E5F28A972238442D002721ED /* MailTableViewCell.swift in Sources */,
 				E5690D7222D042B1003493E1 /* ImportKeysListViewController.swift in Sources */,
 				E540988D22837B8600E2C588 /* MailHTMLBodyTableViewCell.swift in Sources */,
