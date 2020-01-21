@@ -81,7 +81,34 @@ class API: NSObject {
         }.resume()
     }
     
-    func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
+    func twoFactorAuth(login: String, password: String,pin:String,userKey:String,userValue:Any,completionHandler: @escaping (Bool, Error?) -> Void){
+        let parameters = ["Pin":pin,userKey:userValue,"Login": login, "Password": password]
+        removeCookies()
+        
+        callAPI(module: "TwoFactorAuth", method: "VerifyPin", parameters: parameters) { (res, error) in
+            
+            if let error = error {
+                completionHandler(false, error)
+                return
+            }
+            if let result = res["Result"] {
+                if(result is Bool){
+                   completionHandler(false, nil)
+                }else{
+                    let token = (result as! [String:String])["AuthToken"]
+                    keychain["AccessToken"] = token
+                    self.setCookie(key: "AuthToken", value: token as AnyObject)
+                    
+                    completionHandler(true, nil)
+                }
+            } else {
+                completionHandler(false, nil)
+            }
+        }
+        
+    }
+    
+    func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void,onTwoFactorAuth: @escaping (String, Any) -> Void) {
         let parameters = ["Login": login, "Password": password]
         removeCookies()
         
@@ -92,14 +119,18 @@ class API: NSObject {
                 return
             }
             
-            if let result = result["Result"] {
-                let res = result as! [String: String]
-                let token = res["AuthToken"]
-                
-                keychain["AccessToken"] = token
-                self.setCookie(key: "AuthToken", value: token as AnyObject)
-                
-                completionHandler(true, nil)
+            if let result = result["Result"] as? [String: Any] {
+                if result["AuthToken"] != nil {
+                    let token = result["AuthToken"] as! String
+                    keychain["AccessToken"] = token
+                    self.setCookie(key: "AuthToken", value: token as AnyObject)
+                    
+                    completionHandler(true, nil)
+                } else{
+                    let userIdMap = result["TwoFactorAuth"] as! [String: Any]
+                    let mapEntity=userIdMap.first!
+                    onTwoFactorAuth(mapEntity.key,mapEntity.value)
+                }
             } else {
                 completionHandler(false, nil)
             }
