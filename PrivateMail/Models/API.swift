@@ -81,8 +81,8 @@ class API: NSObject {
         }.resume()
     }
     
-    func twoFactorAuth(login: String, password: String,pin:String,userKey:String,userValue:Any,completionHandler: @escaping (Bool, Error?) -> Void){
-        let parameters = ["Pin":pin,userKey:userValue,"Login": login, "Password": password]
+    func twoFactorAuth(login: String, password: String,pin:String,completionHandler: @escaping (Bool, Error?) -> Void){
+        let parameters = ["Pin":pin,"Login": login, "Password": password]
         removeCookies()
         
         callAPI(module: "TwoFactorAuth", method: "VerifyPin", parameters: parameters) { (res, error) in
@@ -91,11 +91,12 @@ class API: NSObject {
                 completionHandler(false, error)
                 return
             }
-            if let result = res["Result"] {
-                if(result is Bool){
+            if let result = res["Result"]  {
+                let map = result as? [String:String]
+                if(map == nil || map!["AuthToken"] == nil){
                    completionHandler(false, nil)
                 }else{
-                    let token = (result as! [String:String])["AuthToken"]
+                    let token = map!["AuthToken"]
                     keychain["AccessToken"] = token
                     self.setCookie(key: "AuthToken", value: token as AnyObject)
                     
@@ -108,7 +109,7 @@ class API: NSObject {
         
     }
     
-    func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void,onTwoFactorAuth: @escaping (String, Any) -> Void) {
+    func login(login: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void,onTwoFactorAuth: @escaping () -> Void) {
         let parameters = ["Login": login, "Password": password]
         removeCookies()
         
@@ -127,9 +128,7 @@ class API: NSObject {
                     
                     completionHandler(true, nil)
                 } else{
-                    let userIdMap = result["TwoFactorAuth"] as! [String: Any]
-                    let mapEntity=userIdMap.first!
-                    onTwoFactorAuth(mapEntity.key,mapEntity.value)
+                    onTwoFactorAuth()
                 }
             } else {
                 completionHandler(false, nil)

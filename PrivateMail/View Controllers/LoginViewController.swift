@@ -148,11 +148,11 @@ class LoginViewController: UIViewController {
                     self.dismiss(animated: true, completion: nil)
                 }
             }
-        }) { (key, value) in
+        }) {
             progressCompletion(.dismiss)
             self.setIsUserInteractionEnabled(true)
             DispatchQueue.main.async {
-                self.performSegue(withIdentifier: "TwoFactorAuth", sender: [login,password,key,value])
+                self.performSegue(withIdentifier: "TwoFactorAuth", sender: [login,password])
             }
         }
     }
@@ -255,8 +255,7 @@ class LoginViewController: UIViewController {
         let list = sender as! [Any]
         controller.login=list[0] as? String
         controller.password=list[1] as? String
-        controller.userKey=list[2] as? String
-        controller.userValue=list[3]
+
         controller.complete={
             self.dismiss(animated: false, completion:nil)
         }

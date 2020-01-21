@@ -20,8 +20,6 @@ class TwoFactorAuthConroller: UIViewController {
     var complete:(()->Void)?
     var login:String?
     var password:String?
-    var userKey:String?
-    var userValue:Any?
     
     
     override func viewDidLoad() {
@@ -44,7 +42,7 @@ class TwoFactorAuthConroller: UIViewController {
             return
         }
         SVProgressHUD.show()
-        API.shared.twoFactorAuth(login: login!, password: password!, pin: pin!,userKey:userKey!,userValue:userValue!) { (success, error) in
+        API.shared.twoFactorAuth(login: login!, password: password!, pin: pin!) { (success, error) in
             SVProgressHUD.dismiss()
             if let error = error {
                 SVProgressHUD.showError(withStatus: error.localizedDescription)
@@ -59,8 +57,8 @@ class TwoFactorAuthConroller: UIViewController {
                         }
                         
                         DispatchQueue.main.async {
-                            self.complete!()
                             self.dismiss(animated: false, completion:nil)
+                            self.complete!()
                         }
                     }
                     
