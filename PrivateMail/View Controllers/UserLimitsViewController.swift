@@ -20,18 +20,7 @@ class UserLimitsViewController: UIViewController {
         upgradeNow.layer.cornerRadius = upgradeNow.frame.size.height / 2.0
         backToLoginButton.layer.cornerRadius = backToLoginButton.frame.size.height / 2.0
     }
-    
-    @IBAction func upgradeTapped(_ sender: Any) {
-        guard let url = UrlsManager.shared.upgradePlan else {
-            return
-        }
-        
-        if #available(iOS 10.0, *) {
-            UIApplication.shared.open(url)
-        } else {
-            UIApplication.shared.openURL(url)
-        }
-    }
+
     
     @IBAction func backToLoginTapped(_ sender: Any) {
         dismiss(animated: true)

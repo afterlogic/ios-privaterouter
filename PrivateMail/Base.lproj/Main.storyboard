@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iPJ-Sr-XcC">
     <device id="retina6_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -24,14 +24,14 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="NoMessagesCell" id="SlR-oV-lbn">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="43.333332061767578"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="42.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="SlR-oV-lbn" id="UEA-61-tFI">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.333332061767578"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="42.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="750" text="No messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bku-4o-qyE">
-                                                    <rect key="frame" x="20" y="10.999999999999998" width="374" height="21.333333333333329"/>
+                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="20.666666666666671"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -49,14 +49,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="MoreMessagesCell" id="rjd-F5-M5l">
-                                        <rect key="frame" x="0.0" y="71.333332061767578" width="414" height="42.666667938232422"/>
+                                        <rect key="frame" x="0.0" y="70.666667938232422" width="414" height="43.333332061767578"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rjd-F5-M5l" id="FHg-XN-fdG">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="42.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.333332061767578"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show more messages" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aFs-3k-FiV">
-                                                    <rect key="frame" x="20" y="11.000000000000002" width="374" height="20.666666666666671"/>
+                                                    <rect key="frame" x="20" y="10.999999999999998" width="374" height="21.333333333333329"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -841,7 +841,7 @@
                         <rightBarButtonItems>
                             <barButtonItem id="f7o-df-1hc">
                                 <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="0E3-cs-Dpi" userLabel="Icon">
-                                    <rect key="frame" x="354" y="0.0" width="40" height="44"/>
+                                    <rect key="frame" x="354.00000000000006" y="0.0" width="40" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="side_menu"/>
@@ -1595,8 +1595,8 @@
                                     <constraint firstAttribute="height" constant="67" id="PNa-xd-hvJ"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mobile apps are not allowed in your billing plan. Please upgrade plan." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q7i-8v-NR8">
-                                <rect key="frame" x="44" y="191" width="326" height="479"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mobile apps are not allowed in your billing plan." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q7i-8v-NR8">
+                                <rect key="frame" x="44" y="191" width="326" height="40.666666666666657"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -1604,23 +1604,6 @@
                                     <userDefinedRuntimeAttribute type="string" keyPath="localizedText" value="userLimitsDescription"/>
                                 </userDefinedRuntimeAttributes>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yhe-aC-oXA" customClass="UIAccentButton" customModule="PrivateMail" customModuleProvider="target">
-                                <rect key="frame" x="44" y="694" width="326" height="44"/>
-                                <color key="backgroundColor" red="0.73725490199999999" green="0.2784313725" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="hvY-bY-MIn"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="18"/>
-                                <state key="normal" title="UPGRADE NOW">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="localizedTitle" value="upgradeNow"/>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="upgradeTapped:" destination="s0C-Bl-d5I" eventType="touchUpInside" id="fnu-y4-JTg"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JPi-dX-h2F">
                                 <rect key="frame" x="44" y="762" width="326" height="44"/>
                                 <color key="backgroundColor" red="0.34329658749999997" green="0.38015058639999999" blue="0.53727370500000005" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -1641,15 +1624,11 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="trailingMargin" secondItem="yhe-aC-oXA" secondAttribute="trailing" constant="24" id="5tB-5G-1me"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Q7i-8v-NR8" secondAttribute="trailing" constant="24" id="9re-Lj-78M"/>
-                            <constraint firstItem="yhe-aC-oXA" firstAttribute="top" secondItem="Q7i-8v-NR8" secondAttribute="bottom" constant="24" id="BWo-A4-5uc"/>
                             <constraint firstAttribute="trailing" secondItem="D3h-gE-EZs" secondAttribute="trailing" id="LIN-m4-Ply"/>
                             <constraint firstAttribute="trailingMargin" secondItem="tth-Zz-lEp" secondAttribute="trailing" constant="24" id="LhO-pn-ZHn"/>
-                            <constraint firstItem="JPi-dX-h2F" firstAttribute="top" secondItem="yhe-aC-oXA" secondAttribute="bottom" constant="24" id="O72-UV-QCt"/>
                             <constraint firstAttribute="trailingMargin" secondItem="JPi-dX-h2F" secondAttribute="trailing" constant="24" id="XgY-mb-DNj"/>
                             <constraint firstItem="tth-Zz-lEp" firstAttribute="leading" secondItem="pls-Qq-Cun" secondAttribute="leadingMargin" constant="24" id="XuH-78-8Xu"/>
-                            <constraint firstItem="yhe-aC-oXA" firstAttribute="leading" secondItem="pls-Qq-Cun" secondAttribute="leadingMargin" constant="24" id="cR7-5l-KRS"/>
                             <constraint firstItem="Q7i-8v-NR8" firstAttribute="leading" secondItem="pls-Qq-Cun" secondAttribute="leadingMargin" constant="24" id="dGA-D2-MWI"/>
                             <constraint firstItem="D3h-gE-EZs" firstAttribute="top" secondItem="pls-Qq-Cun" secondAttribute="top" id="daF-ZB-19p"/>
                             <constraint firstItem="JPi-dX-h2F" firstAttribute="leading" secondItem="pls-Qq-Cun" secondAttribute="leadingMargin" constant="24" id="jbK-GZ-jSq"/>
@@ -1663,7 +1642,6 @@
                     <navigationItem key="navigationItem" id="UES-zN-RIy"/>
                     <connections>
                         <outlet property="backToLoginButton" destination="JPi-dX-h2F" id="Fm2-ej-jEb"/>
-                        <outlet property="upgradeNow" destination="yhe-aC-oXA" id="hxm-LM-phJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yhI-Jg-LeV" userLabel="First Responder" sceneMemberID="firstResponder"/>
