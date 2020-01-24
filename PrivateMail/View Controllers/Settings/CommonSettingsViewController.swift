@@ -25,7 +25,7 @@ class CommonSettingsViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(cellClass: SettingsTableViewCell())
-        
+        tableView.tableFooterView = UIView(frame: .zero)
     }
     
     deinit {

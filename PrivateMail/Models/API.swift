@@ -918,7 +918,7 @@ class API: NSObject {
                     
                     let fileContent = try Data(contentsOf: URL(string: fileName)!)
                     
-                    body.appendString("; filename=\"\(filename)\"\r\n")
+                    body.appendString("; filename=\"\(filename.decodeUrl)\"\r\n")
                     body.appendString("Content-Type: \(contentType)\r\n\r\n")
                     body.append(fileContent)
                     body.appendString("\r\n")
@@ -992,6 +992,18 @@ class API: NSObject {
             return
         }
     }
+    
+    func uploadAttachment(name:String,content: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
+        callAPI(
+           module: "Core",
+           method: "SaveContentAsTempFile",
+           parameters: [
+            "Content":content,
+            "FileName":name
+            ],
+           completionHandler: completionHandler
+        )
+       }
     
     
     // MARK: - Helpers
@@ -1230,5 +1242,15 @@ extension NSMutableData {
     func appendString(_ string: String) {
         let data = string.data(using: String.Encoding.utf8, allowLossyConversion: false)
         append(data!)
+    }
+}
+extension String{
+    var encodeUrl : String
+    {
+        return self.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed)!
+    }
+    var decodeUrl : String
+    {
+        return self.removingPercentEncoding!
     }
 }

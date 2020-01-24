@@ -207,6 +207,10 @@ class ContactDetailTableViewCell: UITableViewCell {
             break
             
         case .group:
+            if(currentGroup == nil){
+                 contentField.isHidden = false
+               break
+            }
             description = currentGroup?.name ?? ("(no name)")
             groupSwitch.isOn = ContactsModelController.shared.contact.groupUUIDs?.contains(currentGroup?.uuid ?? "") ?? false
             

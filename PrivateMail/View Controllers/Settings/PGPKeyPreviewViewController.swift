@@ -9,7 +9,7 @@
 import UIKit
 
 class PGPKeyPreviewViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     
     var key: PGPKey?
@@ -106,7 +106,7 @@ extension PGPKeyPreviewViewController: UITableViewDelegate, UITableViewDataSourc
         if section == 0 {
             return key?.email
         }
-
+        
         return nil
     }
     
@@ -117,10 +117,15 @@ extension PGPKeyPreviewViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             if indexPath.row == 0 {
-                var mail = APIMail()
-                mail.htmlBody = key?.armoredKey.replacingOccurrences(of: "\n", with: "<br>")
-                
-                ComposeMailModelController.shared.mail = mail
+                if(key!.email.isNotEmpty){
+                    ComposeMailModelController.shared.attachmentText = [
+                        "\(key!.email) PGP \(key!.isPrivate ? "private":"public") key.asc":key!.armoredKey
+                    ]
+                }else{
+                    ComposeMailModelController.shared.attachmentText = [
+                        "PGP public keys.asc":key!.armoredKey
+                    ]
+                }
                 performSegue(withIdentifier: "ComposeSegue", sender: nil)
             } else if indexPath.row == 1 {
                 if let key = self.key {

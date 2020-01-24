@@ -17,7 +17,7 @@ struct ContactDetailsContent {
 }
 
 class ContactDetailsViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
     
     @IBOutlet var editButton: UIBarButtonItem!
@@ -120,12 +120,13 @@ class ContactDetailsViewController: UIViewController {
         ContactDetailsContent(sectionHeader: NSLocalizedString("Groups", comment: ""), isHidden: false, cells: [
             .header
         ]),
-    ] as [ContactDetailsContent]
+        ] as [ContactDetailsContent]
     
     var groups: [ContactsGroupDB] = [] {
         didSet {
             var cells: [ContactDetailTableViewCellStyle] = [.header]
             
+    
             for _ in groups {
                 cells.append(.group)
             }
@@ -166,7 +167,7 @@ class ContactDetailsViewController: UIViewController {
         } else {
             tableView.addSubview(refreshControl)
         }
-                
+        
         reloadData()
         
         API.shared.getContactGroups { (result, error) in
@@ -175,12 +176,12 @@ class ContactDetailsViewController: UIViewController {
                 self.reloadData()
             }
         }
-    
+        
         
         NotificationCenter.default.addObserver(
             self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(
-        self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+            self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -345,7 +346,7 @@ class ContactDetailsViewController: UIViewController {
                 CNLabeledValue(label: CNLabelWork, value: (contactItem.businessEmail ?? "") as NSString),
                 CNLabeledValue(label: CNLabelOther, value: (contactItem.otherEmail ?? "") as NSString),
             ]
-                        
+            
             do {
                 let data = try CNContactVCardSerialization.data(with: [contact])
                 let directory = NSTemporaryDirectory()
@@ -398,16 +399,25 @@ extension ContactDetailsViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ContactDetailTableViewCell.cellID(), for: indexPath) as! ContactDetailTableViewCell
-                
+        
         cell.isEditable = inEditMode || isAdding
         
         let content = self.content[indexPath.section]
         let style = content.cells[indexPath.row]
         
         if style == .group {
-            cell.currentGroup = groups[indexPath.row - 1]
-        }
+            let groupsId = ContactsModelController.shared.contact.groupUUIDs!
+            let group = groups[indexPath.row - 1]
+            if(groupsId.contains(group.uuid) || cell.isEditable){
+                cell.isHidden=false
+                cell.currentGroup = group
+            }else{
+                cell.isHidden=true
+                cell.currentGroup = nil
+            }
             
+        }
+        
         cell.style = style
         
         if style == .header {
@@ -424,7 +434,7 @@ extension ContactDetailsViewController: UITableViewDelegate, UITableViewDataSour
         
         return cell
     }
-        
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let style = content[indexPath.section].cells[indexPath.row]
         
@@ -436,7 +446,7 @@ extension ContactDetailsViewController: UITableViewDelegate, UITableViewDataSour
             var first = UIAlertAction()
             var second = UIAlertAction()
             var third = UIAlertAction()
-
+            
             switch style {
             case .primaryPhone:
                 first = UIAlertAction(title: "Personal Phone", style: .default, handler: { (action) in

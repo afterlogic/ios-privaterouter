@@ -20,6 +20,7 @@ class ComposeMailViewController: UIViewController {
     
     @IBOutlet var tableViewBottomConstraint: NSLayoutConstraint!
     
+    @IBOutlet var encryptBarButton: UIBarButtonItem!
     @IBOutlet var dialogView: UIView!
     @IBOutlet var encryptDialogView: UIView!
     @IBOutlet var encryptDialogTitle: UILabel!
@@ -94,6 +95,10 @@ class ComposeMailViewController: UIViewController {
             modelController.attachmentFileURL = nil
             addAttachments(urls: [fileURL])
         }
+        if let attachmentText = modelController.attachmentText {
+            modelController.attachmentText = nil
+            addAttachments(text: attachmentText)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -109,7 +114,7 @@ class ComposeMailViewController: UIViewController {
         guard let to = self.modelController.mail.to, to.count > 0 else  {
             return
         }
-        if(self.modelController.mail.encrypted){
+        if(self.modelController.mail.encrypted || self.modelController.mail.signed){
             self.modelController.mail.htmlBody = mailInput?.getTextFromWebView().removingRegexMatches(pattern:"<br>", replaceWith: "\n")
         }else{
             self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
@@ -240,6 +245,8 @@ class ComposeMailViewController: UIViewController {
             mailInput!.isEditor = false
             mailInput!.htmlText = mail.htmlBody!
             mailInput!.setEnable(false)
+            encryptBarButton.isEnabled = false
+            encryptBarButton.tintColor = UIColor.clear
         } catch {
             SVProgressHUD.showInfo(withStatus: error.localizedDescription)
         }
@@ -579,7 +586,6 @@ extension ComposeMailViewController: UIDocumentPickerDelegate {
             }
             
             SVProgressHUD.show()
-            
             API.shared.uploadAttachment(fileName: url.absoluteString) { (result, error) in
                 DispatchQueue.main.async {
                     SVProgressHUD.dismiss()
@@ -601,6 +607,36 @@ extension ComposeMailViewController: UIDocumentPickerDelegate {
                         }
                     } else {
                         SVProgressHUD.showError(withStatus: "Can't upload the file")
+                    }
+                }
+            }
+        }
+    }
+    func addAttachments(text: [String: String]) {
+        DispatchQueue.main.async {
+            
+            let key = text.first!
+            
+            SVProgressHUD.show()
+            API.shared.uploadAttachment(name: key.key, content: key.value) { (result, error) in
+                DispatchQueue.main.async {
+                    SVProgressHUD.dismiss()
+                    
+                    if let result = result?["Result"] as? [String: Any] {
+                        if  let tempName = result["FileName"] as? String,
+                            let fileName = result["FileName"] as? String {
+                            let attachment = [fileName, "", "0", "0", ""]
+                            
+                            if self.modelController.mail.attachmentsToSend == nil {
+                                self.modelController.mail.attachmentsToSend = [:]
+                            }
+                            
+                            self.modelController.mail.attachmentsToSend?[tempName] = attachment
+                            self.tableView.reloadData()
+                            
+                        } else {
+                            SVProgressHUD.showError(withStatus: "Can't upload the file")
+                        }
                     }
                 }
             }

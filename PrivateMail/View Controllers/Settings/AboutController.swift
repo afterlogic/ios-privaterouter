@@ -9,9 +9,11 @@
 import Foundation
 import UIKit
 import SwiftTheme
+import QuartzCore
 
 class AboutController: UIViewController {
     
+    @IBOutlet weak var appImage: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var versionLabel: UILabel!
     @IBOutlet weak var termsLabel: UILabel!
@@ -32,11 +34,11 @@ class AboutController: UIViewController {
         termsLabel.isUserInteractionEnabled = true
         termsLabel.addGestureRecognizer(onTerms)
         
-        privacyLabel.textColor = ThemeManager.color(ThemeColorName.primary)
-        termsLabel.textColor = ThemeManager.color(ThemeColorName.primary)
+        privacyLabel.textColor = UIColor.purple
+        termsLabel.textColor = UIColor.purple
         versionLabel.textColor = UIColor.gray
     }
-    
+ 
     @objc
     func onPrivacy(sender:UITapGestureRecognizer) {
         let url=URL(string:"https://privatemail.com/privacy.php")!

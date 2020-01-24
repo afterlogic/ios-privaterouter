@@ -170,7 +170,7 @@ class ContactsViewController: UIViewController {
     }
     
     func reloadData() {
-        self.noContactsLabel.isHidden = true
+        self.noContactsLabel?.isHidden = true
         DispatchQueue.main.async {
             self.refreshControl.beginRefreshing(in: self.tableView)
             
@@ -196,14 +196,14 @@ class ContactsViewController: UIViewController {
                             
                                 
                                 }
-                                   self.noContactsLabel.isHidden = !self.contacts.isEmpty
+                                   self.noContactsLabel?.isHidden = !self.contacts.isEmpty
                                 self.refreshControl.endRefreshing()
                             }
                         })
                     }
                 } else {
                     DispatchQueue.main.async {
-                        self.noContactsLabel.isHidden = !self.contacts.isEmpty
+                        self.noContactsLabel?.isHidden = !self.contacts.isEmpty
                         self.refreshControl.endRefreshing()
                     }
                 }
