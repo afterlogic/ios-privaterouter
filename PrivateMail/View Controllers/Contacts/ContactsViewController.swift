@@ -17,7 +17,7 @@ extension Notification.Name {
 class ContactsViewController: UIViewController {
     
     @IBOutlet var tableView: UITableView!
-    
+    @IBOutlet var noContactsLabel: UILabel!
     @IBOutlet var searchButton: UIBarButtonItem!
     @IBOutlet var addButton: UIBarButtonItem!
     @IBOutlet var menuButton: UIBarButtonItem!
@@ -170,6 +170,7 @@ class ContactsViewController: UIViewController {
     }
     
     func reloadData() {
+        self.noContactsLabel.isHidden = true
         DispatchQueue.main.async {
             self.refreshControl.beginRefreshing(in: self.tableView)
             
@@ -177,7 +178,6 @@ class ContactsViewController: UIViewController {
             let selectedStorage = GroupsModelController.shared.selectedStorage
             let selectedGroup = GroupsModelController.shared.selectedItem
             self.contacts = StorageProvider.shared.getContacts(selectedGroup.uuid)
-            
             API.shared.getContactsInfo(storage:selectedStorage.id!,group: selectedGroup.uuid) { (result, group, error) in
                 if let contacts = result,
                     oldCTag != group?.cTag {
@@ -193,14 +193,17 @@ class ContactsViewController: UIViewController {
                                     //                            }
                                     
                                     self.contacts = StorageProvider.shared.getContacts(selectedGroup.uuid)
-                                }
+                            
                                 
+                                }
+                                   self.noContactsLabel.isHidden = !self.contacts.isEmpty
                                 self.refreshControl.endRefreshing()
                             }
                         })
                     }
                 } else {
                     DispatchQueue.main.async {
+                        self.noContactsLabel.isHidden = !self.contacts.isEmpty
                         self.refreshControl.endRefreshing()
                     }
                 }

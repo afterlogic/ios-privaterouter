@@ -19,6 +19,8 @@ struct Strings {
     
     static var backToLogin: String { .localized("backToLogin") }
     
+    static var cancel: String { .localized("Cancel") }
+    
     static var cantCompleteAction: String { .localized("cantCompleteAction") }
     
     static var failedToEditContact: String { .localized("failedToEditContact") }

@@ -94,7 +94,7 @@ class API: NSObject {
             if let result = res["Result"]  {
                 let map = result as? [String:String]
                 if(map == nil || map!["AuthToken"] == nil){
-                   completionHandler(false, nil)
+                    completionHandler(false, nil)
                 }else{
                     let token = map!["AuthToken"]
                     keychain["AccessToken"] = token
@@ -1082,13 +1082,18 @@ class API: NSObject {
                  method: String,
                  parameters: [String: Any],
                  completionHandler: @escaping ([String: Any], Error?) -> Void) {
-        rawCallAPI(
-            module: module,
-            method: method,
-            parameters: parameters,
-            dataOnError: [:],
-            dataParser: { try JSONSerialization.jsonObject(with: $0, options: .fragmentsAllowed) as! [String: Any] },
-            completionHandler: completionHandler)
+        do{
+            try rawCallAPI(
+                module: module,
+                method: method,
+                parameters: parameters,
+                dataOnError: [:],
+                dataParser: { try JSONSerialization.jsonObject(with: $0, options: .fragmentsAllowed) as! [String: Any] },
+                completionHandler: completionHandler)
+        }catch{
+            completionHandler([:],error)
+            print(error)
+        }
     }
     
     func rawCallAPI<T>(module: String,

@@ -160,8 +160,10 @@ class ComposeMailViewController: UIViewController {
     @IBAction func signEncryptButtonAction(_ sender: Any) {
         modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         var mail = modelController.mail
+        if( mail.encrypted || mail.signed ){
+            return
+        }
         mail.isHtml=false
-        mail.encrypted=true
         
         
         do {
@@ -206,7 +208,8 @@ class ComposeMailViewController: UIViewController {
             
             var encryptedMessage = message
             if (signSwitch.isOn){
-                
+                mail.signed=true
+                mail.encrypted=publicKeyRing != nil
                 let pass : String = passwordTextField.text ?? ""
                 
                 let encryptorWithSignature = publicKeyRing != nil ?
@@ -221,6 +224,7 @@ class ComposeMailViewController: UIViewController {
                 encryptedMessage = try encryptorWithSignature.encrypt(message: message)
                 
             } else if(encryptSwitch.isOn) {
+                mail.encrypted=true
                 let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing!.publicKeyRing ])
                 
                 encryptedMessage = try encryptorWithoutSignature.encrypt(message: message)
@@ -235,10 +239,11 @@ class ComposeMailViewController: UIViewController {
             ComposeMailModelController.shared.mail = mail
             mailInput!.isEditor = false
             mailInput!.htmlText = mail.htmlBody!
-            
+            mailInput!.setEnable(false)
         } catch {
             SVProgressHUD.showInfo(withStatus: error.localizedDescription)
         }
+        tableView.reloadData()
         cancelButtonAction(sender)
     }
     
@@ -387,8 +392,11 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case indexPath.row == 0 + fromShift:
             let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.isUserInteractionEnabled = !modelController.mail.encrypted
+            cell.textLabel?.isEnabled =  !modelController.mail.encrypted
+            cell.detailTextLabel?.isEnabled =  !modelController.mail.encrypted
             cell.style = .to
-            cell.setItems(modelController.mail.to ?? [])
+            cell.setItems(modelController.mail.to ?? [],!modelController.mail.encrypted)
             cell.delegate = self
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
@@ -396,8 +404,11 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case indexPath.row == 1 + fromShift:
             let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.isUserInteractionEnabled = !modelController.mail.encrypted
+            cell.textLabel?.isEnabled =  !modelController.mail.encrypted
+            cell.detailTextLabel?.isEnabled =  !modelController.mail.encrypted
             cell.style = .cc
-            cell.setItems(modelController.mail.cc ?? [])
+            cell.setItems(modelController.mail.cc ?? [],!modelController.mail.encrypted)
             cell.delegate = self
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell
@@ -405,8 +416,11 @@ extension ComposeMailViewController: UITableViewDelegate, UITableViewDataSource 
             
         case shouldShowBcc && indexPath.row == 2 + fromShift:
             let cell: AddressTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.isUserInteractionEnabled = !modelController.mail.encrypted
+            cell.textLabel?.isEnabled =  !modelController.mail.encrypted
+            cell.detailTextLabel?.isEnabled =  !modelController.mail.encrypted
             cell.style = .bcc
-            cell.setItems(modelController.mail.bcc ?? [])
+            cell.setItems(modelController.mail.bcc ?? [],!modelController.mail.encrypted)
             cell.delegate = self
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             result = cell

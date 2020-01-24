@@ -15,13 +15,14 @@ struct SettingsItem {
 }
 
 class SettingsViewController: UIViewController {
-
+    
     @IBOutlet var tableView: UITableView!
-
+    
     let content: [SettingsItem] = [
         SettingsItem(title: NSLocalizedString("Common", comment: ""), segue: "CommonSegue", parameter: nil),
         SettingsItem(title: NSLocalizedString("Sync", comment: ""), segue: "SyncSegue", parameter: nil),
-        SettingsItem(title: NSLocalizedString("OpenPGP", comment: ""), segue: "PGPSegue", parameter: nil)
+        SettingsItem(title: NSLocalizedString("OpenPGP", comment: ""), segue: "PGPSegue", parameter: nil),
+        SettingsItem(title: NSLocalizedString("About", comment: ""), segue: "About", parameter: nil)
     ]
     
     override func viewDidLoad() {

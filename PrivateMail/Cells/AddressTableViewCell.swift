@@ -20,6 +20,7 @@ enum AddressTableViewCellStyle {
 struct AddressCellContent {
     var fullName: String?
     var email: String
+    var enable: Bool = true
 }
 
 
@@ -120,7 +121,7 @@ class AddressTableViewCell: UITableViewCell {
         }
     }
     
-    func setItems(_ emails: [String]) {
+    func setItems(_ emails: [String],_ enable:Bool) {
         items = []
         
         for email in emails {
@@ -131,7 +132,7 @@ class AddressTableViewCell: UITableViewCell {
                 fullName = contacts[0].fullName
             }
             
-            let contact = AddressCellContent(fullName: fullName, email: email)
+            let contact = AddressCellContent(fullName: fullName, email: email,enable: enable)
             items.append(contact)
         }
     }
@@ -156,7 +157,7 @@ extension AddressTableViewCell: UICollectionViewDelegate, UICollectionViewDataSo
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AddressCollectionViewCell.cellID(), for: indexPath) as! AddressCollectionViewCell
             
             cell.delegate = self
-            
+            cell.deleteButton.isHidden = !items[indexPath.item].enable
             if items[indexPath.item].fullName != nil {
                 cell.titleLabel.text = items[indexPath.item].fullName
             } else {

@@ -55,7 +55,7 @@ class ImportKeysListViewController: UIViewController {
                         while (userIds?.hasNext())! {
                             let userId = userIds!.next()
                             print(userId.debugDescription)
-                            let regex = try! NSRegularExpression(pattern: "\\([\\w\\W]* <[\\w\\W]*>\\)")
+                            let regex = try! NSRegularExpression(pattern: "\\(.*?\\)")
                             var range=regex.firstMatch(
                                 in: userId.debugDescription,
                                 options: [],
@@ -104,7 +104,7 @@ class ImportKeysListViewController: UIViewController {
                         while (userIds?.hasNext())! {
                             let userId = userIds!.next()
                             print(userId.debugDescription)
-                            let regex = try! NSRegularExpression(pattern: "\\([\\w\\W]* <[\\w\\W]*>\\)")
+                            let regex = try! NSRegularExpression(pattern: "\\(.*?\\)")
                             var range=regex.firstMatch(
                                 in: userId.debugDescription,
                                 options: [],

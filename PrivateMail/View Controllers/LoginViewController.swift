@@ -251,13 +251,15 @@ class LoginViewController: UIViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let controller = segue.destination as! TwoFactorAuthConroller
-        let list = sender as! [Any]
-        controller.login=list[0] as? String
-        controller.password=list[1] as? String
-
-        controller.complete={
-            self.dismiss(animated: false, completion:nil)
+        if(segue.destination is TwoFactorAuthConroller){
+            let controller = segue.destination as! TwoFactorAuthConroller
+            let list = sender as! [Any]
+            controller.login=list[0] as? String
+            controller.password=list[1] as? String
+            
+            controller.complete={
+                self.dismiss(animated: false, completion:nil)
+            }
         }
     }
     

@@ -88,6 +88,11 @@ class MailHTMLBodyTableViewCell: UITableViewCell {
         }
     }
     
+    func setEnable(_ isEnable:Bool){
+        webView.isUserInteractionEnabled=isEnable
+        self.isUserInteractionEnabled=isEnable
+    }
+    
      func getTextFromWebView() -> String {
         let script = "document.body.innerHTML;"
         let text = webView.stringByEvaluatingJavaScript(from: script) ?? ""

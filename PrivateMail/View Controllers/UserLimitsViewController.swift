@@ -10,20 +10,18 @@ import Foundation
 import UIKit
 
 class UserLimitsViewController: UIViewController {
-    
-    @IBOutlet weak var upgradeNow: UIButton!
-    @IBOutlet weak var backToLoginButton: UIButton!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    
-        upgradeNow.layer.cornerRadius = upgradeNow.frame.size.height / 2.0
-        backToLoginButton.layer.cornerRadius = backToLoginButton.frame.size.height / 2.0
-    }
 
+    @IBOutlet weak var cancelButton: UIAccentButton!
+    @IBOutlet weak var descriptionLabel: UILabel!
     
-    @IBAction func backToLoginTapped(_ sender: Any) {
-        dismiss(animated: true)
+    override func viewWillLayoutSubviews() {
+        descriptionLabel.textColor = UIColor.white
+        cancelButton.layer.cornerRadius = cancelButton.frame.size.height / 2.0
+    }
+    
+
+    @IBAction func cancel(_ sender: Any) {
+          dismiss(animated: true)
     }
     
 }
