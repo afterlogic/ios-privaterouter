@@ -263,7 +263,7 @@ class API: NSObject {
                                 }
                             } else {
                                 if folderName == currentFolder {
-                                    API.shared.getMailsInfo(folder: folderName, completionHandler: { (result, error) in
+                                    API.shared.getMailsInfo(folder: folderName ,completionHandler: { (result, error) in
                                         if let result = result {
                                             let sortedResult = result.sorted(by: { (first, second) -> Bool in
                                                 let firstUID = Int(first["uid"] as? String ?? "-1") ?? -1
@@ -361,9 +361,45 @@ class API: NSObject {
         }
     }
     
-    func getMailsInfo(folder: String, completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
-        var searchString = ""
-        
+    func getStarred(completionHandler: @escaping ([APIMail]?, Error?) -> Void){
+        getFolders { (folders, error) in
+            if(error != nil){
+                completionHandler(nil,error)
+                return
+            }
+            let inbox=folders?.first(where: { (folder) -> Bool in
+                return folder.type==1
+            })!
+            let parameters = [
+                "AccountID": self.currentUser.id,
+                "Folder": inbox!.fullName!,
+                "Filters":"flagged",
+                "SortBy":"arrival"
+                ] as [String : Any]
+            
+            self.callAPI(module: "Mail", method: "GetMessages", parameters: parameters) { (result, error) in
+                if(error != nil){
+                    completionHandler(nil,error)
+                    return
+                }
+                if let result = result["Result"] as? [String: Any] {
+                    if let items = result["@Collection"] as? [[String: Any]] {
+                        completionHandler( items.map { (map) -> APIMail in
+                            return APIMail.init(input: map)
+                        },nil)
+                        return
+                    }
+                }
+                
+                completionHandler(nil,nil)
+                return
+                
+            }
+        }
+    }
+    
+    func getMailsInfo(folder: String,searchString:String = "", completionHandler: @escaping ([[String: Any]]?, Error?) -> Void) {
+        var searchString=searchString
         if let syncingPeriod = SettingsModelController.shared.getValueFor(.syncPeriod) as? Double, syncingPeriod > 0.0 {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy.MM.dd"
@@ -995,15 +1031,15 @@ class API: NSObject {
     
     func uploadAttachment(name:String,content: String, completionHandler: @escaping ([String: Any]?, Error?) -> Void) {
         callAPI(
-           module: "Core",
-           method: "SaveContentAsTempFile",
-           parameters: [
-            "Content":content,
-            "FileName":name
+            module: "Core",
+            method: "SaveContentAsTempFile",
+            parameters: [
+                "Content":content,
+                "FileName":name
             ],
-           completionHandler: completionHandler
+            completionHandler: completionHandler
         )
-       }
+    }
     
     
     // MARK: - Helpers

@@ -202,6 +202,16 @@ class MenuModelController: NSObject {
     }
     
     func mailsForFolder(name: String?) -> [APIMail] {
+        if(name?.isEmpty==true){
+          for folder in expandedFolders(folders: folders) {
+                if folder.type == 1 {
+                    return folder.mails.filter { (mail) -> Bool in
+                       return mail.isFlagged==true
+                    }
+                }
+            }
+        }
+        
         for folder in expandedFolders(folders: folders) {
             if folder.fullName == name {
                 return folder.mails

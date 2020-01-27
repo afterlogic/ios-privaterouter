@@ -379,7 +379,7 @@ struct APIFolder {
     
     init() {
     }
-    
+
     init(input: [String: Any],namespace:String?) {
         
         
