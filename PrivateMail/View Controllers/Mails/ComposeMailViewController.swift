@@ -114,11 +114,6 @@ class ComposeMailViewController: UIViewController {
         guard let to = self.modelController.mail.to, to.count > 0 else  {
             return
         }
-        if(self.modelController.mail.encrypted || self.modelController.mail.signed){
-            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView().removingRegexMatches(pattern:"<br>", replaceWith: "\n")
-        }else{
-            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
-        }
         let progressCompletion = ProgressHUD.showWithCompletion()
         
         self.view.isUserInteractionEnabled = false
@@ -191,8 +186,8 @@ class ComposeMailViewController: UIViewController {
                 publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString!) );
             }
             
-            let message = mail.htmlBody ?? ""
-            
+
+            let message = try NSAttributedString(data: mail.htmlBody!.data(using: .utf8)!, options: [.documentType : NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil).string
             var secretKeyRing : DMSPGPKeyRing? = nil;
             
             if signSwitch.isOn {
@@ -211,7 +206,7 @@ class ComposeMailViewController: UIViewController {
                 
             }
             
-            var encryptedMessage = message
+            var encryptedMessage = message.removingRegexMatches(pattern: "\n", replaceWith: "\r\n")
             if (signSwitch.isOn){
                 mail.signed=true
                 mail.encrypted=publicKeyRing != nil
@@ -226,20 +221,21 @@ class ComposeMailViewController: UIViewController {
                         secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
                         password:  pass)
                 
-                encryptedMessage = try encryptorWithSignature.encrypt(message: message)
+                encryptedMessage = try encryptorWithSignature.encrypt(fullMessage: encryptedMessage)
                 
             } else if(encryptSwitch.isOn) {
                 mail.encrypted=true
                 let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing!.publicKeyRing ])
                 
-                encryptedMessage = try encryptorWithoutSignature.encrypt(message: message)
+                encryptedMessage = try encryptorWithoutSignature.encrypt(fullMessage: encryptedMessage)
             }else{
                 cancelButtonAction(sender)
                 return
             }
             
             
-            mail.htmlBody = encryptedMessage.removingRegexMatches(pattern: "\n", replaceWith: "<br>")
+            mail.encryptedBody = encryptedMessage
+            mail.htmlBody = mail.encryptedBody!.removingRegexMatches(pattern: "\n", replaceWith: "<br>")
             modelController.mail = mail
             ComposeMailModelController.shared.mail = mail
             mailInput!.isEditor = false
@@ -271,12 +267,8 @@ class ComposeMailViewController: UIViewController {
     
     @IBAction func saveButtonAction(_ sender: Any) {
         SVProgressHUD.show()
-        if(self.modelController.mail.encrypted){
-            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView().removingRegexMatches(pattern:"<br>", replaceWith: "\n")
-        }else{
-            self.modelController.mail.htmlBody = mailInput?.getTextFromWebView()
-        }
-        API.shared.sendMail(mail: modelController.mail, identity: nil, isSaving: true) { (result, error) in
+    
+        API.shared.sendMail(mail: modelController.mail,identity: nil, isSaving: true) { (result, error) in
             DispatchQueue.main.async {
                 SVProgressHUD.dismiss()
                 if error == nil {

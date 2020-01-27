@@ -662,7 +662,7 @@ class API: NSObject {
                 "Cc": mail.cc?.first ?? "",
                 "Bcc": mail.bcc?.first ?? "",
                 "Subject": mail.subject ?? "",
-                "Text": mail.htmlBody ?? "",
+                "Text": mail.encryptedBody ?? mail.htmlBody ?? "",
                 "IsHtml": mail.isHtml,
                 "Importance": 3,
                 "SendReadingConfirmation": false,

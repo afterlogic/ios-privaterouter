@@ -29,6 +29,7 @@
 		DB21C1D923D5A0700016BD3A /* TwoFactorAuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */; };
 		DB33C78B23DB0D7900AB88D9 /* AboutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB33C78A23DB0D7900AB88D9 /* AboutController.swift */; };
 		DB4736A323CF2D2700D1AD06 /* ValidSignVerify.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */; };
+		DBEB4DEB23DEE98600E957F6 /* ValidCreateSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */; };
 		E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50122662288981D00CC7477 /* MailPageViewController.swift */; };
 		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
 		E51C60362319A03600FEB411 /* ArialBlack.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E51C60352319A03600FEB411 /* ArialBlack.ttf */; };
@@ -140,6 +141,7 @@
 		DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorAuthController.swift; sourceTree = "<group>"; };
 		DB33C78A23DB0D7900AB88D9 /* AboutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutController.swift; sourceTree = "<group>"; };
 		DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidSignVerify.swift; sourceTree = "<group>"; };
+		DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidCreateSign.swift; sourceTree = "<group>"; };
 		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
 		E50122662288981D00CC7477 /* MailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailPageViewController.swift; sourceTree = "<group>"; };
 		E5111F042242BA420036501F /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 			isa = PBXGroup;
 			children = (
 				DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */,
+				DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */,
 			);
 			path = Pgp;
 			sourceTree = "<group>";
@@ -752,6 +755,7 @@
 				E5690D6222CFD23B003493E1 /* SettingsTableViewCell.swift in Sources */,
 				A343D6F2238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift in Sources */,
 				E5BB7742232FAFF400DA6979 /* GroupsViewController.swift in Sources */,
+				DBEB4DEB23DEE98600E957F6 /* ValidCreateSign.swift in Sources */,
 				A3EF513D238521C300B2D9C1 /* UserLimitsViewController.swift in Sources */,
 				E5F28AA322387ACB002721ED /* SideMenuViewController.swift in Sources */,
 				E567B4682236D51C00FA9945 /* MainViewController.swift in Sources */,
@@ -989,7 +993,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
@@ -1013,7 +1017,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 53;
+				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;

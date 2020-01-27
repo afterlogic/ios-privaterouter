@@ -48,6 +48,7 @@ struct APIMail {
     var title: String?
     var subject: String?
     var plainBody: String?
+    var encryptedBody: String?
     var htmlBody: String?
     var date: Date?
     var isFlagged: Bool?
