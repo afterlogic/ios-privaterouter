@@ -72,9 +72,10 @@ public class ValidDMSPGPClearTextVerifier {
         var rawMessage: NSString?
         scanner.scanUpTo("-----BEGIN PGP SIGNATURE-----", into: &rawMessage)
         let message = rawMessage as String?     // Message could be empty
-    
-        self.message = message ?? ""
         
+        let end = message!.index(message!.startIndex, offsetBy: message!.count-2)
+        self.message = String(message![...end])
+           
         // Read footer
         var footer: NSString?
         scanner.scanUpTo("-----END PGP SIGNATURE-----", into: &footer)

@@ -67,7 +67,6 @@ extension DMSPGPEncryptor {
             literalDataOutput.write(with: messageBytes)
             literalDataOutput.write(with: IOSByteArray(nsData: Data("\r\n".utf8)))
             signer?.signatureGenerator.update(with: messageBytes)
-            signer?.signatureGenerator.update(with: IOSByteArray(nsData: Data("\r\n".utf8)))
             literalDataOutput.close()
             signer?.signatureGenerator.generate()?.encode(with: literalDataOutput)
 
@@ -108,7 +107,6 @@ extension DMSPGPSigner {
         armoredOutput.write(with: messageBytes)
         signatureGenerator.update(with: messageBytes)
         armoredOutput.write(with: IOSByteArray(nsData: Data("\r\n".utf8)))
-        signatureGenerator.update(with: IOSByteArray(nsData: Data("\r\n".utf8)))
         armoredOutput.endClearText()
         let bcpgOutput = BCBcpgBCPGOutputStream(javaIoOutputStream: armoredOutput)
         signatureGenerator.generate()?.encode(with: bcpgOutput)
