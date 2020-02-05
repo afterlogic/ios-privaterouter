@@ -266,6 +266,7 @@ class ComposeMailViewController: UIViewController {
     }
     
     @IBAction func saveButtonAction(_ sender: Any) {
+        modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         SVProgressHUD.show()
     
         API.shared.sendMail(mail: modelController.mail,identity: nil, isSaving: true) { (result, error) in

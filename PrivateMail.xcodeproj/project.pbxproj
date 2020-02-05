@@ -993,7 +993,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
@@ -1001,8 +1001,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PrivateMail;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -1017,7 +1018,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateMail/PrivateMail.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 54;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = K6298N65JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PrivateMail/Info.plist;
@@ -1025,8 +1026,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.PrivateRouter.PrivateMailApplication;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PrivateMail;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

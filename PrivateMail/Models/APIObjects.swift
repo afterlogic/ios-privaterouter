@@ -355,7 +355,14 @@ struct APIMail {
         }
     }
 }
-
+class FolderType{
+    static let inbox=1
+    static let sent=2
+    static let drafts=3
+    static let spam=4
+    static let trash=5
+    
+}
 struct APIFolder {
     var type: Int?
     var name: String?
@@ -379,7 +386,7 @@ struct APIFolder {
     
     init() {
     }
-
+    
     init(input: [String: Any],namespace:String?) {
         
         

@@ -508,7 +508,7 @@ class MainViewController: UIViewController {
             }
             
             if moveToTrash {
-                API.shared.moveMessages(mails: mails, toFolder: "Trash") { (result, error) in
+                API.shared.moveMessages(mails: mails, type: FolderType.trash) { (result, error) in
                     DispatchQueue.main.async {
                         SVProgressHUD.dismiss()
                         
@@ -598,7 +598,7 @@ class MainViewController: UIViewController {
         let yesButton = UIAlertAction.init(title: NSLocalizedString("Yes", comment: ""), style: .destructive) { (alert: UIAlertAction!) in
             SVProgressHUD.show()
             
-            API.shared.moveMessages(mails: mails, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
+            API.shared.moveMessages(mails: mails, type: markAsSpam ? FolderType.spam : FolderType.inbox) { (result, error) in
                 DispatchQueue.main.async {
                     SVProgressHUD.dismiss()
                     

@@ -763,10 +763,22 @@ class API: NSObject {
             }
         }
     }
-    
-    func moveMessage(mail: APIMail, toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
-        moveMessages(mails: [mail], toFolder: toFolder, completionHandler: completionHandler)
-    }
+    func moveMessages(mails: [APIMail], type: Int, completionHandler: @escaping (Bool?, Error?) -> Void) {
+          getFolders { (folders,error) in
+            if(error != nil){
+                completionHandler(nil,error)
+                return
+            }
+            let folder = folders?.first(where: { (folder) -> Bool in
+                folder.type==type
+            })
+            if(folder != nil){
+                self.moveMessages(mails: mails, toFolder: folder!.fullName!, completionHandler: completionHandler)
+            }else{
+                completionHandler(false,nil)
+            }
+          }
+      }
     
     func moveMessages(mails: [APIMail], toFolder: String, completionHandler: @escaping (Bool?, Error?) -> Void) {
         if mails.count == 0 {

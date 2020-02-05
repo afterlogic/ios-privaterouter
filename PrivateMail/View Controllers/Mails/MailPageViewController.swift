@@ -213,7 +213,7 @@ class MailPageViewController: UIPageViewController {
             SVProgressHUD.show()
             
             if moveToTrash {
-                API.shared.moveMessage(mail: self.mail, toFolder: "Trash") { (result, error) in
+                API.shared.moveMessages(mails: [self.mail], type: FolderType.trash) { (result, error) in
                     DispatchQueue.main.async {
                         SVProgressHUD.dismiss()
                         
@@ -272,7 +272,7 @@ class MailPageViewController: UIPageViewController {
         let yesButton = UIAlertAction.init(title: NSLocalizedString("Yes", comment: ""), style: .destructive) { (alert: UIAlertAction!) in
             SVProgressHUD.show()
             
-            API.shared.moveMessage(mail: self.mail, toFolder: markAsSpam ? "Spam" : "Inbox") { (result, error) in
+            API.shared.moveMessages(mails: [self.mail], type: markAsSpam ? FolderType.spam : FolderType.inbox) { (result, error) in
                 DispatchQueue.main.async {
                     SVProgressHUD.dismiss()
                     
