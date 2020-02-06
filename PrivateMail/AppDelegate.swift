@@ -11,6 +11,7 @@ import KeychainAccess
 import SVProgressHUD
 import SwiftTheme
 import BouncyCastle_ObjC
+import Firebase
 
 let keychain = Keychain(service: "com.PrivateRouter.PrivateMail")
 
@@ -20,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
+        FirebaseApp.configure()
         applyTheme()
 
         SVProgressHUD.setMaximumDismissTimeInterval(2)

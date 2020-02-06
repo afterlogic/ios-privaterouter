@@ -17,7 +17,10 @@ target 'PrivateMail' do
   pod 'DropDown', '2.3.12'
   pod 'BouncyCastle-ObjC', '~> 0.1.0'
   pod 'DMSOpenPGP', '~> 0.1.4'
-
+  pod 'Fabric', '~> 1.10.2'
+  pod 'Crashlytics', '~> 3.14.0'
+  pod 'Firebase/Analytics'
+  
   target 'PrivateMailTests' do
     inherit! :search_paths
     # Pods for testing

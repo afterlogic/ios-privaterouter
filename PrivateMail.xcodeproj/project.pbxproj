@@ -29,6 +29,7 @@
 		DB21C1D923D5A0700016BD3A /* TwoFactorAuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */; };
 		DB33C78B23DB0D7900AB88D9 /* AboutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB33C78A23DB0D7900AB88D9 /* AboutController.swift */; };
 		DB4736A323CF2D2700D1AD06 /* ValidSignVerify.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */; };
+		DBB2978423EC412400FAC526 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DBB2978323EC412400FAC526 /* GoogleService-Info.plist */; };
 		DBEB4DEB23DEE98600E957F6 /* ValidCreateSign.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */; };
 		E50122672288981D00CC7477 /* MailPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E50122662288981D00CC7477 /* MailPageViewController.swift */; };
 		E5111F052242BA420036501F /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5111F042242BA420036501F /* SettingsViewController.swift */; };
@@ -141,6 +142,7 @@
 		DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorAuthController.swift; sourceTree = "<group>"; };
 		DB33C78A23DB0D7900AB88D9 /* AboutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutController.swift; sourceTree = "<group>"; };
 		DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidSignVerify.swift; sourceTree = "<group>"; };
+		DBB2978323EC412400FAC526 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidCreateSign.swift; sourceTree = "<group>"; };
 		DEFC454AF38985DF497E55D5 /* Pods-PrivateMailTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateMailTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PrivateMailTests/Pods-PrivateMailTests.release.xcconfig"; sourceTree = "<group>"; };
 		E50122662288981D00CC7477 /* MailPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailPageViewController.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 		E567B4592236D51C00FA9945 = {
 			isa = PBXGroup;
 			children = (
+				DBB2978323EC412400FAC526 /* GoogleService-Info.plist */,
 				E567B4642236D51C00FA9945 /* PrivateMail */,
 				E567B4792236D51D00FA9945 /* PrivateMailTests */,
 				E567B4842236D51D00FA9945 /* PrivateMailUITests */,
@@ -517,6 +520,7 @@
 				E567B45F2236D51C00FA9945 /* Frameworks */,
 				E567B4602236D51C00FA9945 /* Resources */,
 				F6648D8A6E0195E96B2D06FC /* [CP] Embed Pods Frameworks */,
+				DBB2978023EC403600FAC526 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -635,6 +639,7 @@
 				E58493DB22E9027700E6F160 /* ContactTableViewCell.xib in Resources */,
 				E544D2FD22EA35FF00FA468F /* ContactDetailTableViewCell.xib in Resources */,
 				E5690D6C22CFFF0E003493E1 /* SettingsButtonTableViewCell.xib in Resources */,
+				DBB2978423EC412400FAC526 /* GoogleService-Info.plist in Resources */,
 				E5F1D7942242E626007071AA /* MailBodyTableViewCell.xib in Resources */,
 				E5B2DD6822FDDE3C00EB84A4 /* AddressFieldCollectionViewCell.xib in Resources */,
 				E580A2DF22EBAA2200E90C89 /* KeyImportTableViewCell.xib in Resources */,
@@ -687,6 +692,23 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		DBB2978023EC403600FAC526 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${PODS_ROOT}/Fabric/run\"\n";
 		};
 		E713C8984CE0885B67C80161 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
