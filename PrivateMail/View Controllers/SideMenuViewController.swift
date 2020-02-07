@@ -199,8 +199,10 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.titleLabel.text = ""
         cell.selectionStyle = .none
-        
+
         let item = MenuModelController.shared.menuItems()[indexPath.row]
+        
+        cell.index=indexPath.row
         
         defer {
             cell.setSelected(item.fullName == MenuModelController.shared.selectedMenuItem.fullName)
@@ -221,14 +223,19 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
             guard let folder = MenuModelController.shared.folder(byFullName: item.fullName) else {
                 return cell
             }
-            
             cell.folder = folder
             cell.theme_iconTintColor = .onSurfaceMajorText
             
-            if folder.type == 3 {
+            if folder.type == FolderType.drafts {
                 cell.unreadCount = folder.messagesCount ?? 0
+                cell.unreadClick = { index in
+                    self.onSelect( index!,false)
+                }
             } else {
                 cell.unreadCount = folder.unreadCount ?? 0
+                cell.unreadClick = { index in
+                    self.onSelect( index!,true)
+                }
             }
             
             cell.subFoldersCount = 0//folder.subFoldersCount ?? 0
@@ -270,8 +277,11 @@ extension SideMenuViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = MenuModelController.shared.menuItems()[indexPath.row]
-        
+        onSelect(indexPath.row)
+    }
+    func onSelect(_ index: Int,_ unread: Bool = false){
+        let item = MenuModelController.shared.menuItems()[index]
+        MenuModelController.shared.unread = unread
         MenuModelController.shared.selectedMenuItem = item
         
         if !item.custom {

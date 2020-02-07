@@ -99,10 +99,26 @@ class MainViewController: UIViewController {
             threadedList.sort { (a, b) -> Bool in
                 return a.date?.timeIntervalSince1970 ?? 0.0 > b.date?.timeIntervalSince1970 ?? 0.0
             }
-            
+            if(MenuModelController.shared.unread){
+                if(lastIsUnread && lastSelectedFolder == MenuModelController.shared.selectedFolder){
+                    threadedList = threadedList.filter({ (mail) -> Bool in
+                        return oldValue.contains { (oldMail) -> Bool in
+                            mail.uid == oldMail.uid
+                        }
+                    })
+                }else{
+                    threadedList = threadedList.filter({ (mail) -> Bool in
+                        return mail.isSeen==false
+                    })
+                }
+            }
+            lastIsUnread = MenuModelController.shared.unread
+            lastSelectedFolder=MenuModelController.shared.selectedFolder
             self.mails = threadedList
         }
     }
+    var lastIsUnread=false
+    var lastSelectedFolder=""
     
     var selectedMail: APIMail?
     var selectedFolder = "Mail"
@@ -270,13 +286,16 @@ class MainViewController: UIViewController {
         lastPage = false
         
         let folder = selectedFolder
-      
+        
+        
         mails = MenuModelController.shared.mailsForFolder(name: folder)
-       
+        
         if searchBar.text?.count == 0 {
             tableView.reloadData()
         }
         if withSyncing {
+            lastIsUnread=false
+            lastSelectedFolder=""
             API.shared.getFoldersInfo(folders: MenuModelController.shared.expandedFolders(folders: MenuModelController.shared.folders), completionHandler: { (result, error) in
                 DispatchQueue.main.async {
                     if showRefreshControl {
@@ -356,7 +375,7 @@ class MainViewController: UIViewController {
         
         let selectedMenuItem = MenuModelController.shared.selectedMenuItem
         
-        guard lastSelectedMenuItem?.fullName != selectedMenuItem.fullName else {
+        guard lastSelectedMenuItem?.fullName != selectedMenuItem.fullName || MenuModelController.shared.unread  else {
             return
         }
         lastSelectedMenuItem = selectedMenuItem
@@ -368,12 +387,14 @@ class MainViewController: UIViewController {
             title = selectedMenuItem.name
         }
         
-        if selectedFolder != MenuModelController.shared.selectedFolder {
+        if selectedFolder != MenuModelController.shared.selectedFolder || MenuModelController.shared.unread {
             SettingsModelController.shared.currentSyncingPeriodMultiplier = 1.0
             
             selectedFolder = MenuModelController.shared.selectedFolder
             selectedFolderTitle = MenuModelController.shared.selectedMenuItem.name
+            
             mails = MenuModelController.shared.mailsForCurrentFolder()
+            
             
             var needsSyncing = true
             
@@ -382,6 +403,7 @@ class MainViewController: UIViewController {
                     needsSyncing = false
                 }
             }
+            
             
             tableView.reloadData()
             

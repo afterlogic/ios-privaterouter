@@ -19,7 +19,7 @@ class MenuModelController: NSObject {
         }
     }
     private var expandedFoldersMap: [String: APIFolder] = [:]
-    
+    var unread:Bool = false
     var selectedMenuItem: FolderMenuItem = FolderMenuItem(fullName: "INBOX",name:"INBOX")
     
     var selectedFolder: String {

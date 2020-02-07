@@ -116,10 +116,13 @@ class ComposeMailViewController: UIViewController {
         }
         let progressCompletion = ProgressHUD.showWithCompletion()
         
+                modelController.mail.htmlBody = mailInput?.getTextFromWebView()
         self.view.isUserInteractionEnabled = false
         
-        let mail = self.modelController.mail
-        
+        var mail = self.modelController.mail
+        if(!mail.encrypted && !mail.signed){
+            mail.htmlBody = mailInput?.getTextFromWebView()
+        }
         API.shared.sendMail(mail: mail, identity: self.modelController.selectedIdentity) { (result, error) in
             DispatchQueue.main.async {
                 self.view.isUserInteractionEnabled = true

@@ -62,6 +62,8 @@ class MailViewController: UIViewController {
                         API.shared.setMailSeen(mail: result, completionHandler: { (resul, error) in
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
+                            }else{
+                                NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                             }
                         })
                     }
@@ -105,6 +107,8 @@ class MailViewController: UIViewController {
                     API.shared.setMailSeen(mail: self.mail, completionHandler: { (resul, error) in
                         if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
+                        }else{
+                            NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
                         }
                     })
                 }

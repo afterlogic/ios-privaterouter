@@ -20,7 +20,8 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
     @IBOutlet var unreadCountConstraint: NSLayoutConstraint!
     @IBOutlet var expandIconConstraint: NSLayoutConstraint!
     @IBOutlet var sideConstraint: NSLayoutConstraint!
-    
+    var index :Int?
+    var unreadClick: ((Int?)->Void)?
     var folder: APIFolder?
     
     var subFoldersCount = 0 {
@@ -37,14 +38,19 @@ class FolderTableViewCell: UITableViewCell, UITableViewCellExtensionProtocol {
         }
     }
     
+   @objc  func onUnreadClick(_ sender: UITapGestureRecognizer?=nil){
+        unreadClick?(index)
+    }
+    
     var unreadCount = 0 {
         didSet {
             unreadLabel.text = "\(unreadCount)"
-            
+         
             if unreadCount == 0 {
                 unreadView.isHidden = true
                 unreadCountConstraint.isActive = false
             } else {
+                unreadView.addGestureRecognizer( UITapGestureRecognizer(target: self, action: #selector(self.onUnreadClick(_:))))
                 unreadView.isHidden = false
                 unreadCountConstraint.isActive = true
             }
