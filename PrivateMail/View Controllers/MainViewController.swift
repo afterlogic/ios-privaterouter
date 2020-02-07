@@ -776,7 +776,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             mail = mail.thread[indexPath.row - 1]
         }
         
-        cell.showThreading = showThreads
+        cell.showThreading = !MenuModelController.shared.unread && showThreads
         cell.mail = mail
         cell.delegate = self
         cell.isSelection = isSelection

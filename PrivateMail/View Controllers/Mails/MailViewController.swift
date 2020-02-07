@@ -63,7 +63,7 @@ class MailViewController: UIViewController {
                             if let error = error {
                                 SVProgressHUD.showError(withStatus: error.localizedDescription)
                             }else{
-                                NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
+                                NotificationCenter.default.post(name: .didRecieveUser, object: nil)
                             }
                         })
                     }
@@ -108,7 +108,7 @@ class MailViewController: UIViewController {
                         if let error = error {
                             SVProgressHUD.showError(withStatus: error.localizedDescription)
                         }else{
-                            NotificationCenter.default.post(name: .shouldRefreshFoldersInfo, object: nil)
+                            NotificationCenter.default.post(name: .didRecieveUser, object: nil)
                         }
                     })
                 }
