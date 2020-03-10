@@ -27,6 +27,7 @@
 		A343D6F2238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A343D6F1238D57BE00EF8BD9 /* IdentityChooserTableViewCell.swift */; };
 		A3EF513D238521C300B2D9C1 /* UserLimitsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3EF513C238521C300B2D9C1 /* UserLimitsViewController.swift */; };
 		DB21C1D923D5A0700016BD3A /* TwoFactorAuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */; };
+		DB32B8732417AD9300FC61ED /* ValidPgpEncryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB32B8722417AD9300FC61ED /* ValidPgpEncryptor.swift */; };
 		DB33C78B23DB0D7900AB88D9 /* AboutController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB33C78A23DB0D7900AB88D9 /* AboutController.swift */; };
 		DB4736A323CF2D2700D1AD06 /* ValidSignVerify.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */; };
 		DBB2978423EC412400FAC526 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DBB2978323EC412400FAC526 /* GoogleService-Info.plist */; };
@@ -140,6 +141,7 @@
 		C87AD6871918A3E22A45053C /* Pods_PrivateMail.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMail.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6697EDFE83C9B13917808AE /* Pods_PrivateMailTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrivateMailTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB21C1D823D5A0700016BD3A /* TwoFactorAuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoFactorAuthController.swift; sourceTree = "<group>"; };
+		DB32B8722417AD9300FC61ED /* ValidPgpEncryptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidPgpEncryptor.swift; sourceTree = "<group>"; };
 		DB33C78A23DB0D7900AB88D9 /* AboutController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutController.swift; sourceTree = "<group>"; };
 		DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidSignVerify.swift; sourceTree = "<group>"; };
 		DBB2978323EC412400FAC526 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 			children = (
 				DB4736A223CF2D2700D1AD06 /* ValidSignVerify.swift */,
 				DBEB4DEA23DEE98600E957F6 /* ValidCreateSign.swift */,
+				DB32B8722417AD9300FC61ED /* ValidPgpEncryptor.swift */,
 			);
 			path = Pgp;
 			sourceTree = "<group>";
@@ -827,6 +830,7 @@
 				68B69A9D5F29A7BEA8DA7DA1 /* IdentitiesRepository.swift in Sources */,
 				68B69BC500695504BF207CE0 /* ProgressHUD.swift in Sources */,
 				68B69FBBED1384FDD1E46E92 /* Config.swift in Sources */,
+				DB32B8732417AD9300FC61ED /* ValidPgpEncryptor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

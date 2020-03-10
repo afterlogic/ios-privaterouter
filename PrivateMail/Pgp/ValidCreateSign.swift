@@ -116,3 +116,82 @@ extension DMSPGPSigner {
         return output.toString(with: "UTF-8")
     }
 }
+extension ValidPGPEncryptor {
+
+    public func encrypt(fullMessage: String) throws -> String {
+        let message = fullMessage
+        let output = JavaIoByteArrayOutputStream()
+        let armoredOutput = TCMessageArmoredOutputStream(javaIoOutputStream: output)
+
+        let messageData = Data(message.utf8)
+        let messageBytes = IOSByteArray(nsData: messageData)!
+
+        let signer = self.signer
+
+        switch (encryptedDataGenerator, signer) {
+        // encrypt and sign if possiable
+        case let (encryptedDataGenerator?, _):
+            let encryptDate = JavaUtilDate()
+            let encryptedOutput = encryptedDataGenerator.open(with: armoredOutput, with: IOSByteArray(length: 1 << 16))
+            let compressedDataGenerator = BCOpenpgpPGPCompressedDataGenerator(int: compressAlgorithm)
+            let bcpgOutputStream = encryptedOutput.flatMap { encryptedOutput -> BCBcpgBCPGOutputStream in
+                guard compressAlgorithm != BCBcpgCompressionAlgorithmTags.UNCOMPRESSED else {
+                    return BCBcpgBCPGOutputStream(javaIoOutputStream: encryptedOutput)
+                }
+                let compressedOutput = compressedDataGenerator.open(with: encryptedOutput)
+                return BCBcpgBCPGOutputStream(javaIoOutputStream: compressedOutput)
+            }
+
+            guard let bcpgOutput = bcpgOutputStream else {
+                compressedDataGenerator.close()
+                encryptedOutput?.close()
+
+                armoredOutput.close()
+                output.close()
+                throw DMSPGPError.internal
+            }
+
+            signer?.signatureGenerator.generateOnePassVersion(withBoolean: false)?.encode(with: bcpgOutput)
+
+            let literalDataGenerator = BCOpenpgpPGPLiteralDataGenerator()
+            guard let literalDataOutput = literalDataGenerator
+                .open(with: bcpgOutput,
+                      withChar: BCOpenpgpPGPLiteralData.UTF8,
+                      with: BCOpenpgpPGPLiteralData.CONSOLE,
+                      with: encryptDate,
+                      with: IOSByteArray(length: 1 << 16)) else {
+                literalDataGenerator.close()
+                bcpgOutput.close()
+                compressedDataGenerator.close()
+                encryptedOutput?.close()
+
+                armoredOutput.close()
+                output.close()
+                throw DMSPGPError.internal
+            }
+
+            literalDataOutput.write(with: messageBytes)
+            signer?.signatureGenerator.update(with: messageBytes)
+            literalDataOutput.close()
+            signer?.signatureGenerator.generate()?.encode(with: literalDataOutput)
+
+            bcpgOutput.close()
+            compressedDataGenerator.close()
+            encryptedOutput?.close()
+            encryptedDataGenerator.close()
+
+        // clear sign
+        case let (nil, signer?):
+            return signer.sign(fullMessage: message)
+        default:
+            throw DMSPGPError.internal
+        }
+
+        armoredOutput.close()
+        output.close()
+
+        return output.toString(with: "UTF-8")
+    }
+
+}
+

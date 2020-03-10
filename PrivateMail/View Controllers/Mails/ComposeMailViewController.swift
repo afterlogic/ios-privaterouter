@@ -216,11 +216,11 @@ class ComposeMailViewController: UIViewController {
                 let pass : String = passwordTextField.text ?? ""
                 
                 let encryptorWithSignature = publicKeyRing != nil ?
-                    try DMSPGPEncryptor(
+                    try ValidPGPEncryptor(
                         publicKeyRings: [publicKeyRing!.publicKeyRing],
                         secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
                         password:  pass) :
-                    try DMSPGPEncryptor(
+                    try ValidPGPEncryptor(
                         secretKeyRing: (secretKeyRing?.secretKeyRing!)!,
                         password:  pass)
                 
@@ -228,7 +228,7 @@ class ComposeMailViewController: UIViewController {
                 
             } else if(encryptSwitch.isOn) {
                 mail.encrypted=true
-                let encryptorWithoutSignature = try DMSPGPEncryptor(publicKeyRings: [publicKeyRing!.publicKeyRing ])
+                let encryptorWithoutSignature = try ValidPGPEncryptor(publicKeyRings: [publicKeyRing!.publicKeyRing ])
                 
                 encryptedMessage = try encryptorWithoutSignature.encrypt(fullMessage: encryptedMessage)
             }else{
