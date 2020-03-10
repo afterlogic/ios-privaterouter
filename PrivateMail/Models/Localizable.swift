@@ -12,7 +12,7 @@ struct Strings {
     static var noMessages: String { .localized("noMessages") }
     
     static var showMoreMessages: String { .localized("showMoreMessages") }
-
+    
     static var userLimitsDescription: String { .localized("userLimitsDescription") }
     
     static var upgradeNow: String { .localized("upgradeNow") }
@@ -38,7 +38,7 @@ struct Strings {
     static var error: String { .localized("error") }
     
     static var specifyYourServerUrl: String { .localized("specifyYourServerUrl") }
-
+    
     static var email: String { .localized("email") }
     
     static var password: String { .localized("password") }
@@ -54,12 +54,20 @@ struct Strings {
     static var pleaseEnterHost: String { .localized("pleaseEnterHost") }
     
     static var loginFailedInvalidCredentials: String { .localized("loginFailedInvalidCredentials") }
-
+    
     static var invalidSignature: String { .localized("Invalid signature") }
     
     static var validSignature: String { .localized("Message was successfully verified") }
     
     static var decryptedAndVerified: String { .localized("Message was successfully decrypted and verified") }
+    
+    static var decryptedButNotVerified: String { .localized("Message was successfully decrypted but wasn't verified.") }
+    
+    static var publicKeyNotFound: String { .localized("No public key found for") }
+    
+    static var privateKeyNotFound: String { .localized("No private key found for") }
+    
+    static var decryptError: String { .localized("An error occurred during decrypting the message. You might have entered the wrong password for ") }
 }
 
 extension String {

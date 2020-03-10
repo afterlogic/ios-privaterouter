@@ -85,83 +85,100 @@ class MailPageViewController: UIPageViewController {
         let encrypted = mail.plainBody?.contains(beginPgpMessage) ?? false
         let signed = mail.plainBody?.contains(beginPgpSignedMessage) ?? false
         if(encrypted){
-            let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
-            
-            alert.addTextField { (textField) in
-                textField.placeholder = NSLocalizedString("Enter password", comment: "")
-                textField.isSecureTextEntry = true
+            if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
+                let alert = UIAlertController(title: NSLocalizedString("Enter password", comment: ""), message: nil, preferredStyle: .alert)
+                
+                alert.addTextField { (textField) in
+                    textField.placeholder = NSLocalizedString("Enter password", comment: "")
+                    textField.isSecureTextEntry = true
+                }
+                
+                alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
+                    let textField = alert!.textFields![0]
+                    let password = textField.text!
+                    self.decryptAndCheckSign(password,mail,secretArmoredKeyString)
+                }))
+                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }else{
+                SVProgressHUD.dismiss()
+                SVProgressHUD.showError(withStatus:Strings.privateKeyNotFound+" "+API.shared.currentUser.email!)
             }
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .default, handler: { [weak alert] (_) in
-                let textField = alert!.textFields![0]
-                let password = textField.text!
-                self.decryptAndCheckSign(password,mail)
-            }))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-            
         }else if(signed){
             checkSign(mail)
         }
     }
     
-    func decryptAndCheckSign(_ password:String, _ mail:APIMail){
+    func decryptAndCheckSign(_ password:String, _ mail:APIMail,_ secretArmoredKeyString:String){
         var mail=mail
         SVProgressHUD.show()
-        
+        var verifyMessage:String? = nil
         do {
             
-            if let secretArmoredKeyString = StorageProvider.shared.getPGPKey(API.shared.currentUser.email!, isPrivate: true)?.armoredKey {
-                let body = mail.plainedBody(false)
-                let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
-                var publicKeyRing : DMSPGPKeyRing? = nil
-                if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
-                    do {
-                        publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
-                    } catch {
-                        
-                    }
-                }
+            
+            let body = mail.plainedBody(false)
+            let secretKeyRing = try DMSPGPKeyRing(armoredKey: String(secretArmoredKeyString)  );
+            var publicKeyRing : DMSPGPKeyRing? = nil
+            if let publicArmoredKeyString = StorageProvider.shared.getPGPKey(mail.from!.first!, isPrivate: false)?.armoredKey {
                 do {
-                    let decryptor = try ValidDMSPGPDecryptor(armoredMessage: body)
+                    publicKeyRing = try DMSPGPKeyRing(armoredKey: String(publicArmoredKeyString)  );
+                } catch {
                     
-                    let decryptKey = decryptor.encryptingKeyIDs.compactMap { keyID in
-                        return secretKeyRing.secretKeyRing?.getDecryptingSecretKey(keyID: keyID)
-                    }.first
-                    
-                    guard let secretKey = decryptKey else {
-                        return ;
-                    }
-                    
-                    let message = try decryptor.decrypt(secretKey: secretKey, password: password)
-                    
-                    let signatureVerifier = DMSPGPSignatureVerifier(message: message, onePassSignatureList: decryptor.onePassSignatureList, signatureList: decryptor.signatureList)
+                }
+            }
+            do {
+                let decryptor = try ValidDMSPGPDecryptor(armoredMessage: body)
+                
+                let decryptKey = decryptor.encryptingKeyIDs.compactMap { keyID in
+                    return secretKeyRing.secretKeyRing?.getDecryptingSecretKey(keyID: keyID)
+                }.first
+                
+                guard let secretKey = decryptKey else {
+                    return ;
+                }
+                
+                let message = try decryptor.decrypt(secretKey: secretKey, password: password)
+                
+                let signatureVerifier = DMSPGPSignatureVerifier(message: message, onePassSignatureList: decryptor.onePassSignatureList, signatureList: decryptor.signatureList)
+                
+                if(publicKeyRing != nil){
                     let verifyResult = signatureVerifier.verifySignature(message:message,use: publicKeyRing!.publicKeyRing)
                     
                     switch verifyResult {
                     case .invalid:
-                        SVProgressHUD.showError(withStatus: Strings.invalidSignature)
-                        return
+                        verifyMessage = Strings.decryptedButNotVerified
+                        break
                     default:
                         
                         break
                     }
-                    
-                    mail.htmlBody = message
-                    self.mail = mail
-                    
-                    if let mailVC = self.viewControllers?.last as? MailViewController {
-                        mailVC.mail = mail
-                        mailVC.tableView.reloadData()
+                }else{
+                    if(decryptor.signatureList?.isEmpty()==false){
+                        verifyMessage = Strings.decryptedButNotVerified
                     }
-                } catch {
-                    
                 }
                 
+                mail.htmlBody = message
+                self.mail = mail
+                
+                if let mailVC = self.viewControllers?.last as? MailViewController {
+                    mailVC.mail = mail
+                    mailVC.tableView.reloadData()
+                }
+            } catch {
+                SVProgressHUD.dismiss()
+                SVProgressHUD.showError(withStatus: Strings.decryptError+" "+API.shared.currentUser.email!)
+                return
+            }
+            SVProgressHUD.dismiss()
+            if(verifyMessage != nil){
+                SVProgressHUD.showError(withStatus:verifyMessage)
+            }else{
+                SVProgressHUD.showSuccess(withStatus: Strings.decryptedAndVerified)
             }
             
-            SVProgressHUD.dismiss()
-            SVProgressHUD.showSuccess(withStatus: Strings.decryptedAndVerified)
+            
+            
         } catch {
             SVProgressHUD.showError(withStatus: error.localizedDescription)
         }
@@ -178,9 +195,13 @@ class MailPageViewController: UIPageViewController {
                     
                 }
             }
+            if(publicKeyRing == nil){
+                SVProgressHUD.showError(withStatus: Strings.publicKeyNotFound+" "+mail.from!.first!)
+                return
+            }
             let verifier=try ValidDMSPGPClearTextVerifier(cleartext: message)
             let signatureVerifier = verifier.signatureVerifier
-           
+            
             let verifyResult=signatureVerifier.verifySignature(message:verifier.message,use: publicKeyRing!.publicKeyRing)
             
             mail.htmlBody = signatureVerifier.message

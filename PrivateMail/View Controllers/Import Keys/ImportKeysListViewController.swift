@@ -44,10 +44,9 @@ class ImportKeysListViewController: UIViewController {
                         hasPublicKey = true;
                         
                         let newKey = PGPKey()
-                        let publicKey = try keyRing.publicKeyRing
-                        let armoredPublicKey = publicKey.armored()
+                      
                         newKey.isPrivate = false
-                        newKey.armoredKey = armoredPublicKey
+                        newKey.armoredKey = String(key)
                        
                         let publicKeyRing = keyRing.publicKeyRing;
                         let userIds = publicKeyRing.getPublicKey()?.getUserIDs()
@@ -92,9 +91,9 @@ class ImportKeysListViewController: UIViewController {
                          hasPrivateKey = true;
                         
                         let newKey = PGPKey()
-                        let secretKey = try keyRing.secretKeyRing
+                    
                         newKey.isPrivate = true
-                        newKey.armoredKey = (secretKey?.armored())!
+                        newKey.armoredKey = String(key)
                         
                         let publicKeyRing = keyRing.secretKeyRing;
                         let userIds = publicKeyRing?.getSecretKey()?.getUserIDs()

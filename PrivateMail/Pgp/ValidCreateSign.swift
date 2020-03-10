@@ -65,7 +65,6 @@ extension DMSPGPEncryptor {
             }
 
             literalDataOutput.write(with: messageBytes)
-            literalDataOutput.write(with: IOSByteArray(nsData: Data("\r\n".utf8)))
             signer?.signatureGenerator.update(with: messageBytes)
             literalDataOutput.close()
             signer?.signatureGenerator.generate()?.encode(with: literalDataOutput)
