@@ -24,6 +24,7 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
         hostConstraint.isActive = false
         hostView.isHidden = true
         
